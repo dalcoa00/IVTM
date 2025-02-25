@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 24-feb-2025 17:43:09 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="POJOS.Ordenanza" table="ordenanza" catalog="ivtm" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <property name="ayuntamiento" type="string">
+            <column name="ayuntamiento" length="50" not-null="true" />
+        </property>
+        <property name="tipoVehiculo" type="string">
+            <column name="tipoVehiculo" length="50" not-null="true" />
+        </property>
+        <property name="unidad" type="string">
+            <column name="unidad" length="50" not-null="true" />
+        </property>
+        <property name="minimoRango" type="string">
+            <column name="minimo_rango" length="50" not-null="true" />
+        </property>
+        <property name="maximoRango" type="string">
+            <column name="maximo_rango" length="50" not-null="true" />
+        </property>
+        <property name="importe" type="double">
+            <column name="importe" precision="22" scale="0" not-null="true" />
+        </property>
+        <set name="vehiculoses" table="vehiculos" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="idOrdenanza" not-null="true" />
+            </key>
+            <one-to-many class="POJOS.Vehiculos" />
+        </set>
+    </class>
+</hibernate-mapping>
