@@ -37,7 +37,7 @@ public class Ivtm {
 
                 //Calcular la media de los de los recibos
                 Double avg = (Double) session.createQuery("SELECT AVG(totalRecibo) FROM Recibos").uniqueResult();
-
+                System.out.println("Media: " +avg);
                 //Elimina recibos menores a la media
                 session.createQuery("DELETE FROM Recibos WHERE totalRecibo < :media").setParameter("media", avg).executeUpdate();
             }
