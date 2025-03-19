@@ -9,3 +9,6 @@ ivtm.iml
 out
 /nbproject
 /build
+nbproject/private/private.xml
+build/classes/ivtm/Ivtm.class
+nbproject/project.properties
