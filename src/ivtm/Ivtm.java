@@ -5,7 +5,39 @@ import org.hibernate.Session;
 import java.util.Scanner;
 
 public class Ivtm {
+
     public static void main(String[] args) {
+
+        /* Práctica 1 */
+        //new Ivtm().p1();
+
+        /* Práctica 2 */
+        ExcelManager manager = new ExcelManager();
+        String ruta = "resources\\SistemasVehiculos.xlsx";
+
+        //Metodo que no recibe la hoja -> Toma la primera
+        //manager.readExcel(ruta);
+
+        //Metodo que recibe el número de hoja
+        //manager.readExcel(ruta, 1); //Hoja 2
+
+        //Metodo que modifica la celda indicada con el valor especificado
+        int row = 111; //Es del final, está vacía
+        String newString;
+
+        //Crea nuevas celdas
+        //LOS NÚMEROS TAMBIÉN SON STRINGS EN LOS EXCELS?????????????
+        manager.updateExcel(row, 0, "71475583R");
+        manager.updateExcel(row, 1, "Diego");
+        manager.updateExcel(row, 5, 14);
+
+        //Modifica celdas
+        manager.updateExcel(row, 0, "Aquí va el DNI");
+        manager.updateExcel(row, 5, "14");
+    }
+
+    //Metodo de la p1 para no llenar el main de cosas que no se usan siempre
+    public void p1() {
         // Se obtiene el NIF del contribuyente
         Scanner sc = new Scanner(System.in);
         System.out.println("Ingrese el NIF del contribuyente: ");
@@ -51,7 +83,6 @@ public class Ivtm {
             session.close(); //Se cierra la sesión
             FactorySession.closeSessionFactory(); //Se cierra SessionFactory
         }
-
     }
     
 }
