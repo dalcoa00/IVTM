@@ -7,3 +7,5 @@ manifest.mf
 .idea
 ivtm.iml
 out
+/nbproject
+/build
