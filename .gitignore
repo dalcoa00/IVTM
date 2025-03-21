@@ -11,3 +11,5 @@ nbproject/private/private.xml
 build/classes/ivtm/Ivtm.class
 nbproject/project.properties
 resources/SistemasVehiculos.xlsx
+/build
+/nbproject
