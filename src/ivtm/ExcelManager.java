@@ -12,7 +12,7 @@ import java.util.Iterator;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
-
+    
     /*Lee el archivo excel indicado en la ruta que recibe y el número de hoja especificado*/
     public void readExcel(String filepath, int sheet) {
         try {
@@ -33,50 +33,18 @@ public class ExcelManager {
 
             //Iteración por las filas de la hoja
             Iterator<Row> rowIter = ws.iterator();
+            if(rowIter.hasNext()){
+                rowIter.next();
+            }
             int contador=0;
-            while (rowIter.hasNext()) {
+            while (rowIter.hasNext()&& contador <= 500) {
                 contador++;
                 Row row = rowIter.next();
-
-                //Comprueba los dni de cada fila GONZALO
-                Cell celdaComprobar= row.getCell(0);
-                if(celdaComprobar!=null){
-                    //Si las celdas no son siempre String descomentar esto
-                    String dniNie="";
-                    if(celdaComprobar.getCellType()==CellType.STRING){
-                        dniNie= celdaComprobar.getStringCellValue();
-
-                    }else if(celdaComprobar.getCellType()==CellType.NUMERIC){
-                        dniNie = String.format("%.0f", celdaComprobar.getNumericCellValue()); 
-                      
-                    }
-                    if(ValidadorNieDni.dniNie(dniNie)==1){
-                        System.out.println("Es un DNI");
-                        if(ValidadorNieDni.dniValido(dniNie,row, contador)==true){
-                            System.out.println("El campo es valido");
-                        }else{
-                            ValidadorNieDni.dniValido(dniNie,row, contador);
-                            //  Aqui hay que hacer que se escriba en el otro fichero que se encuentra en resources
-                            System.out.println("El dni no es  correcto");
-                        }
-                    }else if(ValidadorNieDni.dniNie(dniNie)==2){
-                        System.out.println("Es un Nie");
-                        if(ValidadorNieDni.nieValido(dniNie,row, contador)==true){
-                            System.out.println("El campo es valido");
-                        }else{
-                            ValidadorNieDni.dniValido(dniNie,row, contador);
-                            //Lo mismo que en el caso 1
-                            System.out.println("El nie no es  correcto");
-                        }
-
-                    }else if(ValidadorNieDni.dniNie(dniNie)==-1){
-                        //Lomissmo que en el caso 2
-                        ValidadorNieDni.dniValido(dniNie,row, contador);
-                        System.out.println("No se trata ni de un Nie ni de un DNI");
-                    }
-                }else if(celdaComprobar.getCellType()!=CellType.BLANK){
-                    
+                //Si la  fila esta vacia se las salta 
+                if(isEmpty(row)){
+                    continue;
                 }
+                //Comprueba los dni de cada fila GONZALO
 
                 Iterator<Cell> cellIter = row.cellIterator();
 
@@ -181,5 +149,18 @@ public class ExcelManager {
             e.printStackTrace();
         }
 
+    }
+    //Metodo que comprueba si una fila esta vacia o no
+    public static boolean isEmpty(Row comprobar){
+        if(comprobar==null){
+            return true;
+        }
+        for(Cell cell: comprobar){
+            if(cell.getCellType()!=CellType.BLANK &&  cell.getCellType()!=CellType._NONE){
+                return false;
+            }    
+        }
+        return true;
+    
     }
 }
