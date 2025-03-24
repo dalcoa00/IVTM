@@ -103,7 +103,10 @@ public class ExcelManager {
         }
     }
 
-
+    /*Metodo sobrecargado que lee la primera hoja si solo se indica la ruta del archivo*/
+    public void readExcel(String filepath) {
+        readExcel(filepath, 0);
+    }
 
     /*
     * Metodo que permita modificar SistemasVehiculos.xlsx
