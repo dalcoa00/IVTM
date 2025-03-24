@@ -83,6 +83,7 @@ public class ValidadorNieDni {
     //Devuelve true si el dni es correcto y 
     public static boolean dniValido(Cell celda, Row fila, int contador) {
         String dni = celda.getStringCellValue().trim();
+        //
         if(dniVacio(dni)){
             escribirContribuyentes(ruta, contador, fila.getCell(0).getStringCellValue(),fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(),"NIF BLANCO" );
 
