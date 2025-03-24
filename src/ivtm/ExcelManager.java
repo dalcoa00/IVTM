@@ -108,7 +108,7 @@ public class ExcelManager {
     /*
     * Metodo que permita modificar SistemasVehiculos.xlsx
     * Recibe la fila y la columna de la celda que se desea modificar
-    * También recibe el nuevo valor que modificará la hoja
+    * También recibe el nuevo valor que modificará la celda
     */
     public void updateExcel (int row_, int col_, Object newVal) {
         //Ruta al documento y número de hoja de los contribuyentes
@@ -133,17 +133,32 @@ public class ExcelManager {
                 cell = row.createCell(col_);
             }
 
-            //Modifica el valor de la celda dependiento de si es String o int
+            //Obtiene el tipo de dato original de la celda -> No se pueden cambiar los tipos de datos
+            Object cellType = cell.getCellType();
+            System.out.println("La celda que se quiere modificar es de tipo " + cellType);
 
-            //En los excel son todo Strings??????????????
-            if (newVal instanceof String) {
+            //Modifica el valor de la celda según el tipo de dato de la misma
+            if (cellType == CellType.STRING && newVal instanceof String) {
                 cell.setCellValue((String) newVal);
+                System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [String]");
             }
-            else if (newVal instanceof Number) {
-                cell.setCellValue(((Number) newVal).intValue());
+            else if (cellType == CellType.NUMERIC && newVal instanceof Number) {
+                cell.setCellValue(((Number) newVal).doubleValue()); // Los números en Apache POI se almacenan como double
+                System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [Number]");
             }
             else {
-                throw new IllegalArgumentException("El tipo de dato aportado no es soportado");
+                //Si la celda es de tipo BLANK (no tiene un tipo de dato establecidon)
+                if (cellType == CellType.BLANK && newVal instanceof String) {
+                    cell.setCellValue((String) newVal);
+                    System.out.println("El valor de la nueva celda creada es: " + newVal + " [String]");
+                }
+                else if (cellType == CellType.BLANK && newVal instanceof Number) {
+                    cell.setCellValue(((Number) newVal).doubleValue());
+                    System.out.println("El valor de la nueva celda creada es: " + newVal + " [Number]");
+                }
+                else {
+                    throw new IllegalArgumentException("Tipo de dato incompatible con el tipo de celda existente.");
+                }
             }
 
             //Guarda los cambios en el archivo
@@ -153,7 +168,7 @@ public class ExcelManager {
             out.close();
             wb.close();
 
-            System.out.println("El valor de la celda " + row_ + "-" + col_ +" ha sido modificado correctamente");
+            System.out.println("El valor de la celda " + row_ + "-" + col_ +" ha sido modificado correctamente\n");
 
         } catch (IOException e) {
             System.out.println("Error al modificar el archivo " + e.getMessage());

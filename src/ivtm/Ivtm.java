@@ -19,7 +19,7 @@ public class Ivtm {
         //manager.readExcel(ruta);
 
         //Metodo que recibe el número de hoja
-        manager.readExcel(ruta, 0); //Hoja 2
+        //manager.readExcel(ruta, 1); //Hoja 2
 
         //Metodo que modifica la celda indicada con el valor especificado
         int row = 111; //Es del final, está vacía
