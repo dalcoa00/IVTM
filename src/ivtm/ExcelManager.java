@@ -24,7 +24,6 @@ public class ExcelManager {
                 System.out.println("El número de hoja indicado no es válido. El archivo tiene " + wb.getNumberOfSheets() + " hojas.");
                 wb.close();
                 file.close();
-
                 return;
             }
 
@@ -34,9 +33,47 @@ public class ExcelManager {
 
             //Iteración por las filas de la hoja
             Iterator<Row> rowIter = ws.iterator();
-
+            int contador=1;
             while (rowIter.hasNext()) {
+                contador++;
                 Row row = rowIter.next();
+
+                //Comprueba los dni de cada fila GONZALO
+                Cell celdaComprobar= row.getCell(0);
+                if(celdaComprobar!=null){
+                    /*Si las celdas no son siempre String descomentar esto
+                    String dnieNie="";
+                    if(celdaComprobar.getCellType()==CellType.STRING){
+                        dnieNie= celdaComprobar.getStringCellValue();
+                    }else if(celdaComprobar.getCellType()==CellType.NUMERIC){
+                        dnieNie= String.valueOf((int) celdaComprobar.getNumericCellValue());
+                    }
+                     */
+                    if(ValidadorNieDni.dniNie(celdaComprobar)==1){
+                        System.out.println("Es un DNI");
+                        if(ValidadorNieDni.dniValido(celdaComprobar,row, contador)==true){
+                            System.out.println("El campo es valido");
+                        }else{
+                            ValidadorNieDni.dniValido(celdaComprobar,row, contador);
+                            //  Aqui hay que hacer que se escriba en el otro fichero que se encuentra en resources
+                            System.out.println("El dni no es  correcto");
+                        }
+                    }else if(ValidadorNieDni.dniNie(celdaComprobar)==2){
+                        System.out.println("Es un Nie");
+                        if(ValidadorNieDni.nieValido(celdaComprobar,row, contador)==true){
+                            System.out.println("El campo es valido");
+                        }else{
+                            ValidadorNieDni.dniValido(celdaComprobar,row, contador);
+                            //Lo mismo que en el caso 1
+                            System.out.println("El nie no es  correcto");
+                        }
+
+                    }else if(ValidadorNieDni.dniNie(celdaComprobar)==-1){
+                        //Lomissmo que en el caso 2
+                        ValidadorNieDni.dniValido(celdaComprobar,row, contador);
+                        System.out.println("No se trata ni de un Nie ni de un DNI");
+                    }
+                }
 
                 Iterator<Cell> cellIter = row.cellIterator();
 
@@ -66,10 +103,7 @@ public class ExcelManager {
         }
     }
 
-    /*Metodo sobrecargado que lee la primera hoja si solo se indica la ruta del archivo*/
-    public void readExcel(String filepath) {
-        readExcel(filepath, 0);
-    }
+
 
     /*
     * Metodo que permita modificar SistemasVehiculos.xlsx
