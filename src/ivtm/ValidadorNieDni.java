@@ -7,16 +7,23 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Iterator;
 
 
 public class ValidadorNieDni {
     private static final String ruta= "resources\\ErroresNifNie.xml";
 
     //antes de estos dos metodos  hay que comprobar si es dni o nie
-    public static int dniNie(Cell celda){
-        String comprobar= celda.getStringCellValue().trim();
-
-        if (comprobar.matches("^[XYZ][0-9]{7}[A-Z]$")) {
+    public static int dniNie(String comprobar){
+             if (comprobar.matches("^[XYZ][0-9]{7}[A-Z]$")) {
             return 2;
         }
         // Verifica si es un DNI (8 números + 1 letra)
@@ -46,8 +53,7 @@ public class ValidadorNieDni {
             return false;
         }
     }
-    public static boolean nieValido(Cell celda, Row  fila, int contador){
-        String nie =  celda.getStringCellValue().trim();
+    public static boolean nieValido(String nie, Row  fila, int contador){
         if(nieVacio(nie)){
             escribirContribuyentes(ruta, contador, fila.getCell(0).getStringCellValue(),fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(),"NIF BLANCO" );
             return false;
@@ -58,7 +64,7 @@ public class ValidadorNieDni {
         }
         String letraInicioNie= nie.substring(0, 1).toUpperCase();
         if(letraInicioNie!="X"&&letraInicioNie!="Y"&&letraInicioNie!="Z"){
-               System.out.println("El Nie no tiene el formato   correcto (letra  inicial)";
+               System.out.println("El Nie no tiene el formato   correcto (letra  inicial)");
                escribirContribuyentes(ruta, contador, fila.getCell(0).getStringCellValue(),fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(),"NIF ERRONEO" );
                return false;
         }
@@ -70,7 +76,7 @@ public class ValidadorNieDni {
         }
         char nieLetra= nie.charAt(8);
         if(nieLetra!=letraCorrectaNie(letraInicioNie,nieNumero)){
-            celda.setCellValue(letraInicioNie+nieNumero+letraCorrectaNie(letraInicioNie,nieNumero));
+            ExcelManager.updateExcel(contador,0, letraInicioNie+nieNumero+letraCorrectaNie(letraInicioNie,nieNumero));
             System.out.println("El nie tenia el formato correcto pero la letra no coincidia, se ha modificado la letra");
         }
         //Comprueba que la letra sea correcta
@@ -81,15 +87,23 @@ public class ValidadorNieDni {
 
 
     //Devuelve true si el dni es correcto y 
-    public static boolean dniValido(Cell celda, Row fila, int contador) {
-        String dni = celda.getStringCellValue().trim();
+    public static boolean dniValido(String dni, Row fila, int contador) {
         //
         if(dniVacio(dni)){
             escribirContribuyentes(ruta, contador, fila.getCell(0).getStringCellValue(),fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(),"NIF BLANCO" );
 
             return false;
         }
-        if(dni.length()!=9){
+        if(dni.length()>9||dni.length()<8){
+            if(fila.getCell(0).getCellType()==CellType.NUMERIC){
+                String aux = String.format("%.0f", fila.getCell(0).getNumericCellValue()); 
+
+            
+            //ESTA LINEA PUEDE DAR PROBLEMAS EN UN FUTURO MUCHO CUIDADO
+            
+                escribirContribuyentes(ruta, contador, aux, fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(),"NIF ERRONEO" );
+            return false;
+            }
             escribirContribuyentes(ruta, contador, fila.getCell(0).getStringCellValue(),fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(),"NIF ERRONEO" );
             return false;
         }
@@ -111,7 +125,7 @@ public class ValidadorNieDni {
         }
         if(dniLetra!=letraCorrecta(dniNumero)){
             //Se corrige la celdacon la letra correcta----Comprobar si lo  actualiza directamente en el excel 
-            celda.setCellValue(dniNumero+letraCorrecta(dniNumero));
+            ExcelManager.updateExcel(contador,0,dniNumero+letraCorrecta(dniNumero));
             System.out.println("El dni tenia el formato correcto pero la letra no coincidia, se ha modificado la letra");
             return false;
         }
