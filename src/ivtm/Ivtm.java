@@ -69,30 +69,10 @@ public class Ivtm {
 
     public void p2() {
         ExcelManager manager = new ExcelManager();
-        ValidadorNieDni validadorDniNie= new ValidadorNieDni();
         String ruta = "resources\\SistemasVehiculos.xlsx";
 
-        //Metodo que no recibe la hoja -> Toma la primera
+        //Metodo que lee el documento, comprueba DNIs y actualiza de ser necesario
         manager.readExcel(ruta);
-        //Metodo que corrige los dni y comprueba si existen duplicados
-
-        validadorDniNie.validarExcelDni(ruta,0);
-        //Metodo que recibe el número de hoja
-        //manager.readExcel(ruta, 1); //Hoja 2
-
-        //Metodo que modifica la celda indicada con el valor especificado
-        int row = 111; //Es del final, está vacía
-        String newString;
-
-        //Crea nuevas celdas
-        //LOS NÚMEROS TAMBIÉN SON STRINGS EN LOS EXCELS?????????????
-        //manager.updateExcel(row, 0, "71475583R");
-        //manager.updateExcel(row, 1, "Diego");
-        //manager.updateExcel(row, 5, 14);
-
-        //Modifica celdas
-        //manager.updateExcel(row, 0, "Aquí va el DNI");
-        //manager.updateExcel(row, 5, "14");
     }
 
 

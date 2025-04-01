@@ -13,7 +13,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
 public class EditorXML {
-    public static void xmlDniNie(String rutaArchivo, int id, String nifNie, String nombre, String primerApellido, String segundoApellido, String tipoDeError){
+    public void xmlDniNie(String rutaArchivo, int id, String nifNie, String nombre, String primerApellido, String segundoApellido, String tipoDeError){
         try{
             File xmlFile= new File(rutaArchivo);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -57,7 +57,7 @@ public class EditorXML {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "2");
 
             DOMSource source = new DOMSource(doc);
             StreamResult result = new StreamResult(new File(rutaArchivo));

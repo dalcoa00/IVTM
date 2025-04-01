@@ -18,12 +18,16 @@ public class ExcelManager {
         try {
             FileInputStream file = new FileInputStream(new File(filepath));
             XSSFWorkbook wb = new XSSFWorkbook(file);
+            file.close(); //No es necesario mantenerlo abierto
+
+            ValidadorNieDni validador = new ValidadorNieDni();
 
             //Verifica que el índice de la hoja sea correcto
             if (sheet < 0 || sheet >= wb.getNumberOfSheets()) {
                 System.out.println("El número de hoja indicado no es válido. El archivo tiene " + wb.getNumberOfSheets() + " hojas.");
                 wb.close();
                 file.close();
+
                 return;
             }
 
@@ -33,37 +37,53 @@ public class ExcelManager {
 
             //Iteración por las filas de la hoja
             Iterator<Row> rowIter = ws.iterator();
+
+            //Para empezar en la fila 1
             if(rowIter.hasNext()){
                 rowIter.next();
             }
-            int contador=0;
-            while (rowIter.hasNext()&& contador <= 500) {
-                contador++;
+            
+            //El contador no es necesario, lee bien todas las filas
+            while (rowIter.hasNext()) {
                 Row row = rowIter.next();
-                //Si la  fila esta vacia se las salta 
+
+                //Si la  fila esta vacia se las salta
                 if(isEmpty(row)){
+                    System.out.println("Fila sin datos\n");
+
                     continue;
                 }
-                //Comprueba los dni de cada fila GONZALO
 
                 Iterator<Cell> cellIter = row.cellIterator();
+                //Celda del dni que se comprobará
+                Cell dniCell = null;
 
                 while (cellIter.hasNext()) {
                     Cell cell = cellIter.next();
 
-                    //Imprime los valores de cada celda --> DEPURACIÓN, se puede comentar más tarde.
+                    //Imprime los valores de cada celda independientemente del documento y la hora
+                    //DEPURACIÓN, se puede comentar más tarde.
                     if (cell.getCellType() == CellType.NUMERIC) {
                         System.out.print((int) cell.getNumericCellValue() + "\t");
                     }
                     else if (cell.getCellType() == CellType.STRING) {
                         System.out.print(cell.getStringCellValue() + "\t");
                     }
+
+                    if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 0) {
+                        dniCell = cell;
+                    }
                 }
-                System.out.println();
+
+                System.out.println("");
+
+                //Si es SistemasVehiculos.xlsx, hoja 0 y columna 0 -> Comprueba DNIs/NIEs
+                if (dniCell != null) {
+                    validador.validaDNI(dniCell, filepath, row, row.getRowNum(), wb);
+                }
             }
 
             wb.close();
-            file.close();
 
             System.out.println("\nSe ha completado la lectura del archivo\n");
 
@@ -80,25 +100,18 @@ public class ExcelManager {
     }
 
     /*
-    * Metodo que permita modificar SistemasVehiculos.xlsx
-    * Recibe la fila y la columna de la celda que se desea modificar
+    * Metodo que permite modificar el libro que se está leyendo con la ruta pasada como parámetro
+    * Recibe la fila y la columna de la hoja que se desea modificar
     * También recibe el nuevo valor que modificará la celda
     */
-    public static void updateExcel (int row_, int col_, Object newVal) {
-        //Ruta al documento y número de hoja de los contribuyentes
-        String filepath = "resources\\SistemasVehiculos.xlsx";
-
+    public void updateExcel (XSSFWorkbook wb, String filepath, int sheet, int row_, int col_, Object newVal) {
         try {
-            FileInputStream file = new FileInputStream(new File(filepath));
-            XSSFWorkbook wb = new XSSFWorkbook(file);
-            file.close(); //No es necesario mantener abierto el stream de lectura
-
-            Sheet sheet = wb.getSheetAt(0); //Index 0 -> Hoja 1 -> Contribuyentes
+            Sheet hojaModif = wb.getSheetAt(sheet); //Index 0 -> Hoja 1 -> Contribuyentes
 
             //Obtiene la fila, o la crea si no existe
-            Row row = sheet.getRow(row_);
+            Row row = hojaModif.getRow(row_);
             if (row == null) {
-                row = sheet.createRow(row_);
+                row = hojaModif.createRow(row_);
             }
 
             //Obtiene la celda, o la crea si no existe
@@ -112,6 +125,14 @@ public class ExcelManager {
             System.out.println("La celda que se quiere modificar es de tipo " + cellType);
 
             //Modifica el valor de la celda según el tipo de dato de la misma
+            /*
+            * Comprobar si celda tipo String y el valor es número y
+            * si la celda es numeric y el valor String
+            *
+            * HAY QUE HACER LA CONVERSIÓN -> El número sin décimales como en ValidadorNieDni
+            * dniNie = String.format("%.0f", celdaComprobar.getNumericCellValue());
+            *
+            * */
             if (cellType == CellType.STRING && newVal instanceof String) {
                 cell.setCellValue((String) newVal);
                 System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [String]");
@@ -138,9 +159,7 @@ public class ExcelManager {
             //Guarda los cambios en el archivo
             FileOutputStream out = new FileOutputStream(filepath);
             wb.write(out);
-
             out.close();
-            wb.close();
 
             System.out.println("El valor de la celda " + row_ + "-" + col_ +" ha sido modificado correctamente\n");
 
@@ -150,16 +169,21 @@ public class ExcelManager {
         }
 
     }
+
     //Metodo que comprueba si una fila esta vacia o no
     public static boolean isEmpty(Row comprobar){
-        if(comprobar==null){
+        if (comprobar == null){
+
             return true;
         }
+
         for(Cell cell: comprobar){
-            if(cell.getCellType()!=CellType.BLANK &&  cell.getCellType()!=CellType._NONE){
+            if (cell.getCellType() != CellType.BLANK && cell.getCellType() != CellType._NONE){
+
                 return false;
             }    
         }
+
         return true;
     
     }
