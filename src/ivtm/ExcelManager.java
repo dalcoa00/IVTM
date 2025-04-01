@@ -4,7 +4,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,7 +15,7 @@ public class ExcelManager {
     /*Lee el archivo excel indicado en la ruta que recibe y el número de hoja especificado*/
     public void readExcel(String filepath, int sheet) {
         try {
-            FileInputStream file = new FileInputStream(new File(filepath));
+            FileInputStream file = new FileInputStream(filepath);
             XSSFWorkbook wb = new XSSFWorkbook(file);
             file.close(); //No es necesario mantenerlo abierto
 
@@ -75,7 +74,7 @@ public class ExcelManager {
                     }
                 }
 
-                System.out.println("");
+                System.out.println();
 
                 //Si es SistemasVehiculos.xlsx, hoja 0 y columna 0 -> Comprueba DNIs/NIEs
                 if (dniCell != null) {
