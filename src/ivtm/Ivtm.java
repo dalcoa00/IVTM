@@ -69,10 +69,10 @@ public class Ivtm {
 
     public void p2() {
         ExcelManager manager = new ExcelManager();
-        String ruta = "resources\\SistemasVehiculos.xlsx";
+        String rutaVehiculos = "resources\\SistemasVehiculos.xlsx";
 
         //Metodo que lee el documento, comprueba DNIs y actualiza de ser necesario
-        manager.readExcel(ruta);
+        manager.readExcel(rutaVehiculos);
     }
 
 

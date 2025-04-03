@@ -28,4 +28,11 @@
 <SegundoApellido>Prieto</SegundoApellido>
 <TipoDeError>NIF BLANCO</TipoDeError>
 </Contribuyente>
+<Contribuyente id="13">
+<NIF_NIE>09699481J</NIF_NIE>
+<Nombre>Armando</Nombre>
+<PrimerApellido>Garcia</PrimerApellido>
+<SegundoApellido>Prieto</SegundoApellido>
+<TipoDeError>NIF DUPLICADO</TipoDeError>
+</Contribuyente>
 </Contribuyentes>

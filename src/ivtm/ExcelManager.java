@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.HashSet;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
@@ -41,6 +42,11 @@ public class ExcelManager {
             if(rowIter.hasNext()){
                 rowIter.next();
             }
+
+            //DEPURACION
+            int dniLeidos = 0;
+
+            HashSet<String> dniSet = new HashSet<>();
             
             //El contador no es necesario, lee bien todas las filas
             while (rowIter.hasNext()) {
@@ -60,8 +66,6 @@ public class ExcelManager {
                 while (cellIter.hasNext()) {
                     Cell cell = cellIter.next();
 
-                    //Imprime los valores de cada celda independientemente del documento y la hora
-                    //DEPURACIÓN, se puede comentar más tarde.
                     if (cell.getCellType() == CellType.NUMERIC) {
                         System.out.print((int) cell.getNumericCellValue() + "\t");
                     }
@@ -78,13 +82,23 @@ public class ExcelManager {
 
                 //Si es SistemasVehiculos.xlsx, hoja 0 y columna 0 -> Comprueba DNIs/NIEs
                 if (dniCell != null) {
-                    validador.validaDNI(dniCell, filepath, row, row.getRowNum(), wb);
+                    dniLeidos++;
+                    validador.validaDNI(dniCell, filepath, row, row.getRowNum(), wb, dniSet);
                 }
             }
 
             wb.close();
 
             System.out.println("\nSe ha completado la lectura del archivo\n");
+
+            //DEPURACION
+            System.out.println("Número de DNIs leídos: " + dniLeidos);
+            System.out.println("Número de elementos almacenados en dniSet: " + dniSet.size());
+
+            //Despues de leer el documento, vació el HashSet para no consumir memoria
+            dniSet.clear();
+            //Si no se va a utilizar, se puede eliminar la referencia
+            dniSet = null;
 
         }
         catch (IOException e) {
