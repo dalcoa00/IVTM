@@ -39,15 +39,6 @@ public class ValidadorNieDni {
             dniValido(dniNie, wb, ruta, row, numFila, dniSet);
             System.out.println("No se trata ni de un Nie ni de un DNI\n");
         }
-
-        //Devuelve falso si ya esta añadido
-        /*if (celdaComprobar.getCellType() != CellType.BLANK){
-            if(!dniSet.add(dniNie)){ //Daría falso porque en HashSet no puede haber valores duplicados
-                System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe de esta duplicado! ***************\n");
-                editor.xmlDniNie(rutaXML, numFila, row.getCell(0).getStringCellValue(), row.getCell(3).getStringCellValue(), row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), "NIF DUPLICADO");
-                System.out.println("El dni esta repetido");
-            }
-        }*/
     }
 
     //Metodo que comprueba si es dni o nie, dni=1, nie=2 ninguno -1

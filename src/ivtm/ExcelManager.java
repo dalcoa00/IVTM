@@ -151,7 +151,15 @@ public class ExcelManager {
                 System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [String]");
             }
             else if (cellType == CellType.NUMERIC && newVal instanceof Number) {
-                cell.setCellValue(((Number) newVal).doubleValue()); // Los números en Apache POI se almacenan como double
+                cell.setCellValue(((Number) newVal).longValue()); // Los números en Apache POI se almacenan como double
+                System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [Number]");
+            }
+            else if (cellType == CellType.STRING && newVal instanceof Number) {
+                cell.setCellValue(String.format("%.0f", ((Number) newVal).doubleValue())); // Los números en Apache POI se almacenan como double
+                System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [Number]");
+            }
+            else if (cellType == CellType.NUMERIC && newVal instanceof String) {
+                cell.setCellValue(Double.parseDouble((String) newVal)); // Los números en Apache POI se almacenan como double
                 System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [Number]");
             }
             else {
@@ -161,7 +169,7 @@ public class ExcelManager {
                     System.out.println("El valor de la nueva celda creada es: " + newVal + " [String]");
                 }
                 else if (cellType == CellType.BLANK && newVal instanceof Number) {
-                    cell.setCellValue(((Number) newVal).doubleValue());
+                    cell.setCellValue(((Number) newVal).longValue());
                     System.out.println("El valor de la nueva celda creada es: " + newVal + " [Number]");
                 }
                 else {
