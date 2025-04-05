@@ -138,14 +138,6 @@ public class ExcelManager {
             System.out.println("La celda que se quiere modificar es de tipo " + cellType);
 
             //Modifica el valor de la celda según el tipo de dato de la misma
-            /*
-            * Comprobar si celda tipo String y el valor es número y
-            * si la celda es numeric y el valor String
-            *
-            * HAY QUE HACER LA CONVERSIÓN -> El número sin décimales como en ValidadorNieDni
-            * dniNie = String.format("%.0f", celdaComprobar.getNumericCellValue());
-            *
-            * */
             if (cellType == CellType.STRING && newVal instanceof String) {
                 cell.setCellValue((String) newVal);
                 System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [String]");
@@ -163,7 +155,7 @@ public class ExcelManager {
                 System.out.println("El nuevo valor de la celda tras modificarse es: " + newVal + " [Number]");
             }
             else {
-                //Si la celda es de tipo BLANK (no tiene un tipo de dato establecidon)
+                //Si la celda es de tipo BLANK
                 if (cellType == CellType.BLANK && newVal instanceof String) {
                     cell.setCellValue((String) newVal);
                     System.out.println("El valor de la nueva celda creada es: " + newVal + " [String]");

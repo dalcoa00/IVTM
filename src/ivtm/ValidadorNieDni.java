@@ -10,7 +10,6 @@ public class ValidadorNieDni {
     private final String rutaXML = "resources\\ErroresNifNie.xml";
 
     public void validaDNI(Cell celdaComprobar, String ruta, Row row, int numFila, XSSFWorkbook wb, HashSet<String> dniSet) {
-        //HashSet<String> dniSet = new HashSet<>();
         String dniNie = "";
 
         if (celdaComprobar.getCellType() == CellType.STRING) {
@@ -20,14 +19,14 @@ public class ValidadorNieDni {
             dniNie = String.format("%.0f", celdaComprobar.getNumericCellValue());
         }
 
-        if(dniNie(dniNie)==1){
+        if (dniNie(dniNie) == 1){
             System.out.println("Es un DNI");
 
             if (!dniValido(dniNie, wb, ruta, row, numFila, dniSet)){
                 System.out.println("El campo no es valido\n");
             }
         }
-        else if(dniNie(dniNie)==2){
+        else if (dniNie(dniNie) == 2){
             System.out.println("Es un Nie");
 
             if (!nieValido(dniNie, wb, ruta, row, numFila, dniSet)){

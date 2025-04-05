@@ -13,9 +13,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
 public class EditorXML {
-    public void xmlDniNie(String rutaArchivo, int id, String nifNie, String nombre, String primerApellido, String segundoApellido, String tipoDeError){
-        try{
-            File xmlFile= new File(rutaArchivo);
+    public void xmlDniNie(String rutaArchivo, int id, String nifNie, String nombre, String primerApellido, String segundoApellido, String tipoDeError) {
+        try {
+            File xmlFile = new File(rutaArchivo);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(xmlFile);
