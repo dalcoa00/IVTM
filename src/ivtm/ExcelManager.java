@@ -21,7 +21,7 @@ public class ExcelManager {
             file.close(); //No es necesario mantenerlo abierto
 
             ValidadorNieDni validador = new ValidadorNieDni();
-
+            ValidadorCCC validadorCCC= new ValidadorCCC();
             //Verifica que el índice de la hoja sea correcto
             if (sheet < 0 || sheet >= wb.getNumberOfSheets()) {
                 System.out.println("El número de hoja indicado no es válido. El archivo tiene " + wb.getNumberOfSheets() + " hojas.");
@@ -45,9 +45,9 @@ public class ExcelManager {
 
             //DEPURACION
             int dniLeidos = 0;
-
+            int correosGenerados=0;
             HashSet<String> dniSet = new HashSet<>();
-            
+            HashSet<String> correoSet = new HashSet<>();
             //El contador no es necesario, lee bien todas las filas
             while (rowIter.hasNext()) {
                 Row row = rowIter.next();
@@ -62,7 +62,6 @@ public class ExcelManager {
                 Iterator<Cell> cellIter = row.cellIterator();
                 //Celda del dni que se comprobará
                 Cell dniCell = null;
-
                 while (cellIter.hasNext()) {
                     Cell cell = cellIter.next();
 
@@ -83,7 +82,19 @@ public class ExcelManager {
                 //Si es SistemasVehiculos.xlsx, hoja 0 y columna 0 -> Comprueba DNIs/NIEs
                 if (dniCell != null) {
                     dniLeidos++;
-                    validador.validaDNI(dniCell, filepath, row, row.getRowNum(), wb, dniSet);
+                    validador.validaDNI(dniCell, filepath, row, row.getRowNum()+1, wb, dniSet);
+                if (dniCell.getCellType() == CellType.NUMERIC) {
+                    String aux = String.format("%.0f", dniCell.getNumericCellValue());
+                    if(validador.dniValido(aux)||validador.nieValido(aux)){
+                        validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
+                        correosGenerados++;
+                    }
+                }else{
+                    if(validador.dniValido(dniCell.getStringCellValue())||validador.nieValido(dniCell.getStringCellValue())){
+                        validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
+                        correosGenerados++;
+                    }
+                }
                 }
             }
 
@@ -94,11 +105,14 @@ public class ExcelManager {
             //DEPURACION
             System.out.println("Número de DNIs leídos: " + dniLeidos);
             System.out.println("Número de elementos almacenados en dniSet: " + dniSet.size());
-
+            System.out.println("Número de correos generados: " +correosGenerados);
+            System.out.println("Número de elementos almacenados en el correoSet: " +correoSet.size());
             //Despues de leer el documento, vació el HashSet para no consumir memoria
             dniSet.clear();
+            correoSet.clear();
             //Si no se va a utilizar, se puede eliminar la referencia
             dniSet = null;
+            correoSet= null;
 
         }
         catch (IOException e) {
