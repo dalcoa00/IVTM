@@ -47,6 +47,7 @@ public class ExcelManager {
             int dniLeidos = 0;
             int correosGenerados=0;
             HashSet<String> dniSet = new HashSet<>();
+            HashSet<String> cccSet = new HashSet<>();
             HashSet<String> correoSet = new HashSet<>();
             //El contador no es necesario, lee bien todas las filas
             while (rowIter.hasNext()) {
@@ -83,18 +84,24 @@ public class ExcelManager {
                 if (dniCell != null) {
                     dniLeidos++;
                     validador.validaDNI(dniCell, filepath, row, row.getRowNum()+1, wb, dniSet);
-                if (dniCell.getCellType() == CellType.NUMERIC) {
-                    String aux = String.format("%.0f", dniCell.getNumericCellValue());
-                    if(validador.dniValido(aux)||validador.nieValido(aux)){
-                        validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
-                        correosGenerados++;
+
+                    //Dentro del if-else también se llama a la función que genera el IBAN -> validadorCCC.generaIBAN
+                    if (dniCell.getCellType() == CellType.NUMERIC) {
+                        String aux = String.format("%.0f", dniCell.getNumericCellValue());
+                        if(validador.dniValido(aux)||validador.nieValido(aux)){
+                            validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
+                            correosGenerados++;
+
+                            //validadorCCC.generaIBAN
+                        }
+                    } else {
+                        if(validador.dniValido(dniCell.getStringCellValue())||validador.nieValido(dniCell.getStringCellValue())){
+                            validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
+                            correosGenerados++;
+
+                            //validadorCCC.generaIBAN
+                        }
                     }
-                }else{
-                    if(validador.dniValido(dniCell.getStringCellValue())||validador.nieValido(dniCell.getStringCellValue())){
-                        validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
-                        correosGenerados++;
-                    }
-                }
                 }
             }
 
