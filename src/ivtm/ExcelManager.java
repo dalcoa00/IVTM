@@ -4,6 +4,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javafx.scene.control.Cell;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -83,25 +85,30 @@ public class ExcelManager {
                 //Si es SistemasVehiculos.xlsx, hoja 0 y columna 0 -> Comprueba DNIs/NIEs
                 if (dniCell != null) {
                     dniLeidos++;
+                    System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                     validador.validaDNI(dniCell, filepath, row, row.getRowNum()+1, wb, dniSet);
+                    validadorCCC.comprobarCCC(row,wb,filepath,sheet, cccSet);
 
                     //Dentro del if-else también se llama a la función que genera el IBAN -> validadorCCC.generaIBAN
                     if (dniCell.getCellType() == CellType.NUMERIC) {
                         String aux = String.format("%.0f", dniCell.getNumericCellValue());
-                        if(validador.dniValido(aux)||validador.nieValido(aux)){
+                        String cccComprobar= row.getCell(9).getStringCellValue();
+                        
+                        if(dniSet.contains(aux)&&cccSet.contains(cccComprobar)){
                             validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
                             correosGenerados++;
 
-                            //validadorCCC.generaIBAN
+                            validadorCCC.generaIBAN(wb, filepath, sheet, row, aux, cccComprobar, dniSet, cccSet);
                         }
-                    } else {
-                        if(validador.dniValido(dniCell.getStringCellValue())||validador.nieValido(dniCell.getStringCellValue())){
+                    } else if(dniCell.getCellType()==CellType.STRING) {
+                        if(dniSet.contains(dniCell.getStringCellValue())&& cccSet.contains(row.getCell(9).getStringCellValue())){
                             validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
                             correosGenerados++;
 
-                            //validadorCCC.generaIBAN
+                            validadorCCC.generaIBAN(wb, filepath, sheet, row, aux, cccComprobar, dniSet, cccSet);
                         }
                     }
+                    System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                 }
             }
 

@@ -14,7 +14,7 @@ public class Ivtm {
         //ivtm.p1();
 
         /* Práctica 2 */
-        ivtm.p2();
+        ivtm.validateNUpdate();
 
     }
 
@@ -67,7 +67,7 @@ public class Ivtm {
         }
     }
 
-    public void p2() {
+    public void validateNUpdate() {
         ExcelManager manager = new ExcelManager();
         String rutaVehiculos = "resources\\SistemasVehiculos.xlsx";
 
