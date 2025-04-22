@@ -104,12 +104,14 @@ public class EditorXML {
             Element cccError = doc.createElement("CCCErroneo");
             cccError.appendChild(doc.createTextNode(cccErroneo));
             cuentaElement.appendChild(cccError);
+
             //Hay  dos tipos de fichero: tipo de error e ibanCorrecto
-            if(ibanCorrecto==null) {
+            if (ibanCorrecto.isEmpty()) {
                 Element tipoErrorElement = doc.createElement("TipoDeError");
                 tipoErrorElement.appendChild(doc.createTextNode(tipoDeError));
                 cuentaElement.appendChild(tipoErrorElement);
-            }else if(tipoDeError==null) {
+            }
+            else if (tipoDeError.isEmpty()) {
                 Element ibancorrecto = doc.createElement("IBANCorrecto");
                 ibancorrecto.appendChild(doc.createTextNode(ibanCorrecto));
                 cuentaElement.appendChild(ibancorrecto);

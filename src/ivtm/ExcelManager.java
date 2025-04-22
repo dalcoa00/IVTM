@@ -4,8 +4,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import javafx.scene.control.Cell;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,7 +12,7 @@ import java.util.HashSet;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
-    
+
     /*Lee el archivo excel indicado en la ruta que recibe y el número de hoja especificado*/
     public void readExcel(String filepath, int sheet) {
         try {
@@ -63,8 +61,11 @@ public class ExcelManager {
                 }
 
                 Iterator<Cell> cellIter = row.cellIterator();
-                //Celda del dni que se comprobará
+
+                //Celdas que se comprobarán
                 Cell dniCell = null;
+                Cell cccCell = null;
+
                 while (cellIter.hasNext()) {
                     Cell cell = cellIter.next();
 
@@ -78,38 +79,26 @@ public class ExcelManager {
                     if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 0) {
                         dniCell = cell;
                     }
+
+                    if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 9) {
+                        cccCell = cell;
+                    }
                 }
 
                 System.out.println();
 
-                //Si es SistemasVehiculos.xlsx, hoja 0 y columna 0 -> Comprueba DNIs/NIEs
+                //Valida el DNI/NIE si la celda 0 es no nula
                 if (dniCell != null) {
                     dniLeidos++;
-                    System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-                    validador.validaDNI(dniCell, filepath, row, row.getRowNum()+1, wb, dniSet);
-                    validadorCCC.comprobarCCC(row,wb,filepath,sheet, cccSet);
-
-                    //Dentro del if-else también se llama a la función que genera el IBAN -> validadorCCC.generaIBAN
-                    if (dniCell.getCellType() == CellType.NUMERIC) {
-                        String aux = String.format("%.0f", dniCell.getNumericCellValue());
-                        String cccComprobar= row.getCell(9).getStringCellValue();
-                        
-                        if(dniSet.contains(aux)&&cccSet.contains(cccComprobar)){
-                            validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
-                            correosGenerados++;
-
-                            validadorCCC.generaIBAN(wb, filepath, sheet, row, aux, cccComprobar, dniSet, cccSet);
-                        }
-                    } else if(dniCell.getCellType()==CellType.STRING) {
-                        if(dniSet.contains(dniCell.getStringCellValue())&& cccSet.contains(row.getCell(9).getStringCellValue())){
-                            validadorCCC.generacionEmail(row,correoSet,wb,filepath,sheet);
-                            correosGenerados++;
-
-                            validadorCCC.generaIBAN(wb, filepath, sheet, row, aux, cccComprobar, dniSet, cccSet);
-                        }
-                    }
-                    System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+                    validador.validaDNI(dniCell, filepath, row, row.getRowNum() + 1, wb, dniSet);
                 }
+
+                //Valida el CCC si la celda 9 es no nula
+                //Genera IBAN y correo si NIF/NIE y CCC correctos o subsanados
+                if (cccCell != null) {
+                    validadorCCC.comprobarCCC(row, wb, filepath, sheet, cccSet, dniSet, correoSet, dniCell, cccCell);
+                }
+
             }
 
             wb.close();
@@ -123,9 +112,12 @@ public class ExcelManager {
             System.out.println("Número de elementos almacenados en el correoSet: " +correoSet.size());
             //Despues de leer el documento, vació el HashSet para no consumir memoria
             dniSet.clear();
+            cccSet.clear();
             correoSet.clear();
+
             //Si no se va a utilizar, se puede eliminar la referencia
             dniSet = null;
+            cccSet = null;
             correoSet= null;
 
         }
@@ -222,10 +214,10 @@ public class ExcelManager {
             if (cell.getCellType() != CellType.BLANK && cell.getCellType() != CellType._NONE){
 
                 return false;
-            }    
+            }
         }
 
         return true;
-    
+
     }
 }

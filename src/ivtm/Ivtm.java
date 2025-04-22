@@ -67,6 +67,7 @@ public class Ivtm {
         }
     }
 
+    //Prácticas 2 y 3
     public void validateNUpdate() {
         ExcelManager manager = new ExcelManager();
         String rutaVehiculos = "resources\\SistemasVehiculos.xlsx";

@@ -14,26 +14,23 @@ public class ValidadorNieDni {
 
         if (celdaComprobar.getCellType() == CellType.STRING) {
             dniNie = celdaComprobar.getStringCellValue();
-        }
-        else if (celdaComprobar.getCellType() == CellType.NUMERIC) {
+        } else if (celdaComprobar.getCellType() == CellType.NUMERIC) {
             dniNie = String.format("%.0f", celdaComprobar.getNumericCellValue());
         }
 
-        if (dniNie(dniNie) == 1){
+        if (dniNie(dniNie) == 1) {
             System.out.println("Es un DNI");
 
-            if (!dniValido(dniNie, wb, ruta, row, numFila, dniSet)){
+            if (!dniValido(dniNie, wb, ruta, row, numFila, dniSet)) {
                 System.out.println("El campo no es valido\n");
             }
-        }
-        else if (dniNie(dniNie) == 2){
+        } else if (dniNie(dniNie) == 2) {
             System.out.println("Es un Nie");
 
-            if (!nieValido(dniNie, wb, ruta, row, numFila, dniSet)){
+            if (!nieValido(dniNie, wb, ruta, row, numFila, dniSet)) {
                 System.out.println("El campo es valido\n");
             }
-        }
-        else if (dniNie(dniNie) == -1){
+        } else if (dniNie(dniNie) == -1) {
             //Lo mismo que en el caso 2
             dniValido(dniNie, wb, ruta, row, numFila, dniSet);
             System.out.println("No se trata ni de un Nie ni de un DNI\n");
@@ -59,8 +56,7 @@ public class ValidadorNieDni {
             System.out.println("El campo del dni se encuentra vacio");
 
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -71,8 +67,7 @@ public class ValidadorNieDni {
             System.out.println("El campo del Nie se encuentra vacio");
 
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -80,61 +75,68 @@ public class ValidadorNieDni {
     //Metodo que comprueba si el nie es valido o no devolviendo true o false, tambien actualiza letra
     public boolean nieValido(String nie, XSSFWorkbook wb, String ruta, Row fila, int contador, HashSet<String> dniSet) {
         if (nieVacio(nie)) {
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF BLANCO");
-
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF BLANCO");
             return false;
         }
 
         if (nie.length() != 9) {
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
-
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
             return false;
         }
 
         String letraInicioNie = nie.substring(0, 1).toUpperCase();
-
         if (!letraInicioNie.equals("X") && !letraInicioNie.equals("Y") && !letraInicioNie.equals("Z")) {
-            System.out.println("El Nie no tiene el formato   correcto (letra  inicial)");
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
-
+            System.out.println("El NIE no tiene el formato correcto (letra inicial)");
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
             return false;
         }
 
         String nieNumero = nie.substring(1, 8);
-
         if (!nieNumero.matches("\\d{7}")) {
-            System.out.println("El Nie no tiene el formato correcto (numero)");
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
-
+            System.out.println("El NIE no tiene el formato correcto (número)");
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
             return false;
         }
 
         char nieLetra = nie.charAt(8);
+        char letraCorrecta = letraCorrectaNie(letraInicioNie, nieNumero);
+        if (nieLetra != letraCorrecta) {
+            String nieSubsanado = letraInicioNie + nieNumero + letraCorrecta;
 
-        if (nieLetra != letraCorrectaNie(letraInicioNie, nieNumero)) {
-            String nieSubsanado = letraInicioNie + nieNumero + letraCorrectaNie(letraInicioNie, nieNumero);
-            
+            System.out.println("El NIE tenía el formato correcto pero la letra no coincidía, se ha modificado la letra");
 
-            System.out.println("El nie tenia el formato correcto pero la letra no coincidia, se ha modificado la letra");
-
-            //Añado el NIE subsanado al set, si falso -> duplicado
-            if(!dniSet.add(nieSubsanado)){ //Daría falso porque en HashSet no puede haber valores duplicados
-                System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe de esta duplicado! ***************\n");
-                editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
-                System.out.println("El dni esta repetido");
-                return false;
-            }else{
-                manager.updateExcel(wb, ruta, 0, contador, 0, nieSubsanado);
+            // Actualiza en el Excel y en memoria (celda)
+            if (!dniSet.contains(nieSubsanado)) {
+                manager.updateExcel(wb, ruta, 0, contador - 1, 0, nieSubsanado);
+                fila.getCell(0).setCellValue(nieSubsanado);  // <-- importante para coherencia
             }
+            if (!dniSet.add(nieSubsanado)) {
+                System.out.println("\n***************NIE no se ha podido añadir al SET -- Debe estar duplicado! ***************\n");
+                editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                        fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                        fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
+                return false;
+            }
+
+            return true;
         }
 
-        System.out.println("El nie es correcto");
+        System.out.println("El NIE es correcto");
 
-        //Añado el NIE subsanado al set, si falso -> duplicado
-        if(!dniSet.add(nie)){ //Daría falso porque en HashSet no puede haber valores duplicados
-            System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe de esta duplicado! ***************\n");
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
-            System.out.println("El dni esta repetido");
+        if (!dniSet.add(nie)) {
+            System.out.println("\n***************NIE no se ha podido añadir al SET -- Debe estar duplicado! ***************\n");
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
+            return false;
         }
 
         return true;
@@ -142,74 +144,74 @@ public class ValidadorNieDni {
 
     //Metodo que  comprueba si el dni es valido o no devolviendo true o false, tambien actualiza letra
     public boolean dniValido(String dni, XSSFWorkbook wb, String ruta, Row fila, int contador, HashSet<String> dniSet) {
-        //
-        if (dniVacio(dni)) {
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF BLANCO");
+        Sheet hoja = wb.getSheetAt(0);
 
+        if (dniVacio(dni)) {
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF BLANCO");
             return false;
         }
 
         if (dni.length() > 9 || dni.length() < 8) {
-            if (fila.getCell(0).getCellType() == CellType.NUMERIC) {
-                String aux = String.format("%.0f", fila.getCell(0).getNumericCellValue());
+            String aux = fila.getCell(0).getCellType() == CellType.NUMERIC
+                    ? String.format("%.0f", fila.getCell(0).getNumericCellValue())
+                    : fila.getCell(0).getStringCellValue();
 
-                //ESTA LINEA PUEDE DAR PROBLEMAS EN UN FUTURO MUCHO CUIDADO
-                editor.xmlDniNie(rutaXML, contador, aux, fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
-
-                return false;
-            }
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
-
+            editor.xmlDniNie(rutaXML, contador, aux,
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
             return false;
         }
 
-        //Comprueba que el dni tenga el formato corrrecto 8 numero
         String dniNumero = dni.substring(0, 8);
 
         if (!dniNumero.matches("\\d{8}")) {
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
             System.out.println("El dni no tiene el formato correcto (numero)");
-
             return false;
         }
 
-        //Comprueba  que el noveno caracater sea letra
         char dniLetra = dni.charAt(8);
-
         if (!Character.isLetter(dniLetra)) {
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
-
-            System.out.println("El dni  no tiene el  formato correcto (letra)");
-
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
+            System.out.println("El dni no tiene el formato correcto (letra)");
             return false;
         }
 
-        if (dniLetra != letraCorrecta(dniNumero)) {
-            //Se corrige la celda con la letra correcta----Comprobar si lo  actualiza directamente en el excel
-            String dniSubsanado = dniNumero + letraCorrecta(dniNumero);
+        char letraCorrecta = letraCorrecta(dniNumero);
+        if (dniLetra != letraCorrecta) {
+            String dniSubsanado = dniNumero + letraCorrecta;
 
-            System.out.println("El dni tenia el formato correcto pero la letra no coincidia, se ha modificado la letra");
+            System.out.println("El dni tenía el formato correcto pero la letra no coincidía, se ha modificado la letra");
 
-            //Añado el DNI subsanado al set, si falso -> duplicado
-            if(!dniSet.add(dniSubsanado)){ //Daría falso porque en HashSet no puede haber valores duplicados
-                System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe de esta duplicado! ***************\n");
-                editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
-                System.out.println("El dni esta repetido");
+            // Actualiza en el Excel y en memoria (celda)
+            if (!dniSet.contains(dniSubsanado)) {
+                manager.updateExcel(wb, ruta, 0, contador - 1, 0, dniSubsanado);
+                fila.getCell(0).setCellValue(dniSubsanado);  // <-- Esto es clave
+            }
+            if (!dniSet.add(dniSubsanado)) {
+                System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe estar duplicado! ***************\n");
+                editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                        fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                        fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
                 return false;
-            }else{
-                manager.updateExcel(wb, ruta, 0, contador, 0, dniSubsanado);
             }
 
-            
+            return true;
         }
 
         System.out.println("El dni es correcto");
 
-        //Añado el NIE subsanado al set, si falso -> duplicado
-        if(!dniSet.add(dni)){ //Daría falso porque en HashSet no puede haber valores duplicados
-            System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe de esta duplicado! ***************\n");
-            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(), fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(), fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
-            System.out.println("El dni esta repetido");
+        if (!dniSet.add(dni)) {
+            System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe estar duplicado! ***************\n");
+            editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
+                    fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
+                    fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
             return false;
         }
 
@@ -246,14 +248,14 @@ public class ValidadorNieDni {
 
         return letras[dniNumero % 23];
     }
-
+}
     /*
     Los metodos que hay aqui abajo se utilizan para ver si el correo se genera de la forma correctaa
     Viendo si hay que generarlo o no
      */
 
 
-    //Metodo que comprueba si el dni  es correcto no escribe
+    /*//Metodo que comprueba si el dni  es correcto no escribe
     public boolean dniValido(String dni) {
         //
         if (dniVacio(dni)) {
@@ -312,7 +314,4 @@ public class ValidadorNieDni {
         //Si no letra correcta se modifica la letra y ver en la hoja del la practica lo que tiene que escribir en el archuivo
         System.out.println("El nie es correcto");
         return true;
-    }
-}
-
-
+    }*/
