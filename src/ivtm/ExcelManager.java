@@ -108,7 +108,7 @@ public class ExcelManager {
             //DEPURACION
             System.out.println("Número de DNIs leídos: " + dniLeidos);
             System.out.println("Número de elementos almacenados en dniSet: " + dniSet.size());
-            System.out.println("Número de correos generados: " +correosGenerados);
+            System.out.println("Número de elementos almacenados en cccSet: " + cccSet.size());
             System.out.println("Número de elementos almacenados en el correoSet: " +correoSet.size());
             //Despues de leer el documento, vació el HashSet para no consumir memoria
             dniSet.clear();

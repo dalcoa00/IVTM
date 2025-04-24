@@ -116,6 +116,11 @@ public class EditorXML {
                 ibancorrecto.appendChild(doc.createTextNode(ibanCorrecto));
                 cuentaElement.appendChild(ibancorrecto);
             }
+            /*if (tipoDeError.equals("IMPOSIBLE GENERAR IBAN")) {
+                Element tipoErrorElement = doc.createElement("TipoDeError");
+                tipoErrorElement.appendChild(doc.createTextNode(tipoDeError));
+                cuentaElement.appendChild(tipoErrorElement);
+            }*/
 
 
             // Agregar el nuevo contribuyente al XML

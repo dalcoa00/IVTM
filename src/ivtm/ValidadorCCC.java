@@ -8,7 +8,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ValidadorCCC {
     ExcelManager manager = new ExcelManager();
     EditorXML editor = new EditorXML();
-    private final String rutaXML = "resources\\ErroresNifNie.xml";
+    private final String rutaXML = "resources\\ErroresCCC.xml";
 
     public void generacionEmail(Row row, HashSet<String> email, XSSFWorkbook wb,String ruta, int sheet){
 
@@ -179,7 +179,7 @@ public class ValidadorCCC {
 
                 //SI EL CCC HA SIDO SUBSANADO, EN EL XML -> CCC ERRÓNEO (ccc) (ccc != nuevoCCC??) e IBAN generado con nuevoCCC
                 if (!ccc.equals(nuevoCCC)) {
-                    editor.xmlCuenta(ruta, row.getRowNum(), row.getCell(3).getStringCellValue(), row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), dniCell.getStringCellValue(), ccc, iban, "");
+                    editor.xmlCuenta(rutaXML, row.getRowNum(), row.getCell(3).getStringCellValue(), row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), dniCell.getStringCellValue(), ccc, iban, "");
                 }
             }
 
@@ -187,7 +187,7 @@ public class ValidadorCCC {
         else {
             System.out.println("El CCC es incorrecto y/o no subsanable. Imposible generar el IBAN asociado.");
             // XML - IMPOSIBLE GENERAR IBAN
-            editor.xmlCuenta(ruta, row.getRowNum(), row.getCell(3).getStringCellValue(), row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), dniCell.getStringCellValue(), ccc, "", "IMPOSIBLE GENERAR IBAN");
+            editor.xmlCuenta(rutaXML, row.getRowNum(), row.getCell(3).getStringCellValue(), row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), dniCell.getStringCellValue(), ccc, "", "IMPOSIBLE GENERAR IBAN");
 
         }
     }
