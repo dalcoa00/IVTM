@@ -143,5 +143,103 @@ public class EditorXML {
             e.printStackTrace();
         }
     }
+    //Escribe recibos.xml HAY QUE SEPARAR CADA  RECIBO DEMASSIADOS PARAMETROS
+    public void xmlRecibo(String rutaArchivo, List<Recibo> recibos, String fechaPadron) {//Escribe vehiculos.xml  los errores del archivo
+        try{
+            double totalPadron = recibos.stream().mapToDouble(Recibo::getTotalRecibo).sum();
+            int numeroTotalRecibos = recibos.size();
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.newDocument();
+
+            Element root = doc.createElement("Recibos");
+            root.setAttribute("fechaPadron", fechaPadron);
+            root.setAttribute("totalPadron", String.format("%.2f", totalPadron));
+            root.setAttribute("numeroTotalRecibos", String.valueOf(numeroTotalRecibos));
+            doc.appendChild(root);
+            for (Recibo r : recibos) {
+                Element reciboElem = doc.createElement("Recibo");
+                reciboElem.setAttribute("idRecibo", String.valueOf(r.getIdRecibo()));
+
+                appendChild(doc, reciboElem, "Exencion", r.getExencion());
+                appendChild(doc, reciboElem, "idFilaExcelVehiculo", String.valueOf(r.getIdFilaExcelVehiculo()));
+                appendChild(doc, reciboElem, "nombre", r.getNombre());
+                appendChild(doc, reciboElem, "primerApellido", r.getPrimerApellido());
+                appendChild(doc, reciboElem, "segundoApellido", r.getSegundoApellido());
+                appendChild(doc, reciboElem, "NIF", r.getNif());
+                appendChild(doc, reciboElem, "IBAN", r.getIban());
+                appendChild(doc, reciboElem, "tipoVehiculo", r.getTipoVehiculo());
+                appendChild(doc, reciboElem, "marcaModelo", r.getMarcaModelo());
+                appendChild(doc, reciboElem, "matricula", r.getMatricula());
+                appendChild(doc, reciboElem, "totalRecibo", String.valueOf(r.getTotalRecibo()));
+
+                root.appendChild(reciboElem);
+            }
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File(rutaArchivo));
+            transformer.transform(source, result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void xmlVehiculos(String rutaArchivo, int id, String marca, String modelo, String tipodeError){
+        try{
+            File xmlFile = new File(rutaArchivo);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
+
+            // Obtener el nodo raíz <cuentas>
+            Element rootElement = doc.getDocumentElement();
+
+            // Crear nuevo contribuyente
+            Element cuentaElement = doc.createElement("Vehiculo");
+            cuentaElement.setAttribute("id", String.valueOf(id));
+
+            Element marcaElement = doc.createElement("Marca");
+            marcaElement.appendChild(doc.createTextNode(marca));
+            cuentaElement.appendChild(marcaElement);
+
+            Element modeloElement = doc.createElement("Modelo");
+            modeloElement.appendChild(doc.createTextNode(modelo));
+            cuentaElement.appendChild(modeloElement);
+
+            Element tipodeErrorElement = doc.createElement("Error");
+            tipodeErrorElement.appendChild(doc.createTextNode(tipodeError));
+            cuentaElement.appendChild(tipodeErrorElement);
+            // Agregar el nuevo contribuyente al XML
+
+            rootElement.appendChild(cuentaElement);
+
+            // Guardar los cambios en el XML
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "2");
+
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File(rutaArchivo));
+
+            transformer.transform(source, result);
+
+            System.out.println("Vehiculo agregado al XML:");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    //Metodo auxiliar para añadir de  forma correcta los recibos
+    private void appendChild(Document doc, Element parent, String tagName, String textContent) {
+        Element elem = doc.createElement(tagName);
+        elem.setTextContent(textContent);
+        parent.appendChild(elem);
+    }
 }
 
