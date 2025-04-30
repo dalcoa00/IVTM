@@ -12,6 +12,10 @@ import java.util.HashSet;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
+    HashSet<String> dniSet = new HashSet<>();
+    HashSet<String> cccSet = new HashSet<>();
+    HashSet<String> correoSet = new HashSet<>();
+    HashSet<String> matriculaSet = new HashSet<>();
 
     /*Lee el archivo excel indicado en la ruta que recibe y el número de hoja especificado*/
     public void readExcel(String filepath, int sheet) {
@@ -22,7 +26,7 @@ public class ExcelManager {
                 XSSFWorkbook wb = new XSSFWorkbook(file);
                 file.close(); //No es necesario mantenerlo abierto
 
-                ValidadorNieDni validador = new ValidadorNieDni();
+                ValidadorNieDni validadorNieDni = new ValidadorNieDni();
                 ValidadorCCC validadorCCC= new ValidadorCCC();
 
                 //Se lee la hoja
@@ -38,10 +42,6 @@ public class ExcelManager {
                 }
 
                 int dniLeidos = 0;
-
-                HashSet<String> dniSet = new HashSet<>();
-                HashSet<String> cccSet = new HashSet<>();
-                HashSet<String> correoSet = new HashSet<>();
 
                 //Va fila por fila
                 while (rowIter.hasNext()) {
@@ -71,11 +71,11 @@ public class ExcelManager {
                             System.out.print(cell.getStringCellValue() + "\t");
                         }
 
-                        if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 0) {
+                        if (cell.getColumnIndex() == 0) {
                             dniCell = cell;
                         }
 
-                        if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 9) {
+                        if (cell.getColumnIndex() == 9) {
                             cccCell = cell;
                         }
                     }
@@ -85,7 +85,7 @@ public class ExcelManager {
                     //Valida el DNI/NIE si la celda 0 es no nula
                     if (dniCell != null) {
                         dniLeidos++;
-                        validador.validaDNI(dniCell, filepath, row, row.getRowNum() + 1, wb, dniSet);
+                        validadorNieDni.validaDNI(dniCell, filepath, row, row.getRowNum() + 1, wb, dniSet);
                     }
 
                     //Valida el CCC si la celda 9 es no nula
@@ -135,6 +135,8 @@ public class ExcelManager {
                 //Iteración por las filas de la hoja
                 Iterator<Row> rowIter = ws.iterator();
 
+                ValidadorVehiculo validaVehiculo = new ValidadorVehiculo();
+
                 //Para empezar en la fila 1
                 if(rowIter.hasNext()){
                     rowIter.next();
@@ -153,6 +155,9 @@ public class ExcelManager {
 
                     Iterator<Cell> cellIter = row.cellIterator();
 
+                    Cell tipoVehiculoCell = null;
+                    Cell matriculaCell = null;
+
                     while (cellIter.hasNext()) {
                         Cell cell = cellIter.next();
 
@@ -162,11 +167,30 @@ public class ExcelManager {
                         else if (cell.getCellType() == CellType.STRING) {
                             System.out.print(cell.getStringCellValue() + "\t");
                         }
+
+                        if (cell.getColumnIndex() == 0) {
+                            tipoVehiculoCell = cell;
+                        }
+
+                        if (cell.getColumnIndex() == 3) {
+                            matriculaCell = cell;
+                        }
+
+                    }
+
+                    //Valido los datos del vehículo cuando me aseguro de que tengo un tipo y matrícula
+                    if (matriculaCell != null && tipoVehiculoCell != null) {
+                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell);
+                    }
+                    else {
+                        System.out.println("No es posible comprobar los datos del vehículo.");
                     }
 
                 }
 
                 wb.close();
+
+                matriculaSet.clear();
 
                 System.out.println("\nSe ha completado la lectura del archivo\n");
             }
