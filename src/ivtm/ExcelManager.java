@@ -15,121 +15,169 @@ public class ExcelManager {
 
     /*Lee el archivo excel indicado en la ruta que recibe y el número de hoja especificado*/
     public void readExcel(String filepath, int sheet) {
-        try {
-            FileInputStream file = new FileInputStream(filepath);
-            XSSFWorkbook wb = new XSSFWorkbook(file);
-            file.close(); //No es necesario mantenerlo abierto
+        //Hoja "Contribuyentes" -> Comprobación de DNIs, CCCs y generación de e-mails e IBANs
+        if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0) {
+            try {
+                FileInputStream file = new FileInputStream(filepath);
+                XSSFWorkbook wb = new XSSFWorkbook(file);
+                file.close(); //No es necesario mantenerlo abierto
 
-            ValidadorNieDni validador = new ValidadorNieDni();
-            ValidadorCCC validadorCCC= new ValidadorCCC();
-            //Verifica que el índice de la hoja sea correcto
-            if (sheet < 0 || sheet >= wb.getNumberOfSheets()) {
-                System.out.println("El número de hoja indicado no es válido. El archivo tiene " + wb.getNumberOfSheets() + " hojas.");
+                ValidadorNieDni validador = new ValidadorNieDni();
+                ValidadorCCC validadorCCC= new ValidadorCCC();
+
+                //Se lee la hoja
+                XSSFSheet ws = wb.getSheetAt(sheet);
+                System.out.println("\nLeyendo hoja \"" + ws.getSheetName() + "\"");
+
+                //Iteración por las filas de la hoja
+                Iterator<Row> rowIter = ws.iterator();
+
+                //Para empezar en la fila 1
+                if(rowIter.hasNext()){
+                    rowIter.next();
+                }
+
+                int dniLeidos = 0;
+
+                HashSet<String> dniSet = new HashSet<>();
+                HashSet<String> cccSet = new HashSet<>();
+                HashSet<String> correoSet = new HashSet<>();
+
+                //Va fila por fila
+                while (rowIter.hasNext()) {
+                    Row row = rowIter.next();
+
+                    //Si la  fila esta vacia se las salta
+                    if(isEmpty(row)){
+                        System.out.println("Fila sin datos\n");
+
+                        continue;
+                    }
+
+                    Iterator<Cell> cellIter = row.cellIterator();
+
+                    //Celdas que se comprobarán
+                    Cell dniCell = null;
+                    Cell cccCell = null;
+
+                    //Lee columna por columna (celdas de la fila)
+                    while (cellIter.hasNext()) {
+                        Cell cell = cellIter.next();
+
+                        if (cell.getCellType() == CellType.NUMERIC) {
+                            System.out.print((int) cell.getNumericCellValue() + "\t");
+                        }
+                        else if (cell.getCellType() == CellType.STRING) {
+                            System.out.print(cell.getStringCellValue() + "\t");
+                        }
+
+                        if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 0) {
+                            dniCell = cell;
+                        }
+
+                        if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 9) {
+                            cccCell = cell;
+                        }
+                    }
+
+                    System.out.println();
+
+                    //Valida el DNI/NIE si la celda 0 es no nula
+                    if (dniCell != null) {
+                        dniLeidos++;
+                        validador.validaDNI(dniCell, filepath, row, row.getRowNum() + 1, wb, dniSet);
+                    }
+
+                    //Valida el CCC si la celda 9 es no nula
+                    //Genera IBAN y correo si NIF/NIE y CCC correctos o subsanados
+                    if (cccCell != null) {
+                        validadorCCC.comprobarCCC(row, wb, filepath, sheet, cccSet, dniSet, correoSet, dniCell, cccCell);
+                    }
+
+                }
+
                 wb.close();
-                file.close();
 
-                return;
-            }
+                System.out.println("\nSe ha completado la lectura del archivo\n");
 
-            //Si índice correcto -> Se lee la hoja
-            XSSFSheet ws = wb.getSheetAt(sheet);
-            System.out.println("\nLeyendo hoja \"" + ws.getSheetName() + "\"");
+                //DEPURACION
+                System.out.println("Número de DNIs leídos: " + dniLeidos);
+                System.out.println("Número de elementos almacenados en dniSet: " + dniSet.size());
+                System.out.println("Número de elementos almacenados en cccSet: " + cccSet.size());
+                System.out.println("Número de elementos almacenados en el correoSet: " +correoSet.size());
+                //Despues de leer el documento, vació el HashSet para no consumir memoria
+                dniSet.clear();
+                cccSet.clear();
+                correoSet.clear();
 
-            //Iteración por las filas de la hoja
-            Iterator<Row> rowIter = ws.iterator();
-
-            //Para empezar en la fila 1
-            if(rowIter.hasNext()){
-                rowIter.next();
-            }
-
-            //DEPURACION
-            int dniLeidos = 0;
-            int correosGenerados=0;
-            HashSet<String> dniSet = new HashSet<>();
-            HashSet<String> cccSet = new HashSet<>();
-            HashSet<String> correoSet = new HashSet<>();
-            //El contador no es necesario, lee bien todas las filas
-            while (rowIter.hasNext()) {
-                Row row = rowIter.next();
-
-                //Si la  fila esta vacia se las salta
-                if(isEmpty(row)){
-                    System.out.println("Fila sin datos\n");
-
-                    continue;
-                }
-
-                Iterator<Cell> cellIter = row.cellIterator();
-
-                //Celdas que se comprobarán
-                Cell dniCell = null;
-                Cell cccCell = null;
-
-                while (cellIter.hasNext()) {
-                    Cell cell = cellIter.next();
-
-                    if (cell.getCellType() == CellType.NUMERIC) {
-                        System.out.print((int) cell.getNumericCellValue() + "\t");
-                    }
-                    else if (cell.getCellType() == CellType.STRING) {
-                        System.out.print(cell.getStringCellValue() + "\t");
-                    }
-
-                    if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 0) {
-                        dniCell = cell;
-                    }
-
-                    if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 0 && cell.getColumnIndex() == 9) {
-                        cccCell = cell;
-                    }
-                }
-
-                System.out.println();
-
-                //Valida el DNI/NIE si la celda 0 es no nula
-                if (dniCell != null) {
-                    dniLeidos++;
-                    validador.validaDNI(dniCell, filepath, row, row.getRowNum() + 1, wb, dniSet);
-                }
-
-                //Valida el CCC si la celda 9 es no nula
-                //Genera IBAN y correo si NIF/NIE y CCC correctos o subsanados
-                if (cccCell != null) {
-                    validadorCCC.comprobarCCC(row, wb, filepath, sheet, cccSet, dniSet, correoSet, dniCell, cccCell);
-                }
+                //Si no se va a utilizar, se puede eliminar la referencia
+                /*dniSet = null;
+               cccSet = null;
+               correoSet= null;*/
 
             }
-
-            wb.close();
-
-            System.out.println("\nSe ha completado la lectura del archivo\n");
-
-            //DEPURACION
-            System.out.println("Número de DNIs leídos: " + dniLeidos);
-            System.out.println("Número de elementos almacenados en dniSet: " + dniSet.size());
-            System.out.println("Número de elementos almacenados en cccSet: " + cccSet.size());
-            System.out.println("Número de elementos almacenados en el correoSet: " +correoSet.size());
-            //Despues de leer el documento, vació el HashSet para no consumir memoria
-            dniSet.clear();
-            cccSet.clear();
-            correoSet.clear();
-
-            //Si no se va a utilizar, se puede eliminar la referencia
-            dniSet = null;
-            cccSet = null;
-            correoSet= null;
-
+            catch (IOException e) {
+                System.out.println("Error al leer el archivo " + e.getMessage());
+                e.printStackTrace();
+            }
         }
-        catch (IOException e) {
-            System.out.println("Error al leer el archivo " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+        //Hoja "Vehiculos" -> Comprobación de matrículas
+        else if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 1) {
+            try {
+                FileInputStream file = new FileInputStream(filepath);
+                XSSFWorkbook wb = new XSSFWorkbook(file);
+                file.close(); //No es necesario mantenerlo abierto
 
-    /*Metodo sobrecargado que lee la primera hoja si solo se indica la ruta del archivo*/
-    public void readExcel(String filepath) {
-        readExcel(filepath, 0);
+                //Se lee la hoja
+                XSSFSheet ws = wb.getSheetAt(sheet);
+                System.out.println("\nLeyendo hoja \"" + ws.getSheetName() + "\"");
+
+                //Iteración por las filas de la hoja
+                Iterator<Row> rowIter = ws.iterator();
+
+                //Para empezar en la fila 1
+                if(rowIter.hasNext()){
+                    rowIter.next();
+                }
+
+                //Lee columna por columna de cada fila
+                while (rowIter.hasNext()) {
+                    Row row = rowIter.next();
+
+                    //Si la  fila esta vacia se las salta
+                    if(isEmpty(row)){
+                        System.out.println("Fila sin datos\n");
+
+                        continue;
+                    }
+
+                    Iterator<Cell> cellIter = row.cellIterator();
+
+                    while (cellIter.hasNext()) {
+                        Cell cell = cellIter.next();
+
+                        if (cell.getCellType() == CellType.NUMERIC) {
+                            System.out.print((int) cell.getNumericCellValue() + "\t");
+                        }
+                        else if (cell.getCellType() == CellType.STRING) {
+                            System.out.print(cell.getStringCellValue() + "\t");
+                        }
+                    }
+
+                }
+
+                wb.close();
+
+                System.out.println("\nSe ha completado la lectura del archivo\n");
+            }
+            catch (IOException e) {
+                System.out.println("Error al leer el archivo " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("Ruta u hoja errónea.");
+        }
     }
 
     /*

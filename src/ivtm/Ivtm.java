@@ -72,8 +72,11 @@ public class Ivtm {
         ExcelManager manager = new ExcelManager();
         String rutaVehiculos = "resources\\SistemasVehiculos.xlsx";
 
-        //Metodo que lee el documento, comprueba DNIs y actualiza de ser necesario
-        manager.readExcel(rutaVehiculos);
+        //Lee la hoja "Contribuyentes", comprueba los campos y los actualiza de ser necesario
+        manager.readExcel(rutaVehiculos, 0);
+
+        //Lee la hoja "Vehiculos" y comprueba si los campos son correctos
+        manager.readExcel(rutaVehiculos, 1);
     }
 
 
