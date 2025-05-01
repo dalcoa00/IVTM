@@ -105,16 +105,6 @@ public class ExcelManager {
                 System.out.println("Número de elementos almacenados en dniSet: " + dniSet.size());
                 System.out.println("Número de elementos almacenados en cccSet: " + cccSet.size());
                 System.out.println("Número de elementos almacenados en el correoSet: " +correoSet.size());
-                //Despues de leer el documento, vació el HashSet para no consumir memoria
-                dniSet.clear();
-                cccSet.clear();
-                correoSet.clear();
-
-                //Si no se va a utilizar, se puede eliminar la referencia
-                /*dniSet = null;
-               cccSet = null;
-               correoSet= null;*/
-
             }
             catch (IOException e) {
                 System.out.println("Error al leer el archivo " + e.getMessage());
@@ -155,14 +145,25 @@ public class ExcelManager {
 
                     Iterator<Cell> cellIter = row.cellIterator();
 
+                /******************************************************************************************************/
                     Cell tipoVehiculoCell = null;
                     Cell matriculaCell = null;
+                    Cell fechaMatriculacion = null;
+                    Cell fechaAlta = null;
+                    Cell fechaBaja = null;
+                    Cell fechaBajaTemp = null;
+                    Cell nifPropietario = null;
 
                     while (cellIter.hasNext()) {
                         Cell cell = cellIter.next();
 
                         if (cell.getCellType() == CellType.NUMERIC) {
-                            System.out.print((int) cell.getNumericCellValue() + "\t");
+                            //Si es celda formato fecha
+                            if (DateUtil.isCellDateFormatted(cell)) {
+                                System.out.print(cell.getDateCellValue() + "\t");
+                            } else {
+                                System.out.print((int) cell.getNumericCellValue() + "\t");
+                            }
                         }
                         else if (cell.getCellType() == CellType.STRING) {
                             System.out.print(cell.getStringCellValue() + "\t");
@@ -176,11 +177,30 @@ public class ExcelManager {
                             matriculaCell = cell;
                         }
 
+                        if(cell.getColumnIndex() == 10) {
+                            fechaMatriculacion = cell;
+                        }
+
+                        if(cell.getColumnIndex() == 11) {
+                            fechaAlta = cell;
+                        }
+
+                        if(cell.getColumnIndex() == 12) {
+                            fechaBaja = cell;
+                        }
+
+                        if(cell.getColumnIndex() == 13) {
+                            fechaBajaTemp = cell;
+                        }
+
+                        if(cell.getColumnIndex() == 14) {
+                            nifPropietario = cell;
+                        }
                     }
 
-                    //Valido los datos del vehículo cuando me aseguro de que tengo un tipo y matrícula
+                    //Comprueba que los datos del vehiculo son correctos
                     if (matriculaCell != null && tipoVehiculoCell != null) {
-                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell);
+                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell, fechaMatriculacion, fechaAlta, fechaBaja, fechaBajaTemp, nifPropietario);
                     }
                     else {
                         System.out.println("No es posible comprobar los datos del vehículo.");
@@ -190,7 +210,7 @@ public class ExcelManager {
 
                 wb.close();
 
-                matriculaSet.clear();
+
 
                 System.out.println("\nSe ha completado la lectura del archivo\n");
             }
@@ -291,5 +311,19 @@ public class ExcelManager {
 
         return true;
 
+    }
+
+    //Metodo que limpia los sets al finalizar la ejecución
+    public void cleanSets() {
+        //Despues de leer el documento, vació el HashSet para no consumir memoria
+        dniSet.clear();
+        cccSet.clear();
+        correoSet.clear();
+        matriculaSet.clear();
+
+        //Si no se va a utilizar, se puede eliminar la referencia
+        /*dniSet = null;
+        cccSet = null;
+        correoSet= null;*/
     }
 }

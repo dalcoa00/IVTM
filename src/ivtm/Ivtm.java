@@ -7,19 +7,22 @@ import java.util.Scanner;
 public class Ivtm {
 
     public static void main(String[] args) {
-
-        Ivtm ivtm = new Ivtm();
+        ExcelManager manager = new ExcelManager();
 
         /* Práctica 1 */
-        //ivtm.p1();
+        //p1();
 
-        /* Práctica 2 */
-        ivtm.validateNUpdate();
+        /* Práctica 2, 3 y 4 */
+        validateNUpdate(manager);
 
+
+
+        //Al finalizar la ejecución completa del programa se limpian los sets con los datos almacenados
+        manager.cleanSets();
     }
 
     //Metodo de la p1 para no llenar el main de cosas que no se usan siempre
-    public void p1() {
+    public static void p1() {
         // Se obtiene el NIF del contribuyente
         Scanner sc = new Scanner(System.in);
         System.out.println("Ingrese el NIF del contribuyente: ");
@@ -67,9 +70,9 @@ public class Ivtm {
         }
     }
 
-    //Prácticas 2 y 3
-    public void validateNUpdate() {
-        ExcelManager manager = new ExcelManager();
+    //Prácticas 2, 3 Y 4
+    public static void validateNUpdate(ExcelManager manager) {
+        //ExcelManager manager = new ExcelManager();
         String rutaVehiculos = "resources\\SistemasVehiculos.xlsx";
 
         //Lee la hoja "Contribuyentes", comprueba los campos y los actualiza de ser necesario
