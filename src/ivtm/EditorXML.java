@@ -144,7 +144,7 @@ public class EditorXML {
         }
     }
     //Escribe recibos.xml HAY QUE SEPARAR CADA  RECIBO DEMASSIADOS PARAMETROS
-    public void xmlRecibo(String rutaArchivo, List<Recibo> recibos, String fechaPadron) {//Escribe vehiculos.xml  los errores del archivo
+    /*public void xmlRecibo(String rutaArchivo, List<Recibo> recibos, String fechaPadron) {//Escribe vehiculos.xml  los errores del archivo
         try{
             double totalPadron = recibos.stream().mapToDouble(Recibo::getTotalRecibo).sum();
             int numeroTotalRecibos = recibos.size();
@@ -186,7 +186,7 @@ public class EditorXML {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void xmlVehiculos(String rutaArchivo, int id, String marca, String modelo, String tipodeError){
         try{

@@ -101,10 +101,10 @@ public class ExcelManager {
                 System.out.println("\nSe ha completado la lectura del archivo\n");
 
                 //DEPURACION
-                System.out.println("Número de DNIs leídos: " + dniLeidos);
-                System.out.println("Número de elementos almacenados en dniSet: " + dniSet.size());
-                System.out.println("Número de elementos almacenados en cccSet: " + cccSet.size());
-                System.out.println("Número de elementos almacenados en el correoSet: " +correoSet.size());
+                System.out.println("Número de NIFs leídos: " + dniLeidos);
+                System.out.println("Número de NIFs correctos o subsanados: " + dniSet.size());
+                System.out.println("Número de CCCs correctos o subsanados: " + cccSet.size());
+                System.out.println("Número de e-mails generados: " + correoSet.size());
             }
             catch (IOException e) {
                 System.out.println("Error al leer el archivo " + e.getMessage());
@@ -148,16 +148,18 @@ public class ExcelManager {
                 /******************************************************************************************************/
                     Cell tipoVehiculoCell = null;
                     Cell matriculaCell = null;
-                    Cell fechaMatriculacion = null;
-                    Cell fechaAlta = null;
-                    Cell fechaBaja = null;
-                    Cell fechaBajaTemp = null;
-                    Cell nifPropietario = null;
+                    Cell fechaMatriculacionCell = null;
+                    Cell fechaAltaCell = null;
+                    Cell fechaBajaCell = null;
+                    Cell fechaBajaTempCell = null;
+                    Cell nifPropietarioCell = null;
+
+                    System.out.println();
 
                     while (cellIter.hasNext()) {
                         Cell cell = cellIter.next();
 
-                        if (cell.getCellType() == CellType.NUMERIC) {
+                        if ((cell.getColumnIndex() == 0 || cell.getColumnIndex() == 3) && cell.getCellType() == CellType.NUMERIC) {
                             //Si es celda formato fecha
                             if (DateUtil.isCellDateFormatted(cell)) {
                                 System.out.print(cell.getDateCellValue() + "\t");
@@ -165,7 +167,7 @@ public class ExcelManager {
                                 System.out.print((int) cell.getNumericCellValue() + "\t");
                             }
                         }
-                        else if (cell.getCellType() == CellType.STRING) {
+                        else if ((cell.getColumnIndex() == 0 || cell.getColumnIndex() == 3) && cell.getCellType() == CellType.STRING) {
                             System.out.print(cell.getStringCellValue() + "\t");
                         }
 
@@ -178,29 +180,29 @@ public class ExcelManager {
                         }
 
                         if(cell.getColumnIndex() == 10) {
-                            fechaMatriculacion = cell;
+                            fechaMatriculacionCell = cell;
                         }
 
                         if(cell.getColumnIndex() == 11) {
-                            fechaAlta = cell;
+                            fechaAltaCell = cell;
                         }
 
                         if(cell.getColumnIndex() == 12) {
-                            fechaBaja = cell;
+                            fechaBajaCell = cell;
                         }
 
                         if(cell.getColumnIndex() == 13) {
-                            fechaBajaTemp = cell;
+                            fechaBajaTempCell = cell;
                         }
 
                         if(cell.getColumnIndex() == 14) {
-                            nifPropietario = cell;
+                            nifPropietarioCell = cell;
                         }
                     }
 
                     //Comprueba que los datos del vehiculo son correctos
                     if (matriculaCell != null && tipoVehiculoCell != null) {
-                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell, fechaMatriculacion, fechaAlta, fechaBaja, fechaBajaTemp, nifPropietario);
+                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell, fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell, nifPropietarioCell);
                     }
                     else {
                         System.out.println("No es posible comprobar los datos del vehículo.");
@@ -210,9 +212,10 @@ public class ExcelManager {
 
                 wb.close();
 
-
-
                 System.out.println("\nSe ha completado la lectura del archivo\n");
+
+                //DEPURACION
+                System.out.println("Número de matrículas correctas: " + matriculaSet.size());
             }
             catch (IOException e) {
                 System.out.println("Error al leer el archivo " + e.getMessage());
@@ -295,7 +298,7 @@ public class ExcelManager {
 
     }
 
-    //Metodo que comprueba si una fila esta vacia o no
+    /*Metodo que comprueba si una fila esta vacia o no*/
     public static boolean isEmpty(Row comprobar){
         if (comprobar == null){
 
@@ -313,7 +316,7 @@ public class ExcelManager {
 
     }
 
-    //Metodo que limpia los sets al finalizar la ejecución
+    /*Metodo que limpia los sets al finalizar la ejecución*/
     public void cleanSets() {
         //Despues de leer el documento, vació el HashSet para no consumir memoria
         dniSet.clear();
