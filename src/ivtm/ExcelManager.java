@@ -1,5 +1,7 @@
 package ivtm;
 
+import modelosExcel.*;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -7,8 +9,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.HashSet;
+import java.util.*;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
@@ -16,6 +17,10 @@ public class ExcelManager {
     HashSet<String> cccSet = new HashSet<>();
     HashSet<String> correoSet = new HashSet<>();
     HashSet<String> matriculaSet = new HashSet<>();
+
+    //Mapas para relacionar contribuyentes y sus vehículos para generar los recibos
+    Map<String, ContribuyenteExcel> contribuyentes = new HashMap<>();
+    Map<String, List<VehiculoExcel>> vehiculosContribuyentes = new HashMap<>();
 
     /*Lee el archivo excel indicado en la ruta que recibe y el número de hoja especificado*/
     public void readExcel(String filepath, int sheet) {
@@ -111,7 +116,7 @@ public class ExcelManager {
                 e.printStackTrace();
             }
         }
-        //Hoja "Vehiculos" -> Comprobación de matrículas
+        //Hoja "Vehiculos" -> Comprobación de vehiculos
         else if (filepath.equals("resources\\SistemasVehiculos.xlsx") && sheet == 1) {
             try {
                 FileInputStream file = new FileInputStream(filepath);
@@ -222,9 +227,32 @@ public class ExcelManager {
                 e.printStackTrace();
             }
         }
+        /*
+        *Otro else-if para leer SistemaOrdenanzas
+        * Y almacenar en algún sitio los datos que se necesitan para generar el recibo
+        * y calcular el precio de lo que debería de pagar
+        * */
         else {
             System.out.println("Ruta u hoja errónea.");
         }
+
+        /*********************************************************************************************************/
+        /*
+        * Una vez comprobados todos los contribuyentes y vehiculos correctos
+        * Los HashSets se mantienen porque sirven para comprobar otros datos
+        *
+        * Con (ya declarados al principio):
+        * Map <String, Contribuyente> contribuyentes = new HashMap<>()
+        * Map <String, List<Vehiculo> vehiculosContribuyente = new HashMap<>()>
+        *
+        * Cuando un contribuyente es correcto, tras validar CCC, IBAN, etc. se añade a contribuyentes con todos
+        * los datos necesarios para generar el recibo (Tras lo último que haga ValidadorCCC creo recordar)
+        *
+        * Cuando el vehiculo es correcto, se busca el dni del propietario en HashMap contribuyentes, si está se añade
+        * el vehiculo a vehiculosContribuyentes con todos los datos necesarios para generar el recibo (En ValidadorVehiculo)
+        *
+        * De este modo, los datos del vehiculo y su contribuyente estarán relacionados y se podrán generar los recibos
+        * sin necesidad de volver a abri los documentos excel*/
     }
 
     /*

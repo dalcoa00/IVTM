@@ -37,6 +37,7 @@ public class ValidadorVehiculo {
         if (!matriculaSet.add(matricula)) {
             System.out.println("\nMATRICULA DUPLICADA!!!!\n");
         }
+
     }
 
     /*Comprueba que la correlación de fechas sea correcta*/
