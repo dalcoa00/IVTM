@@ -7,7 +7,9 @@ public class VehiculoExcel {
     private String modelo;
     private String matricula;
     private String bastidor;
-    private String unidadCobro;
+    //1=CVs, 2=Plazas, 3=KGs, 4=CCs
+    private int unidadCobro;
+    //nº cvs, plazas, kgs o ccs
     private double valorUnidad;
     private double importe;
     private double exenc_bonif;
@@ -61,11 +63,11 @@ public class VehiculoExcel {
         this.bastidor = bastidor;
     }
 
-    public String getUnidadCobro() {
+    public int getUnidadCobro() {
         return unidadCobro;
     }
 
-    public void setUnidadCobro(String unidadCobro) {
+    public void setUnidadCobro(int unidadCobro) {
         this.unidadCobro = unidadCobro;
     }
 

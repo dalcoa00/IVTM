@@ -1,10 +1,8 @@
 package ivtm;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Date;
+import java.util.*;
 
+import modelosExcel.VehiculoExcel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -13,7 +11,7 @@ public class ValidadorVehiculo {
     private final String erroresVehiculosXML = "resources\\ErroresVehiculos.xml";
 
     /*Comprueba la validez de los datos del vehículo*/
-    public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell) {
+    public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
         String matricula = matriculaCell.getStringCellValue().trim().toUpperCase();
 
         //Comprueba que la correlación de fechas es correcta
@@ -35,8 +33,12 @@ public class ValidadorVehiculo {
 
         System.out.println("\nTodos los datos del vehículos son correctos.");
         if (!matriculaSet.add(matricula)) {
-            System.out.println("\nMATRICULA DUPLICADA!!!!\n");
+            System.out.println("\nMATRICULA DUPLICADA!\n");
+            return;
         }
+
+        //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
+        agregarVehiculo(vehiculosContribuyentesMap, row);
 
     }
 
@@ -271,6 +273,102 @@ public class ValidadorVehiculo {
         return false;
     }
 
+    public void agregarVehiculo (Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Row row) {
+        String nifPropietario = row.getCell(14).getStringCellValue();
+        String tipo = row.getCell(0).getStringCellValue();
+        String marca = row.getCell(1).getStringCellValue();
+        String modelo = row.getCell(2).getStringCellValue();
+        String matricula = row.getCell(3).getStringCellValue();
+        String bastidor = row.getCell(4).getStringCellValue();
+        int unidadCobro = 0;
+        double valorUnidad = 0.0;
+        double exenc_bonif = -1.0;
+        //Falta el importe y el total que se añaden al leer la hoja Ordenanzas
 
+        //Unidad de cobro -> CVs(1), plazas(2), kgs(3), CCs(4)
+        if (row.getCell(5) != null) {
+            unidadCobro = 1;
+
+            if (row.getCell(5).getCellType() == CellType.NUMERIC) {
+                valorUnidad = row.getCell(5).getNumericCellValue();
+            }
+            else if (row.getCell(5).getCellType() == CellType.STRING) {
+                try {
+                    valorUnidad = Double.parseDouble(row.getCell(5).getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Error al convertir String a double: " + row.getCell(5).getStringCellValue());
+                }
+            }
+        }
+        else if (row.getCell(6) != null) {
+            unidadCobro = 2;
+
+            if (row.getCell(6).getCellType() == CellType.NUMERIC) {
+                valorUnidad = row.getCell(8).getNumericCellValue();
+            }
+            else if (row.getCell(6).getCellType() == CellType.STRING) {
+                try {
+                    valorUnidad = Double.parseDouble(row.getCell(6).getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Error al convertir String a double: " + row.getCell(6).getStringCellValue());
+                }
+            }
+        }
+        else if (row.getCell(7) != null) {
+            unidadCobro = 3;
+
+            if (row.getCell(7).getCellType() == CellType.NUMERIC) {
+                valorUnidad = row.getCell(7).getNumericCellValue();
+            }
+            else if (row.getCell(7).getCellType() == CellType.STRING) {
+                try {
+                    valorUnidad = Double.parseDouble(row.getCell(7).getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Error al convertir String a double: " + row.getCell(7).getStringCellValue());
+                }
+            }
+        }
+        else if (row.getCell(8) != null) {
+            unidadCobro = 4;
+
+            if (row.getCell(8).getCellType() == CellType.NUMERIC) {
+                valorUnidad = row.getCell(8).getNumericCellValue();
+            }
+            else if (row.getCell(8).getCellType() == CellType.STRING) {
+                try {
+                    valorUnidad = Double.parseDouble(row.getCell(8).getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Error al convertir String a double: " + row.getCell(8).getStringCellValue());
+                }
+            }
+        }
+
+        Cell exenc_bonifCell = row.getCell(9);
+
+        if (exenc_bonifCell != null || exenc_bonifCell.getCellType() != CellType.BLANK) {
+            //No está exento, paga el importe total
+            if (exenc_bonifCell.getStringCellValue().equals("N")) {
+                //Si hubiera bonificación (porcentaje supongo) imagino que sería (100 - bonif) * importe -> 100 - 0 = 100
+                exenc_bonif = 0.0;
+            }
+        }
+
+        VehiculoExcel v = new VehiculoExcel();
+        v.setNifPropietario(nifPropietario);
+        v.setTipoVehiculo(tipo);
+        v.setMarca(marca);
+        v.setModelo(modelo);
+        v.setMatricula(matricula);
+        v.setBastidor(bastidor);
+        v.setUnidadCobro(unidadCobro);
+        v.setValorUnidad(valorUnidad);
+        v.setExenc_bonif(exenc_bonif);
+
+        //La clave del mapa es el NIFNIE, puesto que existe la posibilidad de que una persona tenga varios vehiculos (valor)
+        //Cada vehiculo se asocia a un nif, por eso un nif puede asociarse a una lista de vehiculos
+        //Este metodo añade el vehiculo al map asociado al nif, si el nif no estaba ya crea una lista, si ya existía (ya tenía
+        //un vehículo registrado a su nombre) recupera la lista e incluye el nuevo vehículo
+        vehiculosContribuyentesMap.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(v);
+    }
 
 }

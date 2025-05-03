@@ -19,8 +19,8 @@ public class ExcelManager {
     HashSet<String> matriculaSet = new HashSet<>();
 
     //Mapas para relacionar contribuyentes y sus vehículos para generar los recibos
-    Map<String, ContribuyenteExcel> contribuyentes = new HashMap<>();
-    Map<String, List<VehiculoExcel>> vehiculosContribuyentes = new HashMap<>();
+    Map<String, ContribuyenteExcel> contribuyentesMap = new HashMap<>(); // <- Hoja Contribuyentes
+    Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap = new HashMap<>(); // <- Hoja vehiculos
 
     /*Lee el archivo excel indicado en la ruta que recibe y el número de hoja especificado*/
     public void readExcel(String filepath, int sheet) {
@@ -96,7 +96,7 @@ public class ExcelManager {
                     //Valida el CCC si la celda 9 es no nula
                     //Genera IBAN y correo si NIF/NIE y CCC correctos o subsanados
                     if (cccCell != null) {
-                        validadorCCC.comprobarCCC(row, wb, filepath, sheet, cccSet, dniSet, correoSet, dniCell, cccCell);
+                        validadorCCC.comprobarCCC(row, wb, filepath, sheet, cccSet, dniSet, correoSet, dniCell, cccCell, contribuyentesMap);
                     }
 
                 }
@@ -207,7 +207,7 @@ public class ExcelManager {
 
                     //Comprueba que los datos del vehiculo son correctos
                     if (matriculaCell != null && tipoVehiculoCell != null) {
-                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell, fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell, nifPropietarioCell);
+                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell, fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell, nifPropietarioCell, vehiculosContribuyentesMap);
                     }
                     else {
                         System.out.println("No es posible comprobar los datos del vehículo.");

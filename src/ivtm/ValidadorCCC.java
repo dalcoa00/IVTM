@@ -2,6 +2,9 @@ package ivtm;
 
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.Map;
+
+import modelosExcel.ContribuyenteExcel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -62,7 +65,7 @@ public class ValidadorCCC {
         }
         return dniNie;
     }
-    public void comprobarCCC(Row row, XSSFWorkbook wb, String  ruta, int sheet, HashSet<String> cccSet, HashSet<String> dniSet, HashSet<String> correoSet, Cell dniCell, Cell cccCell) {
+    public void comprobarCCC(Row row, XSSFWorkbook wb, String  ruta, int sheet, HashSet<String> cccSet, HashSet<String> dniSet, HashSet<String> correoSet, Cell dniCell, Cell cccCell,  Map<String, ContribuyenteExcel> contribuyentesMap) {
         //Una vez que se comprueba el CCC hay que generar el IBAN
         //Aunque el CCC sea erróneo (o se ha subsanado), si se puede generar el IBAN se genera y se incluye en erroresCCC o se actualiza en el Excel
         Integer[] factores = {1, 2, 4, 8, 5, 10, 9, 7, 3, 6};
@@ -181,6 +184,9 @@ public class ValidadorCCC {
                 if (!ccc.equals(nuevoCCC)) {
                     editor.xmlCuenta(rutaXML, row.getRowNum(), row.getCell(3).getStringCellValue(), row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), dniCell.getStringCellValue(), ccc, iban, "");
                 }
+
+                //Agrega el contribuyente al map para generar los recibos
+                agregarContribuyente(contribuyentesMap, row);
             }
 
         }
@@ -249,6 +255,27 @@ public class ValidadorCCC {
         }
 
         return numPais.toString();
+    }
+
+    /*Metodo que agrega el contribuyente al Map una vez sus datos han sido verificados o subsanados*/
+    public void agregarContribuyente (Map<String, ContribuyenteExcel> contribuyentesMap, Row row) {
+        String nombre = row.getCell(3).getStringCellValue();
+        String apellido1 = row.getCell(1).getStringCellValue();
+        String apellido2 = row.getCell(2).getStringCellValue();
+        String nifnie = row.getCell(0).getStringCellValue();
+        String direccion = row.getCell(4).getStringCellValue();
+        String iban = row.getCell(10).getStringCellValue();
+        //Falta la bonificacion que se añade más adelante, al leer Ordenanzas
+
+        ContribuyenteExcel c = new ContribuyenteExcel();
+        c.setNombre(nombre);
+        c.setApellido1(apellido1);
+        c.setApellido2(apellido2);
+        c.setNifnie(nifnie);
+        c.setDireccion(direccion);
+        c.setIban(iban);
+
+        contribuyentesMap.put(nifnie, c);
     }
 
 }
