@@ -1,8 +1,9 @@
 package ivtm;
 
 import java.util.*;
+import POJOS.*;
+import modelosExcel.*;
 
-import modelosExcel.VehiculoExcel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -194,6 +195,7 @@ public class ValidadorVehiculo {
     }
 
     private boolean esMatriculaCiclomotor (String matricula) {
+
         return matricula.matches("C\\d{4}[A-Z]{3}");
     }
 
@@ -243,6 +245,7 @@ public class ValidadorVehiculo {
     }
 
     private boolean esMatriculaHistorico (String matricula) {
+
         return matricula.matches("H\\d{4}[A-Z]{3}");
     }
 
@@ -282,7 +285,9 @@ public class ValidadorVehiculo {
         String bastidor = row.getCell(4).getStringCellValue();
         int unidadCobro = 0;
         double valorUnidad = 0.0;
-        double exenc_bonif = -1.0;
+
+        String exenc = row.getCell(9).getStringCellValue().trim();
+        Character exencion = exenc.charAt(0);
         //Falta el importe y el total que se añaden al leer la hoja Ordenanzas
 
         //Unidad de cobro -> CVs(1), plazas(2), kgs(3), CCs(4)
@@ -343,16 +348,6 @@ public class ValidadorVehiculo {
             }
         }
 
-        Cell exenc_bonifCell = row.getCell(9);
-
-        if (exenc_bonifCell != null || exenc_bonifCell.getCellType() != CellType.BLANK) {
-            //No está exento, paga el importe total
-            if (exenc_bonifCell.getStringCellValue().equals("N")) {
-                //Si hubiera bonificación (porcentaje supongo) imagino que sería (100 - bonif) * importe -> 100 - 0 = 100
-                exenc_bonif = 0.0;
-            }
-        }
-
         VehiculoExcel v = new VehiculoExcel();
         v.setNifPropietario(nifPropietario);
         v.setTipoVehiculo(tipo);
@@ -362,7 +357,7 @@ public class ValidadorVehiculo {
         v.setBastidor(bastidor);
         v.setUnidadCobro(unidadCobro);
         v.setValorUnidad(valorUnidad);
-        v.setExenc_bonif(exenc_bonif);
+        v.setExenc_bonif(exencion);
 
         //La clave del mapa es el NIFNIE, puesto que existe la posibilidad de que una persona tenga varios vehiculos (valor)
         //Cada vehiculo se asocia a un nif, por eso un nif puede asociarse a una lista de vehiculos

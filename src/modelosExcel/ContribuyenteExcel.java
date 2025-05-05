@@ -7,7 +7,7 @@ public class ContribuyenteExcel {
     private String nifnie;
     private String direccion;
     private String iban;
-    private String bonificacion;
+    private Double bonificacion;
 
     public String getNombre() {
         return nombre;
@@ -57,11 +57,11 @@ public class ContribuyenteExcel {
         this.iban = iban;
     }
 
-    public String getBonificacion() {
+    public Double getBonificacion() {
         return bonificacion;
     }
 
-    public void setBonificacion(String bonificacion) {
+    public void setBonificacion(Double bonificacion) {
         this.bonificacion = bonificacion;
     }
 }

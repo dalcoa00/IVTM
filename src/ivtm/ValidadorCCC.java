@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Map;
 
+import POJOS.*;
 import modelosExcel.ContribuyenteExcel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -265,6 +266,7 @@ public class ValidadorCCC {
         String nifnie = row.getCell(0).getStringCellValue();
         String direccion = row.getCell(4).getStringCellValue();
         String iban = row.getCell(10).getStringCellValue();
+        Double bonificacion = row.getCell(11).getNumericCellValue();
         //Falta la bonificacion que se añade más adelante, al leer Ordenanzas
 
         ContribuyenteExcel c = new ContribuyenteExcel();
@@ -274,6 +276,7 @@ public class ValidadorCCC {
         c.setNifnie(nifnie);
         c.setDireccion(direccion);
         c.setIban(iban);
+        c.setBonificacion(bonificacion);
 
         contribuyentesMap.put(nifnie, c);
     }

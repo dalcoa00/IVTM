@@ -11,9 +11,9 @@ public class VehiculoExcel {
     private int unidadCobro;
     //nº cvs, plazas, kgs o ccs
     private double valorUnidad;
-    private double importe;
-    private double exenc_bonif;
-    private double total;
+    private double importe; //Se añade al calcularlo leyendo Ordenanza
+    private Character exencion;
+    private double total; //Tras leer ordenanza se calcula
 
     public String getNifPropietario() {
         return nifPropietario;
@@ -87,12 +87,12 @@ public class VehiculoExcel {
         this.importe = importe;
     }
 
-    public double getExenc_bonif() {
-        return exenc_bonif;
+    public Character getExencion() {
+        return exencion;
     }
 
-    public void setExenc_bonif(double exenc_bonif) {
-        this.exenc_bonif = exenc_bonif;
+    public void setExenc_bonif(Character exencion) {
+        this.exencion = exencion;
     }
 
     public double getTotal() {

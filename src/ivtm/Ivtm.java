@@ -73,12 +73,16 @@ public class Ivtm {
     //Prácticas 2, 3 Y 4
     public static void validateNUpdate(ExcelManager manager) {
         String rutaVehiculos = "resources\\SistemasVehiculos.xlsx";
+        String rutaOrdenanzas = "resources\\SistemasOrdenanzas.xlsx";
 
         /*Lee la hoja "Contribuyentes", comprueba los campos y los actualiza de ser necesario*/
         manager.readExcel(rutaVehiculos, 0);
 
         /*Lee la hoja "Vehiculos" y comprueba si los campos son correctos*/
         manager.readExcel(rutaVehiculos, 1);
+
+        /*Lee la hoja ordenanzas para saber los importes a aplicar*/
+        manager.readExcel(rutaOrdenanzas, 0);
     }
 
 
