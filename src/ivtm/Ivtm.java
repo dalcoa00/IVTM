@@ -84,8 +84,4 @@ public class Ivtm {
         /*Lee la hoja ordenanzas para saber los importes a aplicar*/
         manager.readExcel(rutaOrdenanzas, 0);
     }
-
-
-
-    
 }

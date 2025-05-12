@@ -237,12 +237,23 @@ public class ExcelManager {
                 XSSFSheet ws = wb.getSheetAt(sheet);
                 System.out.println("\nSe van a calcular los importes correspondientes a cada vehículo \"" + ws.getSheetName() + "\"");
 
+                //Pido por pantalla el año del que se quieren generar los recibos
+                System.out.println("\n\n\nIntroduce el año del que se quieren generar los recibos con formato \"yyyy\" (ej. 2024): ");
+                int anio = solicitaAnyo();
+
                 ImporteRecibo importe = new ImporteRecibo();
-                importe.calculaImporte(ws, vehiculosContribuyentesMap, contribuyentesMap);
+                importe.calculaImporte(ws, vehiculosContribuyentesMap, contribuyentesMap, anio);
 
                 wb.close();
 
-                System.out.println("\nSe han determinado los importes a pagar por cada vehículo.\n");
+                System.out.println("\nSe han determinado los importes a pagar por cada vehículo en el año " + anio + ".\n\n");
+
+                /*
+                * DEPURACIÓN -> Imprimir por pantalla todos los elementos de los maps con sus datos para
+                * comprobar que es correcto
+                *
+                * */
+                printContribuyentesVehiculos(contribuyentesMap, vehiculosContribuyentesMap);
             }
             catch (IOException e) {
                 System.out.println("Error al leer el archivo " + e.getMessage());
@@ -252,9 +263,6 @@ public class ExcelManager {
         else {
             System.out.println("Ruta u hoja errónea.");
         }
-
-        //DEPURACIÓN - Imprimir por pantalla todos los elementos de los Maps con sus datos para comprobar que se
-        //almacenan correctamente
     }
 
     /*
@@ -346,6 +354,17 @@ public class ExcelManager {
 
     }
 
+    /*Pide al usuario el año del que se quieren generar los recibos*/
+    private int solicitaAnyo () {
+        Scanner scan = new Scanner(System.in);
+
+        int anio = scan.nextInt();
+
+        scan.close();
+
+        return anio;
+    }
+
     /*Metodo que limpia los sets al finalizar la ejecución*/
     public void cleanSets() {
         //Despues de leer el documento, vació el HashSet para no consumir memoria
@@ -360,5 +379,53 @@ public class ExcelManager {
         /*dniSet = null;
         cccSet = null;
         correoSet= null;*/
+    }
+
+    /* DEPURACION */
+    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
+        System.out.println("\n\n\n\n\n");
+        System.out.println("Datos de los contribuyentes correctos:\n\n");
+
+        for (Map.Entry<String, ContribuyenteExcel> entry : contribuyentesMap.entrySet()) {
+            ContribuyenteExcel c = entry.getValue();
+            System.out.println("Nombre: " + c.getNombre());
+            System.out.println("Apellido 1: " + c.getApellido1());
+            System.out.println("Apellido 2: " + c.getApellido2());
+            System.out.println("NIFNIE: " + c.getNifnie());
+            System.out.println("Direccion: " + c.getDireccion());
+            System.out.println("IBAN: " + c.getIban());
+            System.out.println("Bonificacion: " + c.getBonificacion());
+            System.out.println("\n\n");
+        }
+
+        System.out.println("Contribuyentes con datos correctos almacenados en el Map: " + contribuyentesMap.size() + "\n");
+
+
+        System.out.println("\n\n\n\n\n");
+        System.out.println("Datos de los vehiculos correctos:\n\n");
+
+        for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
+            List<VehiculoExcel> vehiculos = entry.getValue();
+
+            for (VehiculoExcel v : vehiculos) {
+                System.out.println("Propietario: " + v.getNifPropietario());
+                System.out.println("Tipo: " + v.getTipoVehiculo());
+                System.out.println("Marca: " + v.getMarca());
+                System.out.println("Modelo: " + v.getModelo());
+                System.out.println("Matricula: " + v.getMatricula());
+                System.out.println("Bastidor: " + v.getBastidor());
+                System.out.println("Fecha alta: " + v.getFechaAlta());
+                System.out.println("Fecha baja: " + v.getFechaBaja());
+                System.out.println("Fecha baja temporal: " + v.getFechaBajaTemporal());
+                System.out.println("Unidad de cobro: " + v.getUnidadCobro());
+                System.out.println("Valor unidad: " + v.getValorUnidad());
+                System.out.println("Importe (sin exenciones ni bonificaciones): " + v.getImporte());
+                System.out.println("Exencion: " + v.getExencion());
+                System.out.println("Total: " + v.getTotal());
+                System.out.println("\n\n");
+            }
+        }
+
+        System.out.println("Vehiculos con datos correctos almacenados en el Map: " + vehiculosContribuyentesMap.size() + "\n");
     }
 }

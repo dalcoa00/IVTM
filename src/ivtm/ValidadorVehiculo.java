@@ -32,7 +32,7 @@ public class ValidadorVehiculo {
             return;
         }
 
-        System.out.println("\nTodos los datos del vehículos son correctos.");
+        System.out.println("\nTodos los datos del vehículo son correctos.");
         if (!matriculaSet.add(matricula)) {
             System.out.println("\nMATRICULA DUPLICADA!\n");
             return;
@@ -40,6 +40,7 @@ public class ValidadorVehiculo {
 
         //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
         agregarVehiculo(vehiculosContribuyentesMap, row);
+        System.out.println("VEHICULO AGREGADO CORRECTAMENTE AL MAP JODER");
 
     }
 
@@ -178,14 +179,14 @@ public class ValidadorVehiculo {
         }
 
         //Formato 2: ciudad + 4 dígitos + 1 o 2 letras
-        if (matricula.matches("[A-Z]{1,2}\\d{1,4}[A-Z]{1,2}")) {
+        if (matricula.matches("[A-Z]{1,2}\\d{4}[A-Z]{1,2}")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
         }
 
         //Formato 3: ciudad + 6 dígitos
-        if (matricula.matches("[A-Z]{1,2}\\d{1,6}")) {
+        if (matricula.matches("[A-Z]{1,2}\\d{5,6}")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
@@ -289,6 +290,8 @@ public class ValidadorVehiculo {
         int unidadCobro = 0;
         double valorUnidad = 0.0;
 
+        System.out.println("a");
+
         //Fechas de alta, baja y baja temporal
         for (int i = 11; i < 14; i++) {
             if (row.getCell(i) != null && row.getCell(i).getCellType() != CellType.BLANK) {
@@ -307,6 +310,8 @@ public class ValidadorVehiculo {
             }
         }
 
+        System.out.println("aa");
+
         String exenc = row.getCell(9).getStringCellValue().trim();
         Character exencion = exenc.charAt(0);
 
@@ -324,12 +329,14 @@ public class ValidadorVehiculo {
                     System.out.println("Error al convertir String a double: " + row.getCell(5).getStringCellValue());
                 }
             }
+
+            System.out.println("aaa");
         }
         else if (row.getCell(6) != null) {
             unidadCobro = 2;
 
             if (row.getCell(6).getCellType() == CellType.NUMERIC) {
-                valorUnidad = row.getCell(8).getNumericCellValue();
+                valorUnidad = row.getCell(6).getNumericCellValue();
             }
             else if (row.getCell(6).getCellType() == CellType.STRING) {
                 try {
@@ -338,6 +345,8 @@ public class ValidadorVehiculo {
                     System.out.println("Error al convertir String a double: " + row.getCell(6).getStringCellValue());
                 }
             }
+
+            System.out.println("aaaa");
         }
         else if (row.getCell(7) != null) {
             unidadCobro = 3;
@@ -352,6 +361,7 @@ public class ValidadorVehiculo {
                     System.out.println("Error al convertir String a double: " + row.getCell(7).getStringCellValue());
                 }
             }
+            System.out.println("aaaaa");
         }
         else if (row.getCell(8) != null) {
             unidadCobro = 4;
@@ -366,6 +376,7 @@ public class ValidadorVehiculo {
                     System.out.println("Error al convertir String a double: " + row.getCell(8).getStringCellValue());
                 }
             }
+            System.out.println("aaaaaaaa");
         }
 
         VehiculoExcel v = new VehiculoExcel();
@@ -387,6 +398,8 @@ public class ValidadorVehiculo {
         //Este metodo añade el vehiculo al map asociado al nif, si el nif no estaba ya crea una lista, si ya existía (ya tenía
         //un vehículo registrado a su nombre) recupera la lista e incluye el nuevo vehículo
         vehiculosContribuyentesMap.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(v);
+
+        System.out.println("Vehiculo mapeado correctamente: " + tipo + marca + modelo);
     }
 
 }
