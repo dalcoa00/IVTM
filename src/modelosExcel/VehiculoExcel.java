@@ -1,5 +1,7 @@
 package modelosExcel;
 
+import java.util.Date;
+
 public class VehiculoExcel {
     private String nifPropietario;
     private String tipoVehiculo;
@@ -7,6 +9,9 @@ public class VehiculoExcel {
     private String modelo;
     private String matricula;
     private String bastidor;
+    private Date fechaAlta;
+    private Date fechaBaja;
+    private Date fechaBajaTemporal;
     //1=CVs, 2=Plazas, 3=KGs, 4=CCs
     private int unidadCobro;
     //nº cvs, plazas, kgs o ccs
@@ -61,6 +66,30 @@ public class VehiculoExcel {
 
     public void setBastidor(String bastidor) {
         this.bastidor = bastidor;
+    }
+
+    public Date getFechaAlta() {
+        return fechaAlta;
+    }
+
+    public void setFechaAlta(Date fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+
+    public Date getFechaBaja() {
+        return fechaBaja;
+    }
+
+    public void setFechaBaja(Date fechaBaja) {
+        this.fechaBaja = fechaBaja;
+    }
+
+    public Date getFechaBajaTemporal() {
+        return fechaBajaTemporal;
+    }
+
+    public void setFechaBajaTemporal(Date fechaBajaTemporal) {
+        this.fechaBajaTemporal = fechaBajaTemporal;
     }
 
     public int getUnidadCobro() {

@@ -283,12 +283,32 @@ public class ValidadorVehiculo {
         String modelo = row.getCell(2).getStringCellValue();
         String matricula = row.getCell(3).getStringCellValue();
         String bastidor = row.getCell(4).getStringCellValue();
+        Date fechaAlta = null;
+        Date fechaBaja = null;
+        Date fechaBajaTemp = null;
         int unidadCobro = 0;
         double valorUnidad = 0.0;
 
+        //Fechas de alta, baja y baja temporal
+        for (int i = 11; i < 14; i++) {
+            if (row.getCell(i) != null && row.getCell(i).getCellType() != CellType.BLANK) {
+                if (i == 11) {
+                    fechaAlta = row.getCell(i).getDateCellValue();
+                }
+                else if (i == 12) {
+                    fechaBaja = row.getCell(i).getDateCellValue();
+                }
+                else if (i == 13) {
+                    fechaBajaTemp = row.getCell(i).getDateCellValue();
+                }
+                else {
+                    System.out.println("La celda no contiene una fecha válida");
+                }
+            }
+        }
+
         String exenc = row.getCell(9).getStringCellValue().trim();
         Character exencion = exenc.charAt(0);
-        //Falta el importe y el total que se añaden al leer la hoja Ordenanzas
 
         //Unidad de cobro -> CVs(1), plazas(2), kgs(3), CCs(4)
         if (row.getCell(5) != null) {
@@ -355,6 +375,9 @@ public class ValidadorVehiculo {
         v.setModelo(modelo);
         v.setMatricula(matricula);
         v.setBastidor(bastidor);
+        v.setFechaAlta(fechaAlta);
+        v.setFechaBaja(fechaBaja);
+        v.setFechaBajaTemporal(fechaBajaTemp);
         v.setUnidadCobro(unidadCobro);
         v.setValorUnidad(valorUnidad);
         v.setExenc_bonif(exencion);

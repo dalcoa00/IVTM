@@ -226,7 +226,7 @@ public class ExcelManager {
                 e.printStackTrace();
             }
         }
-        /*Lee la hoja Ordenanza para determinar el importe de cada vehiculo*/
+        /*Lee la hoja Ordenanza para determinar el importe a pagar por cada vehiculo*/
         else if (filepath.equals("resources\\SistemasOrdenanzas.xlsx") && sheet == 0) {
             try {
                 FileInputStream file = new FileInputStream(filepath);
@@ -237,8 +237,8 @@ public class ExcelManager {
                 XSSFSheet ws = wb.getSheetAt(sheet);
                 System.out.println("\nSe van a calcular los importes correspondientes a cada vehículo \"" + ws.getSheetName() + "\"");
 
-                ImporteVehiculo importe = new ImporteVehiculo();
-                importe.calculaImporte(ws, contribuyentesMap, vehiculosContribuyentesMap);
+                ImporteRecibo importe = new ImporteRecibo();
+                importe.calculaImporte(ws, vehiculosContribuyentesMap, contribuyentesMap);
 
                 wb.close();
 
