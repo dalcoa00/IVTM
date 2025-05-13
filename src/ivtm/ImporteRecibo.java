@@ -73,7 +73,7 @@ public class ImporteRecibo {
                     //Importe de un año completo aplicando la posible bonificación del propietario
                     vehiculo.setImporte(importe_bonif);
                 } else {
-                    System.out.println("No se ha encontrado el propietario del vehículo.\n");
+                    System.out.println("No se ha encontrado el propietario del vehículo.");
                 }
 
                 //Calculo el importe total (real) del importe en el año solicitado
@@ -132,8 +132,8 @@ public class ImporteRecibo {
 
             boolean paga = true;
 
-            //No paga si fue dado de alta después de comenzar el trimestre
-            if (fechaAlta != null && fechaAlta.after(inicio)) {
+            //No paga si fue dado de alta después de terminar el trimestre
+            if (fechaAlta != null && fechaAlta.after(fin)) {
                 paga = false;
             }
 
@@ -152,9 +152,7 @@ public class ImporteRecibo {
         }
 
         //Importe total del año se divide en 4 partes (4 trimestres)
-        double importeTotal = (vehiculo.getImporte() / 4.0) * trimestresAlta;
-
-        return importeTotal;
+        return (vehiculo.getImporte() / 4.0) * trimestresAlta;
     }
 
 

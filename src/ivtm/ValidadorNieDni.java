@@ -132,7 +132,7 @@ public class ValidadorNieDni {
         System.out.println("El NIE es correcto");
 
         if (!dniSet.add(nie)) {
-            System.out.println("\n***************NIE no se ha podido añadir al SET -- Debe estar duplicado! ***************\n");
+            System.out.println("\nNIE DUPLICADO\n");
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
@@ -195,7 +195,7 @@ public class ValidadorNieDni {
                 fila.getCell(0).setCellValue(dniSubsanado);  // <-- Esto es clave
             }
             if (!dniSet.add(dniSubsanado)) {
-                System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe estar duplicado! ***************\n");
+                System.out.println("\nDNI DUPLICADO\n");
                 editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                         fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                         fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
@@ -208,7 +208,7 @@ public class ValidadorNieDni {
         System.out.println("El dni es correcto");
 
         if (!dniSet.add(dni)) {
-            System.out.println("\n***************DNI no se ha podido añadir al SET -- Debe estar duplicado! ***************\n");
+            System.out.println("\nDNI DUPLICADO\n");
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");

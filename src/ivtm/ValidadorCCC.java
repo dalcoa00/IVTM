@@ -81,10 +81,10 @@ public class ValidadorCCC {
             String codigoMasIdentificacion = "00" + String.format("%04d", codigoEntidadBancaria) + String.format("%04d", identificacionOficina);
 
             int validador1 = Integer.parseInt(ccc.substring(8, 9));
-            System.out.println("validador1: " + validador1);
+            //System.out.println("validador1: " + validador1);
 
             int validador2 = Integer.parseInt(ccc.substring(9, 10));
-            System.out.println("validador2: " + validador2);
+            //System.out.println("validador2: " + validador2);
 
             String numeroCuenta = ccc.substring(10, 20);
             System.out.println("codigo " + codigoMasIdentificacion + " " + " " + validador1 + " " + validador2 + " " + numeroCuenta);
@@ -108,8 +108,8 @@ public class ValidadorCCC {
 
             int resto2 = suma2 % 11;
             int segundoDigitoValidacionCalculado = 11 - resto2;
-            System.out.println(resto);
-            System.out.println(resto2);
+            //System.out.println(resto);
+            //System.out.println(resto2);
             String base1 = "";
             String base2 = "";
 
@@ -127,8 +127,8 @@ public class ValidadorCCC {
                 segundoDigitoValidacionCalculado = 0;
             }
 
-            System.out.println(primerDigitoValidacionCalculado);
-            System.out.println(segundoDigitoValidacionCalculado);
+            //System.out.println(primerDigitoValidacionCalculado);
+            //System.out.println(segundoDigitoValidacionCalculado);
 
             if (primerDigitoValidacionCalculado != validador1) {
                 System.out.println("El primer digito de control es incorrecto");
@@ -162,7 +162,7 @@ public class ValidadorCCC {
             }
             else if (dniCell.getCellType() == CellType.NUMERIC) {
                 dni = String.valueOf((long) dniCell.getNumericCellValue());
-                System.out.println("\nLa celda del DNI era numérica, casteado a String es: " + dni + "\n");
+                //System.out.println("\nLa celda del DNI era numérica, casteado a String es: " + dni + "\n");
             }
             else if (dniCell.getCellType() == CellType.BLANK) {
                 dni = "";

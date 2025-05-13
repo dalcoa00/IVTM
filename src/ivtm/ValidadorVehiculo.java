@@ -40,7 +40,6 @@ public class ValidadorVehiculo {
 
         //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
         agregarVehiculo(vehiculosContribuyentesMap, row);
-        System.out.println("VEHICULO AGREGADO CORRECTAMENTE AL MAP JODER");
 
     }
 
@@ -277,6 +276,13 @@ public class ValidadorVehiculo {
         return false;
     }
 
+    /*
+    * Añade el vehiculo al map asociado al nif, si el nif no estaba ya crea una lista, si ya existía (ya tenía
+    * un vehículo registrado a su nombre) recupera la lista e incluye el nuevo vehículo
+    *
+    * La clave del mapa es el NIFNIE, puesto que existe la posibilidad de que una persona tenga varios vehiculos (valor)
+    * Cada vehiculo se asocia a un nif, por eso un nif puede asociarse a una lista de vehiculos
+    */
     public void agregarVehiculo (Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Row row) {
         String nifPropietario = row.getCell(14).getStringCellValue();
         String tipo = row.getCell(0).getStringCellValue();
@@ -289,8 +295,6 @@ public class ValidadorVehiculo {
         Date fechaBajaTemp = null;
         int unidadCobro = 0;
         double valorUnidad = 0.0;
-
-        System.out.println("a");
 
         //Fechas de alta, baja y baja temporal
         for (int i = 11; i < 14; i++) {
@@ -329,8 +333,6 @@ public class ValidadorVehiculo {
                     System.out.println("Error al convertir String a double: " + row.getCell(5).getStringCellValue());
                 }
             }
-
-            System.out.println("aaa");
         }
         else if (row.getCell(6) != null) {
             unidadCobro = 2;
@@ -345,8 +347,6 @@ public class ValidadorVehiculo {
                     System.out.println("Error al convertir String a double: " + row.getCell(6).getStringCellValue());
                 }
             }
-
-            System.out.println("aaaa");
         }
         else if (row.getCell(7) != null) {
             unidadCobro = 3;
@@ -361,7 +361,6 @@ public class ValidadorVehiculo {
                     System.out.println("Error al convertir String a double: " + row.getCell(7).getStringCellValue());
                 }
             }
-            System.out.println("aaaaa");
         }
         else if (row.getCell(8) != null) {
             unidadCobro = 4;
@@ -376,7 +375,6 @@ public class ValidadorVehiculo {
                     System.out.println("Error al convertir String a double: " + row.getCell(8).getStringCellValue());
                 }
             }
-            System.out.println("aaaaaaaa");
         }
 
         VehiculoExcel v = new VehiculoExcel();
@@ -393,10 +391,6 @@ public class ValidadorVehiculo {
         v.setValorUnidad(valorUnidad);
         v.setExenc_bonif(exencion);
 
-        //La clave del mapa es el NIFNIE, puesto que existe la posibilidad de que una persona tenga varios vehiculos (valor)
-        //Cada vehiculo se asocia a un nif, por eso un nif puede asociarse a una lista de vehiculos
-        //Este metodo añade el vehiculo al map asociado al nif, si el nif no estaba ya crea una lista, si ya existía (ya tenía
-        //un vehículo registrado a su nombre) recupera la lista e incluye el nuevo vehículo
         vehiculosContribuyentesMap.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(v);
 
         System.out.println("Vehiculo mapeado correctamente: " + tipo + marca + modelo);

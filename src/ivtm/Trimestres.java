@@ -20,15 +20,21 @@ public class Trimestres {
 
     private Date getFechaInicioFin (int trimestre, boolean inicio) {
         Calendar cal = Calendar.getInstance();
-        int mes = (trimestre - 1) * 3 + (inicio ? 0 : 2);
-        /*Si inicio == true -> dia = 1
-        * Si inicio == false -> dia = último día del mes (28, 30 o 31 dependiendo del mes)*/
-        int dia = inicio ? 1 : cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        cal.set(anio, mes, dia);
+        //Establecer mes del trimestre
+        int mes = (trimestre - 1) * 3 + (inicio ? 0 : 2); //Mes inicial o final del trimestre
+        cal.set(Calendar.YEAR, anio);
+        cal.set(Calendar.MONTH, mes);
 
-        if (!inicio) {
-            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        //Establecer el día del mes
+        if (inicio) {
+            //Primer día del mes
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+        }
+        else {
+            //Día final del mes
+            int ultimo = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+            cal.set(Calendar.DAY_OF_MONTH, ultimo);
         }
 
         return cal.getTime();

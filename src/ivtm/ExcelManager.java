@@ -9,6 +9,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
@@ -238,7 +240,7 @@ public class ExcelManager {
                 System.out.println("\nSe van a calcular los importes correspondientes a cada vehículo \"" + ws.getSheetName() + "\"");
 
                 //Pido por pantalla el año del que se quieren generar los recibos
-                System.out.println("\n\n\nIntroduce el año del que se quieren generar los recibos con formato \"yyyy\" (ej. 2024): ");
+                System.out.println("\n\n\nIntroduce el año del que se quieren generar los recibos con formato \"aaaa\" (ej. 2024): ");
                 int anio = solicitaAnyo();
 
                 ImporteRecibo importe = new ImporteRecibo();
@@ -246,14 +248,8 @@ public class ExcelManager {
 
                 wb.close();
 
-                System.out.println("\nSe han determinado los importes a pagar por cada vehículo en el año " + anio + ".\n\n");
-
-                /*
-                * DEPURACIÓN -> Imprimir por pantalla todos los elementos de los maps con sus datos para
-                * comprobar que es correcto
-                *
-                * */
-                printContribuyentesVehiculos(contribuyentesMap, vehiculosContribuyentesMap);
+                /*Imprime por pantalla los recibos de los vehículos del año solicitado*/
+                printContribuyentesVehiculos(contribuyentesMap, vehiculosContribuyentesMap, anio);
             }
             catch (IOException e) {
                 System.out.println("Error al leer el archivo " + e.getMessage());
@@ -351,7 +347,6 @@ public class ExcelManager {
         }
 
         return true;
-
     }
 
     /*Pide al usuario el año del que se quieren generar los recibos*/
@@ -363,6 +358,78 @@ public class ExcelManager {
         scan.close();
 
         return anio;
+    }
+
+    /* Metodo que imprime los recibos por pantalla */
+    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, int anio) {
+        //Obtengo el día de hoy (Día que se genera el recibo)
+        LocalDate hoy = LocalDate.now();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        System.out.println("\n---------------  RECIBOS GENERADOS  ---------------\n");
+
+        int totalVehiculos = 0;
+
+        for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
+            String nif = entry.getKey();
+            List<VehiculoExcel> vehiculos = entry.getValue();
+            ContribuyenteExcel c = contribuyentesMap.get(nif);
+
+            if (c == null) continue; //Por si acaso, aunque no debería de haber ningún contribuyente nulo
+
+            for (VehiculoExcel v : vehiculos) {
+                //Imprime los datos del contribuyente/propietario
+                System.out.println("Nombre: " + c.getNombre());
+                System.out.println("Apellido 1: " + c.getApellido1());
+                System.out.println("Apellido 2: " + c.getApellido2());
+                System.out.println("NIFNIE: " + c.getNifnie());
+                System.out.println("Direccion: " + c.getDireccion());
+                System.out.println("IBAN: " + c.getIban());
+                System.out.println("Bonificacion: " + c.getBonificacion());
+
+                //Fecha del recibo y del padrón
+                System.out.println("\nFecha del recibo: " + hoy.format(formato)); //Día que ha sido generado el recibo
+                System.out.println("Fecha del padrón: 01/01/" + anio + "\n"); //Siempre el 1 de enero del año solicitado
+
+                String unidadCobro;
+                //Paso la unidad de cobro a String para imprimir
+                switch (v.getUnidadCobro()) {
+                    case 1:
+                        unidadCobro = "CABALLOS";
+                        break;
+                    case 2:
+                        unidadCobro = "PLAZAS";
+                        break;
+                    case 3:
+                        unidadCobro = "KG";
+                        break;
+                    case 4:
+                        unidadCobro = "CC";
+                        break;
+                    default:
+                        unidadCobro = "No definido";
+                        break;
+                }
+
+                //System.out.println("Propietario: " + v.getNifPropietario());
+                System.out.println("Tipo de vehículo: " + v.getTipoVehiculo());
+                System.out.println("Marca: " + v.getMarca());
+                System.out.println("Modelo: " + v.getModelo());
+                System.out.println("Matricula: " + v.getMatricula());
+                System.out.println("Número de bastidor: " + v.getBastidor());
+                System.out.println("Unidad de cobro: " + unidadCobro);
+                System.out.println("Valor de la unidad de cobro: " + v.getValorUnidad());
+                System.out.println("Importe (sin exenciones ni bonificaciones): " + v.getImporte());
+                System.out.println("Exencion/Bonificación: " + v.getExencion());
+                System.out.println("\nImporte total del recibo: " + v.getTotal());
+                System.out.println("\n---------------------------------------------------------------------------\n");
+
+                totalVehiculos++;
+            }
+        }
+
+        System.out.println("Número de vehículos para los que se ha generado un recibo: " + totalVehiculos);
+        System.out.println("Número de contribuyentes a los que se les ha generado un recibo: " + vehiculosContribuyentesMap.size());
     }
 
     /*Metodo que limpia los sets al finalizar la ejecución*/
@@ -381,51 +448,5 @@ public class ExcelManager {
         correoSet= null;*/
     }
 
-    /* DEPURACION */
-    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
-        System.out.println("\n\n\n\n\n");
-        System.out.println("Datos de los contribuyentes correctos:\n\n");
 
-        for (Map.Entry<String, ContribuyenteExcel> entry : contribuyentesMap.entrySet()) {
-            ContribuyenteExcel c = entry.getValue();
-            System.out.println("Nombre: " + c.getNombre());
-            System.out.println("Apellido 1: " + c.getApellido1());
-            System.out.println("Apellido 2: " + c.getApellido2());
-            System.out.println("NIFNIE: " + c.getNifnie());
-            System.out.println("Direccion: " + c.getDireccion());
-            System.out.println("IBAN: " + c.getIban());
-            System.out.println("Bonificacion: " + c.getBonificacion());
-            System.out.println("\n\n");
-        }
-
-        System.out.println("Contribuyentes con datos correctos almacenados en el Map: " + contribuyentesMap.size() + "\n");
-
-
-        System.out.println("\n\n\n\n\n");
-        System.out.println("Datos de los vehiculos correctos:\n\n");
-
-        for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
-            List<VehiculoExcel> vehiculos = entry.getValue();
-
-            for (VehiculoExcel v : vehiculos) {
-                System.out.println("Propietario: " + v.getNifPropietario());
-                System.out.println("Tipo: " + v.getTipoVehiculo());
-                System.out.println("Marca: " + v.getMarca());
-                System.out.println("Modelo: " + v.getModelo());
-                System.out.println("Matricula: " + v.getMatricula());
-                System.out.println("Bastidor: " + v.getBastidor());
-                System.out.println("Fecha alta: " + v.getFechaAlta());
-                System.out.println("Fecha baja: " + v.getFechaBaja());
-                System.out.println("Fecha baja temporal: " + v.getFechaBajaTemporal());
-                System.out.println("Unidad de cobro: " + v.getUnidadCobro());
-                System.out.println("Valor unidad: " + v.getValorUnidad());
-                System.out.println("Importe (sin exenciones ni bonificaciones): " + v.getImporte());
-                System.out.println("Exencion: " + v.getExencion());
-                System.out.println("Total: " + v.getTotal());
-                System.out.println("\n\n");
-            }
-        }
-
-        System.out.println("Vehiculos con datos correctos almacenados en el Map: " + vehiculosContribuyentesMap.size() + "\n");
-    }
 }
