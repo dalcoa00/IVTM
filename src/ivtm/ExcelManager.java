@@ -369,6 +369,7 @@ public class ExcelManager {
         System.out.println("\n---------------  RECIBOS GENERADOS  ---------------\n");
 
         int totalVehiculos = 0;
+        double totalPadron = 0.0;
 
         for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
             String nif = entry.getKey();
@@ -388,8 +389,7 @@ public class ExcelManager {
                 System.out.println("Bonificacion: " + c.getBonificacion());
 
                 //Fecha del recibo y del padrón
-                System.out.println("\nFecha del recibo: " + hoy.format(formato)); //Día que ha sido generado el recibo
-                System.out.println("Fecha del padrón: 01/01/" + anio + "\n"); //Siempre el 1 de enero del año solicitado
+                System.out.println("\nFecha del recibo: " + hoy.format(formato) + "\n"); //Día que ha sido generado el recibo
 
                 String unidadCobro;
                 //Paso la unidad de cobro a String para imprimir
@@ -425,11 +425,14 @@ public class ExcelManager {
                 System.out.println("\n---------------------------------------------------------------------------\n");
 
                 totalVehiculos++;
+                totalPadron = totalPadron + v.getTotal();
             }
         }
 
         System.out.println("Número de vehículos para los que se ha generado un recibo: " + totalVehiculos);
         System.out.println("Número de contribuyentes a los que se les ha generado un recibo: " + vehiculosContribuyentesMap.size());
+        System.out.println("\nFecha del padrón: 01/01/" + anio); //Siempre el 1 de enero del año solicitado
+        System.out.println("Importe total del padrón (Suma de todos los recibos generados): " + totalPadron + "€");
     }
 
     /*Metodo que limpia los sets al finalizar la ejecución*/
