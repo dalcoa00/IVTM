@@ -144,7 +144,7 @@ public class EditorXML {
         }
     }
     //Escribe recibos.xml HAY QUE SEPARAR CADA  RECIBO DEMASSIADOS PARAMETROS
-    public void xmlRecibo(String rutaArchivo, List<Recibo> recibos, String fechaPadron) {
+    public void xmlRecibo(String rutaArchivo, fechaPadron, double totalPadron, int numeroTotalRecibos, int idRecibo,String exencion, int idFila , String nombre, String apellido1, String apellido2, String nif, String iban, String tipo,String marca, String matricula, double totalR ) {
         try {
             // Calcular el total del padrón y el número de recibos
             double totalPadron = recibos.stream().mapToDouble(Recibo::getTotalRecibo).sum();
@@ -166,19 +166,19 @@ public class EditorXML {
             for (Recibo r : recibos) {
                 // Crear el nodo <Recibo> para cada recibo
                 Element reciboElem = doc.createElement("Recibo");
-                //reciboElem.setAttribute("idRecibo", String.valueOf(r.getIdRecibo()));
+                reciboElem.setAttribute("idRecibo", String.valueOf(idRecibo));
 
-                appendChild(doc, reciboElem, "Exencion", r.getExenc_bonif());
-                //appendChild(doc, reciboElem, "idFilaExcelVehiculo", String.valueOf(r.getIdFilaExcelVehiculo()));
-                appendChild(doc, reciboElem, "nombre", r.getNombre());
-                appendChild(doc, reciboElem, "primerApellido", r.getApellido1());
-                appendChild(doc, reciboElem, "segundoApellido", r.getApellido2());
-                appendChild(doc, reciboElem, "NIF", r.getNifnie());
-                appendChild(doc, reciboElem, "IBAN", r.getIban());
-                appendChild(doc, reciboElem, "tipoVehiculo", r.getTipoVehiculo());
-                appendChild(doc, reciboElem, "marcaModelo", r.getMarca());
-                appendChild(doc, reciboElem, "matricula", r.getMatricula());
-                appendChild(doc, reciboElem, "totalRecibo", String.format("%.2f", r.getTotal()));
+                appendChild(doc, reciboElem, "Exencion", exencion);
+                appendChild(doc, reciboElem, "idFilaExcelVehiculo", idFila);
+                appendChild(doc, reciboElem, "nombre", nombre);
+                appendChild(doc, reciboElem, "primerApellido", apellido1);
+                appendChild(doc, reciboElem, "segundoApellido", apellido2);
+                appendChild(doc, reciboElem, "NIF", nif);
+                appendChild(doc, reciboElem, "IBAN", iban);
+                appendChild(doc, reciboElem, "tipoVehiculo", tipo);
+                appendChild(doc, reciboElem, "marcaModelo", marca);
+                appendChild(doc, reciboElem, "matricula", matricula);
+                appendChild(doc, reciboElem, "totalRecibo", String.format("%.2f", totalR));
 
                 // Añadir el recibo al nodo raíz
                 root.appendChild(reciboElem);
@@ -259,5 +259,52 @@ public class EditorXML {
         elem.setTextContent(textContent);
         parent.appendChild(elem);
     }
+    //Metodo que permite modificar los atributos  del xml  de recibos para hacerlo al final 
+    public void modificarAtributosPadron(String rutaArchivo, String nuevaFechaPadron, double nuevoTotalPadron, int nuevoNumeroRecibos) {
+    try {
+        File archivo = new File(rutaArchivo);
+
+        if (!archivo.exists()) {
+            System.err.println("El archivo XML no existe: " + rutaArchivo);
+            return;
+        }
+
+        // Cargar el documento XML existente
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(archivo);
+
+        // Obtener el nodo raíz <Recibos>
+        NodeList listaRecibos = doc.getElementsByTagName("Recibos");
+
+        if (listaRecibos.getLength() == 0) {
+            System.err.println("El documento no contiene un nodo raíz <Recibos>.");
+            return;
+        }
+
+        Element root = (Element) listaRecibos.item(0);
+
+        // Modificar los atributos
+        root.setAttribute("fechaPadron", nuevaFechaPadron);
+        root.setAttribute("totalPadron", String.format("%.2f", nuevoTotalPadron));
+        root.setAttribute("numeroTotalRecibos", String.valueOf(nuevoNumeroRecibos));
+
+        // Guardar los cambios en el mismo archivo
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(archivo);
+        transformer.transform(source, result);
+
+        System.out.println("Atributos del padrón modificados correctamente.");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
 }
 

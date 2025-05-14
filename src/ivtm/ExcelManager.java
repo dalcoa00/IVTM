@@ -19,6 +19,7 @@ public class ExcelManager {
     HashSet<String> cccSet = new HashSet<>();
     HashSet<String> correoSet = new HashSet<>();
     HashSet<String> matriculaSet = new HashSet<>();
+     private final String recibosXML = "resources\\Recibos.xml";
 
     //Mapas para relacionar contribuyentes y sus vehículos para generar los recibos
     Map<String, ContribuyenteExcel> contribuyentesMap = new HashMap<>(); // <- Hoja Contribuyentes
@@ -426,13 +427,18 @@ public class ExcelManager {
 
                 totalVehiculos++;
                 totalPadron = totalPadron + v.getTotal();
+                String aux= "IVTM de "+anio;
+                //Total padron aqui 0 porque  todavia no se ha calculado se modifica abajo 
+                //LO QUE HAY  QUE MODIFICAR ES EL 1 POR IDFILADEL VEHICULO
+                EditorXML.xmlRecibo(recibosXML, aux, 0,totalVehiculos,totalVehiculos, v.getExencion(), 1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getMatricula(), v.getTotal() )
             }
         }
-
+        EditorXML.modificarAtributosPadron(recibosXML, totalPadron);
         System.out.println("Número de vehículos para los que se ha generado un recibo: " + totalVehiculos);
         System.out.println("Número de contribuyentes a los que se les ha generado un recibo: " + vehiculosContribuyentesMap.size());
         System.out.println("\nFecha del padrón: 01/01/" + anio); //Siempre el 1 de enero del año solicitado
         System.out.println("Importe total del padrón (Suma de todos los recibos generados): " + totalPadron + "€");
+    
     }
 
     /*Metodo que limpia los sets al finalizar la ejecución*/
