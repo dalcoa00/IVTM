@@ -14,32 +14,35 @@ public class ValidadorVehiculo {
     /*Comprueba la validez de los datos del vehículo*/
     public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
         String matricula = matriculaCell.getStringCellValue().trim().toUpperCase();
-
+        List<String> errores;
         //Comprueba que la correlación de fechas es correcta
         if (!compruebaFechas(fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell)) {
             System.out.println("La correlación de fechas no es correcta.");
-            return;
+            errores.add("Fechas incoherentes");
         }
 
         //Comprueba que la matrícula sea correcta y la añade al set de serlo
         if (!compruebaMatricula(matricula, tipoVehiculoCell)) {
-            return;
+            errores.add("Matricula Erronea");
         }
 
         //Comprueba que el vehículo tiene propietario y si lo tiene comprueba que el NIF sea correcto
         if(!compruebaPropietario(dniSet, nifPropietarioCell)) {
             System.out.println("El vehículo no tiene propietario o su NIF no es válido.");
-            return;
+            errores.add("Vehiculo sin propietario");
         }
 
         System.out.println("\nTodos los datos del vehículo son correctos.");
         if (!matriculaSet.add(matricula)) {
             System.out.println("\nMATRICULA DUPLICADA!\n");
-            return;
+            errores.add("Matricula duplicada");
         }
-
+        if(errores.isEmpty()){
+            agregarVehiculo(vehiculosContribuyentesMap, row);
+        }else{
+            EditorXML.xmlVehiculos(erroresVehiculosXML, row.getRowNum(),row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), errores);
+        }
         //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
-        agregarVehiculo(vehiculosContribuyentesMap, row);
 
     }
 
