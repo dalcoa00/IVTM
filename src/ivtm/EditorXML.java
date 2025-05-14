@@ -188,7 +188,7 @@ public class EditorXML {
         }
     }*/
 
-    public void xmlVehiculos(String rutaArchivo, int id, String marca, String modelo, String tipodeError){
+    public void xmlVehiculos(String rutaArchivo, int id, String marca, String modelo, List<String> errores){
         try{
             File xmlFile = new File(rutaArchivo);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -212,9 +212,12 @@ public class EditorXML {
             cuentaElement.appendChild(modeloElement);
 
             Element tipodeErrorElement = doc.createElement("Error");
-            tipodeErrorElement.appendChild(doc.createTextNode(tipodeError));
+            String erroresTexto = String.join(". ", errores);
+            if (!erroresTexto.endsWith(".")) {
+                erroresTexto += "."; 
+            }
+            tipodeErrorElement.appendChild(doc.createTextNode(erroresTexto));
             cuentaElement.appendChild(tipodeErrorElement);
-            // Agregar el nuevo contribuyente al XML
 
             rootElement.appendChild(cuentaElement);
 
