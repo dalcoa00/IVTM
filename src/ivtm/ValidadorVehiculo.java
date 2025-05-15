@@ -14,44 +14,57 @@ public class ValidadorVehiculo {
     /*Comprueba la validez de los datos del vehículo*/
     public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
         String matricula = matriculaCell.getStringCellValue().trim().toUpperCase();
-        //List<String> errores = Collections.emptyList();
+        List<String> errores = new ArrayList<>();
         //Comprueba que la correlación de fechas es correcta
         if (!compruebaFechas(fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell)) {
             System.out.println("La correlación de fechas no es correcta.");
-            //errores.add("Fechas incoherentes");
-            return;
+            errores.add("Fechas incoherentes");
+            //return;
         }
 
         //Comprueba que la matrícula sea correcta y la añade al set de serlo
         if (!compruebaMatricula(matricula, tipoVehiculoCell)) {
-            //errores.add("Matricula Erronea");
-            return;
+            errores.add("Matricula Erronea");
+            //return;
         }
 
         //Comprueba que el vehículo tiene propietario y si lo tiene comprueba que el NIF sea correcto
         if(!compruebaPropietario(dniSet, nifPropietarioCell)) {
             System.out.println("El vehículo no tiene propietario o su NIF no es válido.");
-            //errores.add("Vehiculo sin propietario");
-            return;
+            errores.add("Vehiculo sin propietario");
+            //return;
         }
 
         System.out.println("\nTodos los datos del vehículo son correctos.");
         if (!matriculaSet.add(matricula)) {
             System.out.println("\nMATRICULA DUPLICADA!\n");
-            //errores.add("Matricula duplicada");
-            return;
+            errores.add("Matricula duplicada");
+            //return;
         }
-        /*if(errores.isEmpty()){*/
+        if(errores.isEmpty()){
             agregarVehiculo(vehiculosContribuyentesMap, row);
-        /*}else{
-            editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum(),row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), errores);
-        }*/
+        }else{
+            String aux="";
+            String aux2="";
+             if (row.getCell(1).getCellType() == CellType.NUMERIC) {
+                aux = String.format("%.0f", row.getCell(1).getNumericCellValue());
+            }else{
+                aux=row.getCell(1).getStringCellValue();
+            }
+            if(row.getCell(2).getCellType()==CellType.NUMERIC){
+                aux2= String.format("%.0f", row.getCell(2).getNumericCellValue());
+            }else{
+                aux2=row.getCell(2).getStringCellValue();
+            }
+            
+            editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum(),aux, aux2, errores);
+        }
         //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
 
         //Vacía la lista de errores para que no ocupe memoria por si acaso
-        /*if (!errores.isEmpty()) {
+        if (!errores.isEmpty()) {
             errores.clear();
-        }*/
+        }
     }
 
     /*Comprueba que la correlación de fechas sea correcta*/

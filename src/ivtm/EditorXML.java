@@ -144,66 +144,67 @@ public class EditorXML {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    //Escribe recibos.xml HAY QUE SEPARAR CADA  RECIBO DEMASSIADOS PARAMETROS
-    /*public void xmlRecibo(String rutaArchivo, String fechaPadron, double totalPadron, int numeroTotalRecibos, int idRecibo, Character exencion, int idFila , String nombre, String apellido1, String apellido2, String nif, String iban, String tipo,String marca, String matricula, double totalR ) {
-        try {
-            // Calcular el total del padrón y el número de recibos
-            totalPadron = recibos.stream().mapToDouble(Recibo::getTotalRecibo).sum();
-            numeroTotalRecibos = recibos.size();
+    }public void xmlRecibo(String rutaArchivo, String fechaPadron, double totalPadron, int numeroTotalRecibos,
+                      int idRecibo, Character exencion, int idFila, String nombre, String apellido1,
+                      String apellido2, String nif, String iban, String tipo, String marca,
+                      String matricula, double totalR) {
+    try {
+        Document doc;
+        Element root;
 
-            // Crear un nuevo documento XML
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.newDocument();
+        File archivo = new File(rutaArchivo);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
 
-            // Crear el nodo raíz <Recibos> y añadir los atributos
-            Element root = doc.createElement("Recibos");
+        if (archivo.exists()) {
+            // Leer el documento existente
+            doc = builder.parse(archivo);
+            root = doc.getDocumentElement();
+        } else {
+            // Crear nuevo documento
+            doc = builder.newDocument();
+            root = doc.createElement("Recibos");
             root.setAttribute("fechaPadron", fechaPadron);
             root.setAttribute("totalPadron", String.format("%.2f", totalPadron));
             root.setAttribute("numeroTotalRecibos", String.valueOf(numeroTotalRecibos));
             doc.appendChild(root);
-
-            // Iterar sobre la lista de recibos y crear los nodos correspondientes
-            for (Recibo r : recibos) {
-                // Crear el nodo <Recibo> para cada recibo
-                Element reciboElem = doc.createElement("Recibo");
-                reciboElem.setAttribute("idRecibo", String.valueOf(idRecibo));
-
-                appendChild(doc, reciboElem, "Exencion", exencion);
-                appendChild(doc, reciboElem, "idFilaExcelVehiculo", idFila);
-                appendChild(doc, reciboElem, "nombre", nombre);
-                appendChild(doc, reciboElem, "primerApellido", apellido1);
-                appendChild(doc, reciboElem, "segundoApellido", apellido2);
-                appendChild(doc, reciboElem, "NIF", nif);
-                appendChild(doc, reciboElem, "IBAN", iban);
-                appendChild(doc, reciboElem, "tipoVehiculo", tipo);
-                appendChild(doc, reciboElem, "marcaModelo", marca);
-                appendChild(doc, reciboElem, "matricula", matricula);
-                appendChild(doc, reciboElem, "totalRecibo", String.format("%.2f", totalR));
-
-                // Añadir el recibo al nodo raíz
-                root.appendChild(reciboElem);
-            }
-
-            // Configurar el transformer para guardar el archivo XML
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File(rutaArchivo));
-
-            // Guardar el documento en el archivo especificado
-            transformer.transform(source, result);
-
-            System.out.println("Archivo XML generado correctamente.");
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-    }*/
+
+        // Crear el nodo <Recibo>
+        Element reciboElem = doc.createElement("Recibo");
+        reciboElem.setAttribute("idRecibo", String.valueOf(idRecibo));
+        appendChild(doc, reciboElem, "Exencion", String.valueOf(exencion));
+        appendChild(doc, reciboElem, "idFilaExcelVehiculo", String.valueOf(idFila));
+        appendChild(doc, reciboElem, "nombre", nombre);
+        appendChild(doc, reciboElem, "primerApellido", apellido1);
+        appendChild(doc, reciboElem, "segundoApellido", apellido2);
+        appendChild(doc, reciboElem, "NIF", nif);
+        appendChild(doc, reciboElem, "IBAN", iban);
+        appendChild(doc, reciboElem, "tipoVehiculo", tipo);
+        appendChild(doc, reciboElem, "marcaModelo", marca);
+        appendChild(doc, reciboElem, "matricula", matricula);
+        appendChild(doc, reciboElem, "totalRecibo", String.format("%.2f", totalR));
+
+        // Añadir el recibo al nodo raíz
+        root.appendChild(reciboElem);
+
+        // Guardar el documento actualizado
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(archivo);
+        transformer.transform(source, result);
+
+        System.out.println("Recibo añadido correctamente.");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
 
     public void xmlVehiculos(String rutaArchivo, int id, String marca, String modelo, List<String> errores){
         try{

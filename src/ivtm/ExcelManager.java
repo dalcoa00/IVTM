@@ -433,7 +433,7 @@ public class ExcelManager {
 
                 //Total padron aqui 0 porque  todavia no se ha calculado se modifica abajo 
                 //LO QUE HAY  QUE MODIFICAR ES EL 1 POR IDFILADEL VEHICULO
-                //editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila(), c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getMatricula(), v.getTotal() );
+                editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila(), c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getMatricula(), v.getTotal() );
             }
         }
         //Redondea el total del padrón a 2 decimales
