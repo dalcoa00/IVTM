@@ -260,7 +260,7 @@ public class EditorXML {
         parent.appendChild(elem);
     }
     //Metodo que permite modificar los atributos  del xml  de recibos para hacerlo al final 
-    public void modificarAtributosPadron(String rutaArchivo, String nuevaFechaPadron, double nuevoTotalPadron, int nuevoNumeroRecibos) {
+    public void modificarAtributosPadron(String rutaArchivo, double nuevoTotalPadron) {
     try {
         File archivo = new File(rutaArchivo);
 
@@ -285,9 +285,8 @@ public class EditorXML {
         Element root = (Element) listaRecibos.item(0);
 
         // Modificar los atributos
-        root.setAttribute("fechaPadron", nuevaFechaPadron);
         root.setAttribute("totalPadron", String.format("%.2f", nuevoTotalPadron));
-        root.setAttribute("numeroTotalRecibos", String.valueOf(nuevoNumeroRecibos));
+
 
         // Guardar los cambios en el mismo archivo
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
