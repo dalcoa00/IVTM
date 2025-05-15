@@ -14,7 +14,7 @@ public class ValidadorVehiculo {
     /*Comprueba la validez de los datos del vehículo*/
     public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
         String matricula = matriculaCell.getStringCellValue().trim().toUpperCase();
-        List<String> errores;
+        List<String> errores = Collections.emptyList();
         //Comprueba que la correlación de fechas es correcta
         if (!compruebaFechas(fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell)) {
             System.out.println("La correlación de fechas no es correcta.");
@@ -40,10 +40,14 @@ public class ValidadorVehiculo {
         if(errores.isEmpty()){
             agregarVehiculo(vehiculosContribuyentesMap, row);
         }else{
-            EditorXML.xmlVehiculos(erroresVehiculosXML, row.getRowNum(),row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), errores);
+            editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum(),row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), errores);
         }
         //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
 
+        //Vacía la lista de errores para que no ocupe memoria por si acaso
+        if (!errores.isEmpty()) {
+            errores.clear();
+        }
     }
 
     /*Comprueba que la correlación de fechas sea correcta*/
@@ -287,6 +291,7 @@ public class ValidadorVehiculo {
     * Cada vehiculo se asocia a un nif, por eso un nif puede asociarse a una lista de vehiculos
     */
     public void agregarVehiculo (Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Row row) {
+        int idFila = row.getRowNum();
         String nifPropietario = row.getCell(14).getStringCellValue();
         String tipo = row.getCell(0).getStringCellValue();
         String marca = row.getCell(1).getStringCellValue();
@@ -381,6 +386,7 @@ public class ValidadorVehiculo {
         }
 
         VehiculoExcel v = new VehiculoExcel();
+        v.setIdFila(idFila);
         v.setNifPropietario(nifPropietario);
         v.setTipoVehiculo(tipo);
         v.setMarca(marca);

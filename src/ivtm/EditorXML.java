@@ -2,6 +2,7 @@ package ivtm;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,6 +12,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.List;
 
 public class EditorXML {
     //Escribe en ErroresNifNie.xml los errores del archivo
@@ -144,11 +146,11 @@ public class EditorXML {
         }
     }
     //Escribe recibos.xml HAY QUE SEPARAR CADA  RECIBO DEMASSIADOS PARAMETROS
-    public void xmlRecibo(String rutaArchivo, fechaPadron, double totalPadron, int numeroTotalRecibos, int idRecibo,String exencion, int idFila , String nombre, String apellido1, String apellido2, String nif, String iban, String tipo,String marca, String matricula, double totalR ) {
+    /*public void xmlRecibo(String rutaArchivo, String fechaPadron, double totalPadron, int numeroTotalRecibos, int idRecibo, Character exencion, int idFila , String nombre, String apellido1, String apellido2, String nif, String iban, String tipo,String marca, String matricula, double totalR ) {
         try {
             // Calcular el total del padrón y el número de recibos
-            double totalPadron = recibos.stream().mapToDouble(Recibo::getTotalRecibo).sum();
-            int numeroTotalRecibos = recibos.size();
+            totalPadron = recibos.stream().mapToDouble(Recibo::getTotalRecibo).sum();
+            numeroTotalRecibos = recibos.size();
 
             // Crear un nuevo documento XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -201,7 +203,7 @@ public class EditorXML {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void xmlVehiculos(String rutaArchivo, int id, String marca, String modelo, List<String> errores){
         try{

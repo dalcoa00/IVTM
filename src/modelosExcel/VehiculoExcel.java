@@ -3,6 +3,7 @@ package modelosExcel;
 import java.util.Date;
 
 public class VehiculoExcel {
+    private int idFila;
     private String nifPropietario;
     private String tipoVehiculo;
     private String marca;
@@ -19,6 +20,14 @@ public class VehiculoExcel {
     private double importe; //Se añade al calcularlo leyendo Ordenanza
     private Character exencion;
     private double total; //Tras leer ordenanza se calcula
+
+    public int getIdFila() {
+        return idFila;
+    }
+
+    public void setIdFila(int idFila) {
+        this.idFila = idFila;
+    }
 
     public String getNifPropietario() {
         return nifPropietario;
