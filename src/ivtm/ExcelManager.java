@@ -385,9 +385,6 @@ public class ExcelManager {
             for (VehiculoExcel v : vehiculos) {
                 totalPadron = totalPadron + v.getTotal();
 
-                //Imprime el ID del recibo (fila del vehiculo)
-                System.out.println("Id: " + v.getIdFila() + "\n");
-
                 //Imprime los datos del contribuyente/propietario
                 System.out.println("Nombre: " + c.getNombre());
                 System.out.println("Apellido 1: " + c.getApellido1());
@@ -439,12 +436,14 @@ public class ExcelManager {
                 //editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila(), c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getMatricula(), v.getTotal() );
             }
         }
-        //Lo comento para que no de errores y pueda ejecutar. como no entiendo nada corriges tú los errores de los xml
+        //Redondea el total del padrón a 2 decimales
+        totalPadron = Math.round(totalPadron * 100.0) / 100.0;
+
         editor.modificarAtributosPadron(recibosXML, totalPadron);
         System.out.println("Número de vehículos para los que se ha generado un recibo: " + totalVehiculos);
         System.out.println("Número de contribuyentes a los que se les ha generado un recibo: " + vehiculosContribuyentesMap.size());
 
-        System.out.println("\nFecha del padrón: 01/01/" + anio); //Siempre el 1 de enero del año solicitado
+        System.out.println("\nIVTM de " + fechaPadron); //Siempre el 1 de enero del año solicitado
         System.out.println("Importe total del padrón (Suma de todos los recibos generados): " + totalPadron + "€");
     
     }

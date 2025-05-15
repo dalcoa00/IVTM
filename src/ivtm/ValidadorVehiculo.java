@@ -14,40 +14,44 @@ public class ValidadorVehiculo {
     /*Comprueba la validez de los datos del vehículo*/
     public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
         String matricula = matriculaCell.getStringCellValue().trim().toUpperCase();
-        List<String> errores = Collections.emptyList();
+        //List<String> errores = Collections.emptyList();
         //Comprueba que la correlación de fechas es correcta
         if (!compruebaFechas(fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell)) {
             System.out.println("La correlación de fechas no es correcta.");
-            errores.add("Fechas incoherentes");
+            //errores.add("Fechas incoherentes");
+            return;
         }
 
         //Comprueba que la matrícula sea correcta y la añade al set de serlo
         if (!compruebaMatricula(matricula, tipoVehiculoCell)) {
-            errores.add("Matricula Erronea");
+            //errores.add("Matricula Erronea");
+            return;
         }
 
         //Comprueba que el vehículo tiene propietario y si lo tiene comprueba que el NIF sea correcto
         if(!compruebaPropietario(dniSet, nifPropietarioCell)) {
             System.out.println("El vehículo no tiene propietario o su NIF no es válido.");
-            errores.add("Vehiculo sin propietario");
+            //errores.add("Vehiculo sin propietario");
+            return;
         }
 
         System.out.println("\nTodos los datos del vehículo son correctos.");
         if (!matriculaSet.add(matricula)) {
             System.out.println("\nMATRICULA DUPLICADA!\n");
-            errores.add("Matricula duplicada");
+            //errores.add("Matricula duplicada");
+            return;
         }
-        if(errores.isEmpty()){
+        /*if(errores.isEmpty()){*/
             agregarVehiculo(vehiculosContribuyentesMap, row);
-        }else{
+        /*}else{
             editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum(),row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), errores);
-        }
+        }*/
         //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
 
         //Vacía la lista de errores para que no ocupe memoria por si acaso
-        if (!errores.isEmpty()) {
+        /*if (!errores.isEmpty()) {
             errores.clear();
-        }
+        }*/
     }
 
     /*Comprueba que la correlación de fechas sea correcta*/
@@ -101,6 +105,7 @@ public class ValidadorVehiculo {
     /*Comprueba que el formato de la matrícula es correcto en función del tipo de vehículo*/
     private boolean compruebaMatricula (String matricula, Cell tipoVehiculoCell) {
         //En principio en estas celdas hay letras siempre, tiene que ser String
+
         String tipo = tipoVehiculoCell.getStringCellValue().trim().toUpperCase();
         Set<String> ciudades = new HashSet<>(Arrays.asList("VI", "AB", "A", "AL", "AV", "BA", "IB", "B", "BU", "CC", "CA", "CS", "CE", "CR", "CO",
                 "C", "CU", "GI", "GR", "GU", "SS", "H", "HU", "J", "LE", "L", "LO", "LU", "M", "MA", "ML", "MU", "NA", "OR", "O", "P", "GC", "PO", "SA", "TF",
