@@ -16,7 +16,13 @@ public class ImporteRecibo {
     public void calculaImporte (XSSFSheet ws, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<String, ContribuyenteExcel> contribuyentesMap, int anio) {
 
         for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
+            //Obtengo los propietarios para comparar el ayuntamiento
+            String nif = entry.getKey();
+            ContribuyenteExcel c = contribuyentesMap.get(nif);
+
             List<VehiculoExcel> vehiculos = entry.getValue();
+
+            if (c == null) continue;
 
             for (VehiculoExcel vehiculo : vehiculos) {
                 //Iteración por las filas de la hoja
@@ -60,12 +66,10 @@ public class ImporteRecibo {
                 }
 
                 /*Obtengo la bonificacion del propietario y calcula el importe provisional (importe de un año completo)*/
-                String nif = entry.getKey();
-                ContribuyenteExcel contribuyente = contribuyentesMap.get(nif);
                 double importeBruto = vehiculo.getImporte();
 
-                if (contribuyente != null) {
-                    double bonificacion = contribuyente.getBonificacion();
+                if (c != null) {
+                    double bonificacion = c.getBonificacion();
                     //Asumiendo que la bonificacion es un porcentaje que se aplica sobre el importe total
                     double deduccion = importeBruto * (bonificacion / 100);
                     double importe_bonif = importeBruto - deduccion;

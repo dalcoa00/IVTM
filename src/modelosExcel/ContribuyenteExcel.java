@@ -8,6 +8,7 @@ public class ContribuyenteExcel {
     private String direccion;
     private String iban;
     private Double bonificacion;
+    private String aytoCont;
 
     public String getNombre() {
         return nombre;
@@ -63,5 +64,13 @@ public class ContribuyenteExcel {
 
     public void setBonificacion(Double bonificacion) {
         this.bonificacion = bonificacion;
+    }
+
+    public String getAytoCont() {
+        return aytoCont;
+    }
+
+    public void setAytoCont(String aytoCont) {
+        this.aytoCont = aytoCont;
     }
 }
