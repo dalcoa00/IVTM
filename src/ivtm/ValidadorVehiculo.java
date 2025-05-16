@@ -57,7 +57,7 @@ public class ValidadorVehiculo {
                 aux2=row.getCell(2).getStringCellValue();
             }
             
-            editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum(),aux, aux2, errores);
+            editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum()+1,aux, aux2, errores);
         }
         //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
 

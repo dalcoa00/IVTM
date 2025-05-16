@@ -146,7 +146,7 @@ public class EditorXML {
         }
     }public void xmlRecibo(String rutaArchivo, String fechaPadron, double totalPadron, int numeroTotalRecibos,
                       int idRecibo, Character exencion, int idFila, String nombre, String apellido1,
-                      String apellido2, String nif, String iban, String tipo, String marca,
+                      String apellido2, String nif, String iban, String tipo, String marca, String modelo,
                       String matricula, double totalR) {
     try {
         Document doc;
@@ -181,7 +181,8 @@ public class EditorXML {
         appendChild(doc, reciboElem, "NIF", nif);
         appendChild(doc, reciboElem, "IBAN", iban);
         appendChild(doc, reciboElem, "tipoVehiculo", tipo);
-        appendChild(doc, reciboElem, "marcaModelo", marca);
+        String marcaModelo= marca+" "+modelo;
+        appendChild(doc, reciboElem, "marcaModelo", marcaModelo);
         appendChild(doc, reciboElem, "matricula", matricula);
         appendChild(doc, reciboElem, "totalRecibo", String.format("%.2f", totalR));
 
@@ -263,7 +264,7 @@ public class EditorXML {
         parent.appendChild(elem);
     }
     //Metodo que permite modificar los atributos  del xml  de recibos para hacerlo al final 
-    public void modificarAtributosPadron(String rutaArchivo, double nuevoTotalPadron) {
+    public void modificarAtributosPadron(String rutaArchivo, double nuevoTotalPadron, String fechaPadron, int numeroTotalRecibos) {
     try {
         File archivo = new File(rutaArchivo);
 
@@ -288,7 +289,9 @@ public class EditorXML {
         Element root = (Element) listaRecibos.item(0);
 
         // Modificar los atributos
+        root.setAttribute("fechaPadron", fechaPadron);
         root.setAttribute("totalPadron", String.format("%.2f", nuevoTotalPadron));
+        root.setAttribute("numeroTotalRecibos", String.valueOf(numeroTotalRecibos));
 
 
         // Guardar los cambios en el mismo archivo

@@ -387,7 +387,7 @@ public class ExcelManager {
 
                 if (c == null) {
                     //Aquí llamar a editor.xmlVehiculos, con el error "Vehículo con propietario erróneo"
-
+                    
                     continue; //Por si acaso, aunque no debería de haber ningún contribuyente nulo
                 }
 
@@ -441,13 +441,13 @@ public class ExcelManager {
 
                 //Total padron aqui 0 porque  todavia no se ha calculado se modifica abajo 
                 //LO QUE HAY  QUE MODIFICAR ES EL 1 POR IDFILADEL VEHICULO
-                editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila(), c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getMatricula(), v.getTotal() );
+                editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal() );
             }
         }
         //Redondea el total del padrón a 2 decimales
         totalPadron = Math.round(totalPadron * 100.0) / 100.0;
-
-        editor.modificarAtributosPadron(recibosXML, totalPadron);
+        String fecha= "IVTM de "+anio;
+        editor.modificarAtributosPadron(recibosXML, totalPadron, fecha, totalVehiculos);
         System.out.println("Número de recibos generados: " + totalVehiculos);
 
         System.out.println("\nIVTM de " + fechaPadron); //Siempre el 1 de enero del año solicitado
