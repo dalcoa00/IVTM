@@ -380,11 +380,17 @@ public class ExcelManager {
         for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
             String nif = entry.getKey();
             List<VehiculoExcel> vehiculos = entry.getValue();
-            ContribuyenteExcel c = contribuyentesMap.get(nif);
 
-            if (c == null) continue; //Por si acaso, aunque no debería de haber ningún contribuyente nulo
 
             for (VehiculoExcel v : vehiculos) {
+                ContribuyenteExcel c = contribuyentesMap.get(nif);
+
+                if (c == null) {
+                    //Aquí llamar a editor.xmlVehiculos, con el error "Vehículo con propietario erróneo"
+
+                    continue; //Por si acaso, aunque no debería de haber ningún contribuyente nulo
+                }
+
                 totalPadron = totalPadron + v.getTotal();
 
                 //Imprime los datos del contribuyente/propietario
