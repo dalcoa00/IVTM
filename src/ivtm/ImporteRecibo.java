@@ -43,19 +43,21 @@ public class ImporteRecibo {
                         continue;
                     }
 
+                    Cell aytoCell = row.getCell(0);
                     Cell tipoCell = row.getCell(1);
                     Cell unidadCell = row.getCell(2);
                     Cell minUnidadCell = row.getCell(3);
                     Cell maxUnidadCell = row.getCell(4);
                     Cell importeCell = row.getCell(5);
 
+                    String aytoOrdenanza = aytoCell.getStringCellValue().trim().toUpperCase();
                     String tipo = tipoCell.getStringCellValue();
                     String unidadStr = unidadCell.getStringCellValue();
                     double minUnidad = minUnidadCell.getNumericCellValue();
                     double maxUnidad = maxUnidadCell.getNumericCellValue();
                     double importe = importeCell.getNumericCellValue();
 
-                    if (vehiculo.getTipoVehiculo().equals(tipo)) {
+                    if (c.getAytoCont().equals(aytoOrdenanza) && vehiculo.getTipoVehiculo().equals(tipo)) {
                         if (vehiculo.getValorUnidad() >= minUnidad && vehiculo.getValorUnidad() <= maxUnidad) {
                             //Importe bruto de un año completo sin bonificaciones ni exenciones
                             vehiculo.setImporte(importe);

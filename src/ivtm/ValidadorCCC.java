@@ -267,7 +267,7 @@ public class ValidadorCCC {
         String direccion = row.getCell(4).getStringCellValue();
         String iban = row.getCell(10).getStringCellValue();
         Double bonificacion = row.getCell(11).getNumericCellValue();
-        //Falta la bonificacion que se añade más adelante, al leer Ordenanzas
+        String ayto = row.getCell(7).getStringCellValue().trim().toUpperCase();
 
         ContribuyenteExcel c = new ContribuyenteExcel();
         c.setNombre(nombre);
@@ -277,6 +277,7 @@ public class ValidadorCCC {
         c.setDireccion(direccion);
         c.setIban(iban);
         c.setBonificacion(bonificacion);
+        c.setAytoCont(ayto);
 
         contribuyentesMap.put(nifnie, c);
     }
