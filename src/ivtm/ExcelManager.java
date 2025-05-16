@@ -245,6 +245,8 @@ public class ExcelManager {
                 int anio = solicitaAnyo();
 
                 ImporteRecibo importe = new ImporteRecibo();
+                //Meter en contribuyentes map (cuando se mapea en validadorCCC) el ayuntamiento (nuevo atributo)
+                // para calcular el importe correcto cuando recorre ordenanza en base al ayto
                 importe.calculaImporte(ws, vehiculosContribuyentesMap, contribuyentesMap, anio);
 
                 wb.close();
@@ -440,8 +442,7 @@ public class ExcelManager {
         totalPadron = Math.round(totalPadron * 100.0) / 100.0;
 
         editor.modificarAtributosPadron(recibosXML, totalPadron);
-        System.out.println("Número de vehículos para los que se ha generado un recibo: " + totalVehiculos);
-        System.out.println("Número de contribuyentes a los que se les ha generado un recibo: " + vehiculosContribuyentesMap.size());
+        System.out.println("Número de recibos generados: " + totalVehiculos);
 
         System.out.println("\nIVTM de " + fechaPadron); //Siempre el 1 de enero del año solicitado
         System.out.println("Importe total del padrón (Suma de todos los recibos generados): " + totalPadron + "€");

@@ -231,13 +231,13 @@ public class ValidadorVehiculo {
         }
 
         //Ciudad + 5 dígitos + VE
-        if (matricula.matches("[A-Z]{1,2}\\d{1,5}VE")) {
+        if (matricula.matches("[A-Z]{1,2}\\d{5}VE")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
         }
         //Ciudad + 6 dígitos
-        if (matricula.matches("[A-Z]{1,2}\\d{1,6}")) {
+        if (matricula.matches("[A-Z]{1,2}\\d{6}")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
@@ -253,14 +253,14 @@ public class ValidadorVehiculo {
         }
 
         //Ciudad + 5 dígitos + VE
-        if (matricula.matches("[A-Z]{1,2}\\d{1,5}VE")) {
+        if (matricula.matches("[A-Z]{1,2}\\d{5}VE")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
         }
 
         //Ciudad + 6 dígitos
-        if (matricula.matches("[A-Z]{1,2}\\d{1,6}")) {
+        if (matricula.matches("[A-Z]{1,2}\\d{6}")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
