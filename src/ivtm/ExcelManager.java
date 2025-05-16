@@ -19,7 +19,9 @@ public class ExcelManager {
     HashSet<String> cccSet = new HashSet<>();
     HashSet<String> correoSet = new HashSet<>();
     HashSet<String> matriculaSet = new HashSet<>();
+EditorXML editor = new EditorXML();
      private final String recibosXML = "resources\\Recibos.xml";
+     private final String vehiculosRutaXML = "resources\\ErroresVehiculos.xml";
 
     //Mapas para relacionar contribuyentes y sus vehículos para generar los recibos
     Map<String, ContribuyenteExcel> contribuyentesMap = new HashMap<>(); // <- Hoja Contribuyentes
@@ -386,8 +388,10 @@ public class ExcelManager {
                 ContribuyenteExcel c = contribuyentesMap.get(nif);
 
                 if (c == null) {
+                    List<String> errores = new ArrayList<>();
+                    errores.add("Vehiculo con propietario erroneo.");
                     //Aquí llamar a editor.xmlVehiculos, con el error "Vehículo con propietario erróneo"
-                    
+                    editor.xmlVehiculos(vehiculosRutaXML, v.getIdFila()+1, v.getMarca(), v.getModelo(), errores);
                     continue; //Por si acaso, aunque no debería de haber ningún contribuyente nulo
                 }
 
@@ -452,7 +456,8 @@ public class ExcelManager {
 
         System.out.println("\nIVTM de " + fechaPadron); //Siempre el 1 de enero del año solicitado
         System.out.println("Importe total del padrón (Suma de todos los recibos generados): " + totalPadron + "€");
-    
+        editor.ordenarVehiculosPorId(vehiculosRutaXML);
+        editor.ordenarRecibosPorIdFila(recibosXML);
     }
 
     /*Metodo que limpia los sets al finalizar la ejecución*/

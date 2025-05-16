@@ -3,6 +3,7 @@ package ivtm;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,6 +14,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.util.List;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
+
 
 public class EditorXML {
     //Escribe en ErroresNifNie.xml los errores del archivo
@@ -310,6 +315,134 @@ public class EditorXML {
         e.printStackTrace();
     }
 }
+public void ordenarVehiculosPorId(String rutaArchivo) {
+    try {
+        File xmlFile = new File(rutaArchivo);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(xmlFile);
+        doc.getDocumentElement().normalize();
+
+        Element root = doc.getDocumentElement(); // <Vehiculos>
+
+        NodeList vehiculoNodes = root.getElementsByTagName("Vehiculo");
+
+        List<Element> vehiculos = new ArrayList<>();
+        for (int i = 0; i < vehiculoNodes.getLength(); i++) {
+            vehiculos.add((Element) vehiculoNodes.item(i));
+        }
+
+        // Ordenar por el atributo id numéricamente
+        vehiculos.sort(Comparator.comparingInt(e -> Integer.parseInt(e.getAttribute("id"))));
+
+        // Eliminar nodos actuales
+        for (Element v : vehiculos) {
+            root.removeChild(v);
+        }
+
+        // Volver a agregar nodos en orden
+        for (Element v : vehiculos) {
+            root.appendChild(v);
+        }
+
+        // 🧹 Eliminar nodos vacíos de texto (líneas en blanco)
+        eliminarNodosVacios(doc);
+
+        // Guardar de nuevo el XML
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(new File(rutaArchivo));
+        transformer.transform(source, result);
+
+        System.out.println("Vehículos ordenados por ID en el XML.");
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+public void ordenarRecibosPorIdFila(String rutaArchivo) {
+    try {
+        File archivo = new File(rutaArchivo);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(archivo);
+        doc.getDocumentElement().normalize();
+
+        Element root = doc.getDocumentElement();
+        NodeList recibosList = root.getElementsByTagName("Recibo");
+
+        List<Element> recibos = new ArrayList<>();
+        for (int i = 0; i < recibosList.getLength(); i++) {
+            Node node = recibosList.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                recibos.add((Element) node);
+            }
+        }
+
+        // Ordenar por idFilaExcelVehiculo
+        recibos.sort(Comparator.comparingInt(e -> 
+            Integer.parseInt(e.getElementsByTagName("idFilaExcelVehiculo").item(0).getTextContent()))
+        );
+
+        // Eliminar todos los nodos <Recibo> actuales
+        for (Element recibo : recibos) {
+            root.removeChild(recibo);
+        }
+
+        // Reinsertar con idRecibo actualizado
+        int nuevoId = 1;
+        for (Element recibo : recibos) {
+            recibo.setAttribute("idRecibo", String.valueOf(nuevoId++));
+            root.appendChild(recibo);
+        }
+
+        // 🧹 Eliminar nodos vacíos (saltos de línea / espacios)
+        eliminarNodosVacios(doc);
+
+        // Guardar el archivo actualizado
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+        DOMSource source = new DOMSource(doc);
+        StreamResult result = new StreamResult(archivo);
+        transformer.transform(source, result);
+
+        System.out.println("Recibos ordenados correctamente por idFilaExcelVehiculo.");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+// Método auxiliar para eliminar nodos de texto vacíos
+private void eliminarNodosVacios(Node node) {
+    NodeList hijos = node.getChildNodes();
+    for (int i = 0; i < hijos.getLength(); ) {
+        Node actual = hijos.item(i);
+        if (actual.getNodeType() == Node.TEXT_NODE && actual.getTextContent().trim().isEmpty()) {
+            node.removeChild(actual);
+            // no incrementes i ya que el NodeList se actualiza
+        } else {
+            eliminarNodosVacios(actual); // recursivo
+            i++;
+        }
+    }
+}
+
+
+
 
 }
 
