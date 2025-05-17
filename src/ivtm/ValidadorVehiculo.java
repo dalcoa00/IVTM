@@ -29,37 +29,42 @@ public class ValidadorVehiculo {
         }
 
         //Comprueba que el vehículo tiene propietario y si lo tiene comprueba que el NIF sea correcto
-        if(!compruebaPropietario(dniSet, nifPropietarioCell)) {
+        if(!compruebaPropietario(dniSet, nifPropietarioCell, errores)) {
             System.out.println("El vehículo no tiene propietario o su NIF no es válido.");
-            errores.add("Vehiculo sin propietario");
+            //errores.add("Vehiculo sin propietario");
             //return;
         }
 
         System.out.println("\nTodos los datos del vehículo son correctos.");
+
         if (!matriculaSet.add(matricula)) {
             System.out.println("\nMATRICULA DUPLICADA!\n");
             errores.add("Matricula duplicada");
             //return;
         }
-        if(errores.isEmpty()){
+
+        if (errores.isEmpty()){
             agregarVehiculo(vehiculosContribuyentesMap, row);
-        }else{
+        }
+        else {
             String aux="";
             String aux2="";
              if (row.getCell(1).getCellType() == CellType.NUMERIC) {
                 aux = String.format("%.0f", row.getCell(1).getNumericCellValue());
-            }else{
+            }
+             else{
                 aux=row.getCell(1).getStringCellValue();
             }
-            if(row.getCell(2).getCellType()==CellType.NUMERIC){
-                aux2= String.format("%.0f", row.getCell(2).getNumericCellValue());
-            }else{
-                aux2=row.getCell(2).getStringCellValue();
+
+             if (row.getCell(2).getCellType() == CellType.NUMERIC) {
+                aux2 = String.format("%.0f", row.getCell(2).getNumericCellValue());
             }
+             else {
+                aux2 = row.getCell(2).getStringCellValue();
+             }
             
-            editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum()+1,aux, aux2, errores);
+             editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum()+1,aux, aux2, errores);
         }
-        //Agrego el vehiculo al Map de vehiculos asociado al nif del propietario si todos los datos son correctos
 
         //Vacía la lista de errores para que no ocupe memoria por si acaso
         if (!errores.isEmpty()) {
@@ -285,8 +290,10 @@ public class ValidadorVehiculo {
     }
 
     /*Comprueba que el vehículo tiene un propietario válido*/
-    private boolean compruebaPropietario (HashSet<String> dniSet, Cell nifPropietarioCell) {
+    private boolean compruebaPropietario (HashSet<String> dniSet, Cell nifPropietarioCell, List<String> errores) {
         if (nifPropietarioCell == null || nifPropietarioCell.getCellType() == CellType.BLANK || nifPropietarioCell.getCellType() != CellType.STRING) {
+            errores.add("Vehiculo sin propietario.");
+
             return false;
         }
 
@@ -298,6 +305,7 @@ public class ValidadorVehiculo {
             return true;
         }
 
+        errores.add("Vehiculo con propietario erróneo.");
         return false;
     }
 
