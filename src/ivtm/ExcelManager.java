@@ -387,12 +387,23 @@ EditorXML editor = new EditorXML();
             for (VehiculoExcel v : vehiculos) {
                 ContribuyenteExcel c = contribuyentesMap.get(nif);
 
+                //Si el propietario es erróneo
                 if (c == null) {
                     List<String> errores = new ArrayList<>();
                     errores.add("Vehiculo con propietario erroneo.");
-                    //Aquí llamar a editor.xmlVehiculos, con el error "Vehículo con propietario erróneo"
+
                     editor.xmlVehiculos(vehiculosRutaXML, v.getIdFila()+1, v.getMarca(), v.getModelo(), errores);
-                    continue; //Por si acaso, aunque no debería de haber ningún contribuyente nulo
+                    continue;
+                }
+
+                //Se pide el recibo de un año en el que el vehículo todavía no ha sido de alta
+                //El importe será 0 pero genera recibo si no se comprueba
+                Calendar calAlta = Calendar.getInstance();
+                calAlta.setTime(v.getFechaAlta());
+                int anioAlta = calAlta.get(Calendar.YEAR);
+
+                if (anio < anioAlta) {
+                    continue;
                 }
 
                 totalPadron = totalPadron + v.getTotal();
@@ -437,7 +448,7 @@ EditorXML editor = new EditorXML();
                 System.out.println("Unidad de cobro: " + unidadCobro);
                 System.out.println("Valor de la unidad de cobro: " + v.getValorUnidad());
                 System.out.println("Importe (sin exenciones ni bonificaciones): " + v.getImporte());
-                System.out.println("Exencion/Bonificación: " + v.getExencion());
+                System.out.println("Exencion: " + v.getExencion());
                 System.out.println("\nImporte total del recibo: " + v.getTotal());
                 System.out.println("\n---------------------------------------------------------------------------\n");
 

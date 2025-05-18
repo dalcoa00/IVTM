@@ -83,7 +83,9 @@ public class ImporteRecibo {
                 }
 
                 //Calculo el importe total (real) del importe en el año solicitado
-                vehiculo.setTotal(calculaTotalRecibo(anio, vehiculo));
+                double totalRecibo = calculaTotalRecibo(anio, vehiculo);
+
+                vehiculo.setTotal(totalRecibo);
 
             }
         }
@@ -92,12 +94,10 @@ public class ImporteRecibo {
     public double calculaTotalRecibo (int anio, VehiculoExcel vehiculo) {
 
         //Si vehiculo exento
-        if (vehiculo.getExencion().equals("S")) {
-            vehiculo.setImporte(0);
-            return 0;
+        if (vehiculo.getExencion() == 'S') {
+            return 0.0;
         }
 
-        int total = -10;
         int anioBaja = -1;
 
         Date fechaAlta = vehiculo.getFechaAlta();
@@ -111,7 +111,7 @@ public class ImporteRecibo {
 
         //Si el año de alta es después del año del recibo
         if (anioAlta > anio) {
-            return -1;
+            return 0.0;
         }
 
         //Obtener año de baja si existe
@@ -124,7 +124,7 @@ public class ImporteRecibo {
 
         //Si fue dado de baja DEFINITIVA antes del año pedido
         if (fechaBaja != null && anioBaja < anio) {
-            return -1;
+            return 0.0;
         }
 
         //Define los trimestres del año consultado

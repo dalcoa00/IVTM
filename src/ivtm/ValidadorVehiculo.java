@@ -350,7 +350,7 @@ public class ValidadorVehiculo {
 
         System.out.println("aa");
 
-        String exenc = row.getCell(9).getStringCellValue().trim();
+        String exenc = row.getCell(9).getStringCellValue().trim().toUpperCase();
         Character exencion = exenc.charAt(0);
 
         //Unidad de cobro -> CVs(1), plazas(2), kgs(3), CCs(4)
