@@ -479,7 +479,8 @@ public class ExcelManager {
         editor.ordenarRecibosPorIdFila(recibosXML);
 
         //Creado Recibos.xml correctamente, los creamos en formato PDF
-        reciboPDF.generaRecibo(recibosMap);
+        //Creo que se genera un recibo de menos??
+        reciboPDF.generaRecibo(recibosMap, anio);
 
         //Con todos los recibos ya creados, creamos el resumen
         //reciboPDF.generaResumen(anio, totalPadron, recibosMap) -> recibosMap.size() para el núm. de recibos

@@ -4,6 +4,9 @@ import modelosExcel.ReciboExcel;
 
 import java.util.List;
 import java.util.Map;
+import com.itextpdf.*;
+import java.io.File;
+import java.text.SimpleDateFormat;
 
 public class ReciboPDF {
     /*
@@ -12,8 +15,29 @@ public class ReciboPDF {
     * Se puede generar el Resumen PDF aquí también, pero como es mucha repetición de código igual
     * hacer en otra clase para que no nos líe el día de la modificación*/
 
-    public void generaRecibo(Map<String, List<ReciboExcel>> recibos) {
+    //private static final String img_path = "resources/ivtm.png";
+    private static final String salida_path = "resources/recibos/";
 
+    public void generaRecibo(Map<String, List<ReciboExcel>> recibos, int anio) {
+        //Crea el directorio si no existe
+        File dir = new File(salida_path);
+
+        if (!dir.exists()) dir.mkdirs();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        for (Map.Entry<String, List<ReciboExcel>> entry : recibos.entrySet()) {
+            for (ReciboExcel r : entry.getValue()) {
+                String nombreArchivo = salida_path + r.getNifPropietario() +
+                        r.getContribuyente().getNombre() + r.getContribuyente().getApellido1() +
+                        r.getContribuyente().getApellido2() + r.getVehiculo().getMatricula() + anio;
+
+                PdfWriter
+            }
+        }
+
+
+        System.out.println("\n\nNúmero de recibos mapeados: " + recibos.size());
     }
 
 
