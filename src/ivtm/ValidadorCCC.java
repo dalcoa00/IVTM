@@ -266,6 +266,7 @@ public class ValidadorCCC {
         String nifnie = row.getCell(0).getStringCellValue();
         String direccion = row.getCell(4).getStringCellValue();
         String iban = row.getCell(10).getStringCellValue();
+        String email = row.getCell(6).getStringCellValue();
         Double bonificacion = row.getCell(11).getNumericCellValue();
         String ayto = row.getCell(7).getStringCellValue().trim().toUpperCase();
 
@@ -276,6 +277,7 @@ public class ValidadorCCC {
         c.setNifnie(nifnie);
         c.setDireccion(direccion);
         c.setIban(iban);
+        c.setEmail(email);
         c.setBonificacion(bonificacion);
         c.setAytoCont(ayto);
 

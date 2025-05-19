@@ -10,22 +10,28 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
+    //Sets en los que se almacenan los datos correctos y subsanados
     HashSet<String> dniSet = new HashSet<>();
     HashSet<String> cccSet = new HashSet<>();
     HashSet<String> correoSet = new HashSet<>();
     HashSet<String> matriculaSet = new HashSet<>();
-EditorXML editor = new EditorXML();
-     private final String recibosXML = "resources\\Recibos.xml";
-     private final String vehiculosRutaXML = "resources\\ErroresVehiculos.xml";
 
     //Mapas para relacionar contribuyentes y sus vehículos para generar los recibos
     Map<String, ContribuyenteExcel> contribuyentesMap = new HashMap<>(); // <- Hoja Contribuyentes
     Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap = new HashMap<>(); // <- Hoja vehiculos
+    Map<String, List<ReciboExcel>> recibosMap = new HashMap<>(); //Recibos que se generan
+
+    EditorXML editor = new EditorXML();
+    ReciboPDF reciboPDF = new ReciboPDF();
+
+    private final String recibosXML = "resources\\Recibos.xml";
+    private final String vehiculosRutaXML = "resources\\ErroresVehiculos.xml";
 
     /*Lee el archivo excel indicado en la ruta que recibe y el número de hoja especificado*/
     public void readExcel(String filepath, int sheet) {
@@ -365,10 +371,8 @@ EditorXML editor = new EditorXML();
         return anio;
     }
 
-    /* Metodo que imprime los recibos por pantalla */
+    /* Metodo que imprime los recibos por pantalla y loa guarda en un Map (solo los que hay que generar)*/
     private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, int anio) {
-        EditorXML editor = new EditorXML();
-
         //Obtengo el día de hoy (Día que se genera el recibo)
         LocalDate hoy = LocalDate.now();
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -376,6 +380,7 @@ EditorXML editor = new EditorXML();
 
         System.out.println("\n---------------  RECIBOS GENERADOS  ---------------\n");
 
+        int i = 1;
         int totalVehiculos = 0;
         double totalPadron = 0.0;
 
@@ -454,9 +459,12 @@ EditorXML editor = new EditorXML();
 
                 totalVehiculos++;
 
-                //Total padron aqui 0 porque  todavia no se ha calculado se modifica abajo 
-                //LO QUE HAY  QUE MODIFICAR ES EL 1 POR IDFILADEL VEHICULO
-                editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal() );
+                //Añade el recibo a Recibos.xml
+                editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal());
+
+                //Añade el recibo al Map que almacena los recibos que se deben generar
+                mapeaRecibos(recibosMap, c, v, i);
+                i++;
             }
         }
         //Redondea el total del padrón a 2 decimales
@@ -469,6 +477,39 @@ EditorXML editor = new EditorXML();
         System.out.println("Importe total del padrón (Suma de todos los recibos generados): " + totalPadron + "€");
         editor.ordenarVehiculosPorId(vehiculosRutaXML);
         editor.ordenarRecibosPorIdFila(recibosXML);
+
+        //Creado Recibos.xml correctamente, los creamos en formato PDF
+        reciboPDF.generaRecibo(recibosMap);
+
+        //Con todos los recibos ya creados, creamos el resumen
+        //reciboPDF.generaResumen(anio, totalPadron, recibosMap) -> recibosMap.size() para el núm. de recibos
+    }
+
+    /*Metodo que mapea los recibos generados para un año usando como clave el nif del contribuyente*/
+    public void mapeaRecibos(Map<String, List<ReciboExcel>> recibos, ContribuyenteExcel c, VehiculoExcel v, int numRecibo) {
+        LocalDate localDate = LocalDate.now();
+        Date fechaRecibo = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        int anioPadron = LocalDate.now().getYear();
+        LocalDate unoDelUno = LocalDate.of(anioPadron, 1, 1);
+        Date fechaPadron = Date.from(unoDelUno.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        String nifPropietario = v.getNifPropietario();
+
+        ReciboExcel r = new ReciboExcel();
+
+        r.setNumRecibo(numRecibo);
+        r.setContribuyente(c);
+        r.setVehiculo(v);
+        r.setNifPropietario(nifPropietario);
+        r.setFechaRecibo(fechaRecibo);
+        r.setFechaPadron(fechaPadron);
+        r.setUnidadCobro(v.getUnidadCobro());
+        r.setTotalRecibo(v.getTotal());
+
+        //Para cada propietario, crea una lista de recibos
+        //Si solo tiene un recibo, es una lista de 1 elementos
+        //Si tiene más, es una lista de varios recibos asignados a ese nif
+        recibos.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(r);
     }
 
     /*Metodo que limpia los sets al finalizar la ejecución*/
@@ -480,6 +521,7 @@ EditorXML editor = new EditorXML();
         matriculaSet.clear();
         contribuyentesMap.clear();
         vehiculosContribuyentesMap.clear();
+        recibosMap.clear();
 
         //Si no se va a utilizar, se puede eliminar la referencia
         /*dniSet = null;

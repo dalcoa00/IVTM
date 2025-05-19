@@ -70,7 +70,7 @@ public class Ivtm {
         }
     }
 
-    //Prácticas 2, 3 Y 4
+    //Prácticas 2, 3, 4 y 5
     public static void validateNUpdate(ExcelManager manager) {
         String rutaVehiculos = "resources\\SistemasVehiculos.xlsx";
         String rutaOrdenanzas = "resources\\SistemasOrdenanzas.xlsx";
@@ -82,6 +82,8 @@ public class Ivtm {
         manager.readExcel(rutaVehiculos, 1);
 
         /*Lee la hoja ordenanzas para saber los importes a aplicar*/
+        /*También calcula el total de los recibos, los imprime por pantalla, genera los XMLs
+        * Y crea los recibos en formato PDF*/
         manager.readExcel(rutaOrdenanzas, 0);
     }
 }

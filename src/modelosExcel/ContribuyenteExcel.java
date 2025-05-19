@@ -7,6 +7,7 @@ public class ContribuyenteExcel {
     private String nifnie;
     private String direccion;
     private String iban;
+    private String email;
     private Double bonificacion;
     private String aytoCont;
 
@@ -57,6 +58,10 @@ public class ContribuyenteExcel {
     public void setIban(String iban) {
         this.iban = iban;
     }
+
+    public String getEmail() { return email; }
+
+    public void setEmail(String email) { this.email = email; }
 
     public Double getBonificacion() {
         return bonificacion;
