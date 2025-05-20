@@ -407,7 +407,7 @@ public class ExcelManager {
                 calAlta.setTime(v.getFechaAlta());
                 int anioAlta = calAlta.get(Calendar.YEAR);
 
-                if (anio < anioAlta) {
+                if (anio < anioAlta || v.getNumTrimestres() <= 0) {
                     continue;
                 }
 
@@ -463,8 +463,10 @@ public class ExcelManager {
                 editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal());
 
                 //Añade el recibo al Map que almacena los recibos que se deben generar
-                mapeaRecibos(recibosMap, c, v, i);
-                i++;
+                if (v.getNumTrimestres() > 0) {
+                    mapeaRecibos(recibosMap, c, v, i);
+                    i++;
+                }
             }
         }
         //Redondea el total del padrón a 2 decimales
@@ -483,7 +485,7 @@ public class ExcelManager {
         reciboPDF.generaRecibo(recibosMap, anio);
 
         //Con todos los recibos ya creados, creamos el resumen
-        //reciboPDF.generaResumen(anio, totalPadron, recibosMap) -> recibosMap.size() para el núm. de recibos
+        //reciboPDF.generaResumen(anio, totalPadron, recibosMap.size())
     }
 
     /*Metodo que mapea los recibos generados para un año usando como clave el nif del contribuyente*/
