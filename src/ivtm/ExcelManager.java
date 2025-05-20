@@ -482,7 +482,7 @@ public class ExcelManager {
 
         //Creado Recibos.xml correctamente, los creamos en formato PDF
         reciboPDF.generaRecibos(recibosMap, anio);
-        reciboPDF.generaResumen(anio, totalPadron, recibosMap.size());
+        reciboPDF.generaResumen(anio, totalPadron, recibosMap.size()+1);
     }
 
     /*Metodo que mapea los recibos generados para un año usando como clave el nif del contribuyente*/

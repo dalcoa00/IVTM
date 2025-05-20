@@ -174,19 +174,19 @@ public class ReciboPDF {
         PdfDocument pdfDoc = new PdfDocument(writer);
         Document doc = new Document(pdfDoc, PageSize.LETTER);
 
-        Table tabla1 = new Table(new float[]{1, 1}).useAllAvailableWidth().setBorder(new SolidBorder(1));
+        Table tabla1 = new Table(2).useAllAvailableWidth().setBorder(new SolidBorder(1));
 
         tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(Border.NO_BORDER).add(new Paragraph("RESUMEN IVTM. Ejercicio " + anio)));
-        tabla1.addCell(new Cell().add(new Paragraph("")));
+                .setBorder(Border.NO_BORDER).add(new Paragraph("RESUMEN IVTM. Ejercicio " + anio + ".")));
+        tabla1.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("")));
         tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(Border.NO_BORDER).add(new Paragraph("TOTAL BASE IMPONIBLE................")));
+                .setBorder(Border.NO_BORDER).add(new Paragraph("TOTAL BASE IMPONIBLE......................")));
         tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(Border.NO_BORDER).add(new Paragraph(String.format("%.2f", totalPadron))));
+                .setBorder(Border.NO_BORDER).add(new Paragraph(String.format("%.2f", totalPadron) + " EUROS.")));
         tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .setBorder(Border.NO_BORDER).add(new Paragraph("NÚMERO TOTAL DE RECIBOS.............")));
         tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(Border.NO_BORDER).add(new Paragraph(String.valueOf(nRecibos))));
+                .setBorder(Border.NO_BORDER).add(new Paragraph(String.valueOf(nRecibos) + " RECIBOS.")));
 
         doc.add(tabla1);
 
