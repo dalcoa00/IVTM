@@ -2,9 +2,13 @@ package ivtm;
 
 import modelosExcel.ReciboExcel;
 
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.pdf.*;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.layout.*;
+
 import java.util.List;
 import java.util.Map;
-import com.itextpdf.*;
 import java.io.File;
 import java.text.SimpleDateFormat;
 
@@ -15,7 +19,7 @@ public class ReciboPDF {
     * Se puede generar el Resumen PDF aquí también, pero como es mucha repetición de código igual
     * hacer en otra clase para que no nos líe el día de la modificación*/
 
-    //private static final String img_path = "resources/ivtm.png";
+    private static final String img_path = "resources/ivtm.png";
     private static final String salida_path = "resources/recibos/";
 
     public void generaRecibo(Map<String, List<ReciboExcel>> recibos, int anio) {
@@ -32,7 +36,7 @@ public class ReciboPDF {
                         r.getContribuyente().getNombre() + r.getContribuyente().getApellido1() +
                         r.getContribuyente().getApellido2() + r.getVehiculo().getMatricula() + anio;
 
-                PdfWriter
+                PdfWriter writer = new PdfWriter();
             }
         }
 
