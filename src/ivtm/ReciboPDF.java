@@ -26,7 +26,8 @@ public class ReciboPDF {
     private static final String img_path = "resources/ivtm.png";
     private static final String salida_path = "resources/recibos/";
 
-    public void generaRecibo(Map<String, List<ReciboExcel>> recibos, int anio) throws IOException {
+    /*Metodo que genera los recibos individuales en formato PDF*/
+    public void generaRecibos(Map<String, List<ReciboExcel>> recibos, int anio) throws IOException {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         for (Map.Entry<String, List<ReciboExcel>> entry : recibos.entrySet()) {
@@ -163,12 +164,33 @@ public class ReciboPDF {
                 doc.close();
             }
         }
-
     }
 
+    /*Metodo que genera el resumen de los recibos generados para un año en concreto*/
+    public void generaResumen(int anio, double totalPadron, int nRecibos) throws IOException {
+        String nombreArchivo = salida_path + "71475583R_" + "71472238Z_" + "resumen.pdf";
 
+        PdfWriter writer = new PdfWriter(nombreArchivo);
+        PdfDocument pdfDoc = new PdfDocument(writer);
+        Document doc = new Document(pdfDoc, PageSize.LETTER);
 
+        Table tabla1 = new Table(new float[]{1, 1}).useAllAvailableWidth().setBorder(new SolidBorder(1));
 
+        tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER).add(new Paragraph("RESUMEN IVTM. Ejercicio " + anio)));
+        tabla1.addCell(new Cell().add(new Paragraph("")));
+        tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER).add(new Paragraph("TOTAL BASE IMPONIBLE................")));
+        tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER).add(new Paragraph(String.format("%.2f", totalPadron))));
+        tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER).add(new Paragraph("NÚMERO TOTAL DE RECIBOS.............")));
+        tabla1.addCell(new Cell().setTextAlignment(TextAlignment.LEFT).setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(Border.NO_BORDER).add(new Paragraph(String.valueOf(nRecibos))));
 
+        doc.add(tabla1);
+
+        doc.close();
+    }
 
 }

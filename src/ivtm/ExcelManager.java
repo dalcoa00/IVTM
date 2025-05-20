@@ -481,11 +481,8 @@ public class ExcelManager {
         editor.ordenarRecibosPorIdFila(recibosXML);
 
         //Creado Recibos.xml correctamente, los creamos en formato PDF
-        //Creo que se genera un recibo de menos??
-        reciboPDF.generaRecibo(recibosMap, anio);
-
-        //Con todos los recibos ya creados, creamos el resumen
-        //reciboPDF.generaResumen(anio, totalPadron, recibosMap.size())
+        reciboPDF.generaRecibos(recibosMap, anio);
+        reciboPDF.generaResumen(anio, totalPadron, recibosMap.size());
     }
 
     /*Metodo que mapea los recibos generados para un año usando como clave el nif del contribuyente*/
