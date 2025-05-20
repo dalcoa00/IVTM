@@ -372,7 +372,7 @@ public class ExcelManager {
     }
 
     /* Metodo que imprime los recibos por pantalla y loa guarda en un Map (solo los que hay que generar)*/
-    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, int anio) {
+    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, int anio) throws IOException {
         //Obtengo el día de hoy (Día que se genera el recibo)
         LocalDate hoy = LocalDate.now();
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");

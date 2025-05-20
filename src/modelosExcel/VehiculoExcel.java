@@ -10,6 +10,7 @@ public class VehiculoExcel {
     private String modelo;
     private String matricula;
     private String bastidor;
+    private Date fechaMatriculacion;
     private Date fechaAlta;
     private Date fechaBaja;
     private Date fechaBajaTemporal;
@@ -17,7 +18,9 @@ public class VehiculoExcel {
     private int unidadCobro;
     //nº cvs, plazas, kgs o ccs
     private double valorUnidad;
-    private double importe; //Se añade al calcularlo leyendo Ordenanza
+    private int numTrimestres;
+    private double importe;
+    private double importe_bonif; //Se añade al calcularlo leyendo Ordenanza
     private Character exencion;
     private double total; //Tras leer ordenanza se calcula
 
@@ -77,6 +80,14 @@ public class VehiculoExcel {
         this.bastidor = bastidor;
     }
 
+    public Date getFechaMatriculacion() {
+        return fechaMatriculacion;
+    }
+
+    public void setFechaMatriculacion(Date fechaMatriculacion) {
+        this.fechaMatriculacion = fechaMatriculacion;
+    }
+
     public Date getFechaAlta() {
         return fechaAlta;
     }
@@ -117,12 +128,28 @@ public class VehiculoExcel {
         this.valorUnidad = valorUnidad;
     }
 
+    public int getNumTrimestres() {
+        return numTrimestres;
+    }
+
+    public void setNumTrimestres(int numTrimestres) {
+        this.numTrimestres = numTrimestres;
+    }
+
     public double getImporte() {
         return importe;
     }
 
     public void setImporte(double importe) {
         this.importe = importe;
+    }
+
+    public double getImporte_bonif() {
+        return importe_bonif;
+    }
+
+    public void setImporte_bonif(double importe_bonif) {
+        this.importe_bonif = importe_bonif;
     }
 
     public Character getExencion() {

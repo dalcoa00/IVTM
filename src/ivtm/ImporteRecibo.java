@@ -77,7 +77,7 @@ public class ImporteRecibo {
                     double importe_bonif = importeBruto - deduccion;
 
                     //Importe de un año completo aplicando la posible bonificación del propietario
-                    vehiculo.setImporte(importe_bonif);
+                    vehiculo.setImporte_bonif(importe_bonif);
                 } else {
                     System.out.println("No se ha encontrado el propietario del vehículo.");
                 }
@@ -157,8 +157,11 @@ public class ImporteRecibo {
             if (paga) trimestresAlta++;
         }
 
+        //Añado al vehículo los trimestres que ha estado de alta
+        vehiculo.setNumTrimestres(trimestresAlta);
+
         //Importe total del año se divide en 4 partes (4 trimestres)
-        return (vehiculo.getImporte() / 4.0) * trimestresAlta;
+        return (vehiculo.getImporte_bonif() / 4.0) * trimestresAlta;
     }
 
 
