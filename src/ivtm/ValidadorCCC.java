@@ -263,7 +263,7 @@ public class ValidadorCCC {
         String nombre = row.getCell(3).getStringCellValue();
         String apellido1 = row.getCell(1).getStringCellValue();
         String apellido2 = row.getCell(2).getStringCellValue();
-        String nifnie = row.getCell(0).getStringCellValue();
+        String nifnie = row.getCell(0).getStringCellValue().trim();
         String direccion = row.getCell(4).getStringCellValue();
         String iban = row.getCell(10).getStringCellValue();
         String email = row.getCell(6).getStringCellValue();

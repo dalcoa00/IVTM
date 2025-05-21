@@ -18,7 +18,7 @@ public class Ivtm {
 
 
         //Al finalizar la ejecución completa del programa se limpian los sets con los datos almacenados
-        manager.cleanSets();
+        //manager.cleanSets();
     }
 
     //Metodo de la p1 para no llenar el main de cosas que no se usan siempre

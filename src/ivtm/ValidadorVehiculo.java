@@ -35,8 +35,6 @@ public class ValidadorVehiculo {
             //return;
         }
 
-        System.out.println("\nTodos los datos del vehículo son correctos.");
-
         if (!matriculaSet.add(matricula)) {
             System.out.println("\nMATRICULA DUPLICADA!\n");
             errores.add("Matricula duplicada");
@@ -66,10 +64,11 @@ public class ValidadorVehiculo {
              editor.xmlVehiculos(erroresVehiculosXML, row.getRowNum()+1,aux, aux2, errores);
         }
 
-        //Vacía la lista de errores para que no ocupe memoria por si acaso
-        if (!errores.isEmpty()) {
+        //Vacía la lista de errores para el siguiente vehículo
+        /*if (!errores.isEmpty()) {
             errores.clear();
-        }
+        }*/
+        errores.clear();
     }
 
     /*Comprueba que la correlación de fechas sea correcta*/
@@ -203,19 +202,19 @@ public class ValidadorVehiculo {
     private boolean esMatriculaNormal (String matricula, Set<String> ciudades) {
 
         //Formato 1: 4 dígitos + 3 letras
-        if (matricula.matches("\\d{4}[A-Z]{3}")) {
+        if (matricula.matches("^\\d{4}[A-Z]{3}")) {
             return true;
         }
 
         //Formato 2: ciudad + 4 dígitos + 1 o 2 letras
-        if (matricula.matches("[A-Z]{1,2}\\d{4}[A-Z]{1,2}")) {
+        if (matricula.matches("^[A-Z]{1,2}(?!0+$)\\d{1,4}[A-Z]{1,2}")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
         }
 
         //Formato 3: ciudad + 6 dígitos
-        if (matricula.matches("[A-Z]{1,2}\\d{5,6}")) {
+        if (matricula.matches("^[A-Z]{1,2}(?!0+$)\\d{1,6}")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
@@ -226,23 +225,23 @@ public class ValidadorVehiculo {
 
     private boolean esMatriculaCiclomotor (String matricula) {
 
-        return matricula.matches("C\\d{4}[A-Z]{3}");
+        return matricula.matches("^C\\d{4}[A-Z]{3}");
     }
 
     private boolean esMatriculaTractor (String matricula, Set<String> ciudades) {
         //E + 4 dígitos + 3 letras
-        if (matricula.matches("E\\d{4}[A-Z]{3}")) {
+        if (matricula.matches("^E\\d{4}[A-Z]{3}")) {
             return true;
         }
 
         //Ciudad + 5 dígitos + VE
-        if (matricula.matches("[A-Z]{1,2}\\d{5}VE")) {
+        if (matricula.matches("^[A-Z]{1,2}(?!0+$)\\d{1,5}VE")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
         }
         //Ciudad + 6 dígitos
-        if (matricula.matches("[A-Z]{1,2}\\d{6}")) {
+        if (matricula.matches("^[A-Z]{1,2}(?!0+$)\\d{1,6}")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
@@ -253,19 +252,19 @@ public class ValidadorVehiculo {
 
     private boolean esMatriculaRemolque (String matricula, Set<String> ciudades) {
         //R + 4 dígitos + 3 letras
-        if (matricula.matches("R\\d{4}[A-Z]{3}")) {
+        if (matricula.matches("^R\\d{4}[A-Z]{3}")) {
             return true;
         }
 
         //Ciudad + 5 dígitos + VE
-        if (matricula.matches("[A-Z]{1,2}\\d{5}VE")) {
+        if (matricula.matches("^[A-Z]{1,2}(?!0+$)\\d{1,5}VE")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
         }
 
         //Ciudad + 6 dígitos
-        if (matricula.matches("[A-Z]{1,2}\\d{6}")) {
+        if (matricula.matches("^[A-Z]{1,2}(?!0+$)\\d{1,6}")) {
             String ciudad = obtenerPrefijoCiudad(matricula);
 
             return ciudades.contains(ciudad);
@@ -276,7 +275,7 @@ public class ValidadorVehiculo {
 
     private boolean esMatriculaHistorico (String matricula) {
 
-        return matricula.matches("H\\d{4}[A-Z]{3}");
+        return matricula.matches("^H\\d{4}[A-Z]{3}");
     }
 
     private String obtenerPrefijoCiudad (String matricula) {
@@ -318,10 +317,17 @@ public class ValidadorVehiculo {
     */
     public void agregarVehiculo (Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Row row) {
         int idFila = row.getRowNum();
-        String nifPropietario = row.getCell(14).getStringCellValue();
+        String nifPropietario = row.getCell(14).getStringCellValue().trim();
         String tipo = row.getCell(0).getStringCellValue();
         String marca = row.getCell(1).getStringCellValue();
-        String modelo = row.getCell(2).getStringCellValue();
+
+        String modelo;
+        if (row.getCell(2).getCellType() == CellType.NUMERIC) {
+            modelo = String.format("%.0f", row.getCell(2).getNumericCellValue());
+        } else {
+            modelo = row.getCell(2).getStringCellValue();
+        }
+
         String matricula = row.getCell(3).getStringCellValue();
         String bastidor = row.getCell(4).getStringCellValue();
         Date fechaMatriculacion = null;

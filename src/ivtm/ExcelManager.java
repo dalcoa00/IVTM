@@ -385,7 +385,7 @@ public class ExcelManager {
         double totalPadron = 0.0;
 
         for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
-            String nif = entry.getKey();
+            String nif = entry.getKey().trim();
             List<VehiculoExcel> vehiculos = entry.getValue();
 
 
@@ -396,7 +396,7 @@ public class ExcelManager {
                 if (c == null) {
                     List<String> errores = new ArrayList<>();
                     errores.add("Vehiculo con propietario erroneo.");
-
+                    System.out.println("Vehiculo con matrícula:" + v.getMatricula() + " con propietario erroneo.");
                     editor.xmlVehiculos(vehiculosRutaXML, v.getIdFila()+1, v.getMarca(), v.getModelo(), errores);
                     continue;
                 }
@@ -463,7 +463,7 @@ public class ExcelManager {
                 editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal());
 
                 //Añade el recibo al Map que almacena los recibos que se deben generar
-                if (v.getNumTrimestres() > 0) {
+                if (v.getImporte() >= 0.0) {
                     mapeaRecibos(recibosMap, c, v, i);
                     i++;
                 }
@@ -480,6 +480,8 @@ public class ExcelManager {
         editor.ordenarVehiculosPorId(vehiculosRutaXML);
         editor.ordenarRecibosPorIdFila(recibosXML);
 
+        System.out.println("Recibos mapeados: " + recibosMap.size());
+
         //Creado Recibos.xml correctamente, los creamos en formato PDF
         reciboPDF.generaRecibos(recibosMap, anio);
         reciboPDF.generaResumen(anio, totalPadron, recibosMap.size()+1);
@@ -493,7 +495,7 @@ public class ExcelManager {
         LocalDate unoDelUno = LocalDate.of(anioPadron, 1, 1);
         Date fechaPadron = Date.from(unoDelUno.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        String nifPropietario = v.getNifPropietario();
+        String nifPropietario = v.getNifPropietario().trim();
 
         ReciboExcel r = new ReciboExcel();
 
@@ -506,10 +508,12 @@ public class ExcelManager {
         r.setUnidadCobro(v.getUnidadCobro());
         r.setTotalRecibo(v.getTotal());
 
+        System.out.println("Atributos del recibo seteados correctamente.");
         //Para cada propietario, crea una lista de recibos
         //Si solo tiene un recibo, es una lista de 1 elementos
         //Si tiene más, es una lista de varios recibos asignados a ese nif
         recibos.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(r);
+        System.out.println("Recibo mapeado correctamente.");
     }
 
     /*Metodo que limpia los sets al finalizar la ejecución*/
