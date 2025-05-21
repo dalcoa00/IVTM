@@ -92,14 +92,6 @@ public class ImporteRecibo {
     }
 
     public double calculaTotalRecibo (int anio, VehiculoExcel vehiculo) {
-
-        //Si vehiculo exento
-        if (vehiculo.getExencion() == 'S') {
-            return 0.0;
-        }
-
-        int anioBaja = -1;
-
         Date fechaAlta = vehiculo.getFechaAlta();
         Date fechaBaja = vehiculo.getFechaBaja();
         Date fechaBajaTemporal = vehiculo.getFechaBajaTemporal();
@@ -111,54 +103,37 @@ public class ImporteRecibo {
 
         //Si el año de alta es después del año del recibo
         if (anioAlta > anio) {
+            vehiculo.setNumTrimestres(0);
             return 0.0;
         }
 
-        //Obtener año de baja si existe
+        // Validación año de baja definitiva (antes del año actual)
         if (fechaBaja != null) {
             Calendar calBaja = Calendar.getInstance();
             calBaja.setTime(fechaBaja);
-
-            anioBaja = calBaja.get(Calendar.YEAR);
+            int anioBaja = calBaja.get(Calendar.YEAR);
+            if (anioBaja < anio) {
+                vehiculo.setNumTrimestres(0);
+                return 0.0;
+            }
         }
 
-        //Si fue dado de baja DEFINITIVA antes del año pedido
-        if (fechaBaja != null && anioBaja < anio) {
+        Date fechaFinUso = (vehiculo.getFechaBajaTemporal() != null) ? vehiculo.getFechaBajaTemporal() : vehiculo.getFechaBaja();
+
+        Trimestres trimestres = new Trimestres(anio);
+        int trimestresAlta = trimestres.calculaTrimestresVehiculo(vehiculo.getFechaAlta(), fechaFinUso);
+
+        vehiculo.setNumTrimestres(trimestresAlta);
+
+        //Si vehiculo exento
+        if (vehiculo.getExencion() == 'S') {
             return 0.0;
         }
 
-        //Define los trimestres del año consultado
-        Trimestres trimestres = new Trimestres(anio);
-        int trimestresAlta = 0;
-
-        //Comprueba si ha estado de alta cada trimestre individualmente
-        for (int i = 1; i <= 4; i++) {
-            Date inicio = trimestres.getInicio(i);
-            Date fin = trimestres.getFin(i);
-
-            boolean paga = true;
-
-            //No paga si fue dado de alta después de terminar el trimestre
-            if (fechaAlta != null && fechaAlta.after(fin)) {
-                paga = false;
-            }
-
-            //No paga si fue dado de baja antes de empezar el trimestre
-            if (fechaBaja != null && fechaBaja.before(inicio)) {
-                paga = false;
-            }
-
-            //No paga si fue dado de baja temporal antes de comenzar el trimestre
-            if (fechaBajaTemporal != null && fechaBajaTemporal.before(inicio)) {
-                paga = false;
-            }
-
-            //Si true en el trimestre, se incremente en uno los trimestres que hay que pagar
-            if (paga) trimestresAlta++;
+        if (trimestresAlta == 0) {
+            vehiculo.setNumTrimestres(0);
+            return 0.0;
         }
-
-        //Añado al vehículo los trimestres que ha estado de alta
-        vehiculo.setNumTrimestres(trimestresAlta);
 
         //Importe total del año se divide en 4 partes (4 trimestres)
         return (vehiculo.getImporte_bonif() / 4.0) * trimestresAlta;

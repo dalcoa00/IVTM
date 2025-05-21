@@ -407,7 +407,15 @@ public class ExcelManager {
                 calAlta.setTime(v.getFechaAlta());
                 int anioAlta = calAlta.get(Calendar.YEAR);
 
+                //DEPURACION
+                System.out.println("Verificando vehículo: " + v.getMatricula());
+                System.out.println("Fecha alta: " + v.getFechaAlta());
+                System.out.println("Trimestres: " + v.getNumTrimestres());
+
                 if (anio < anioAlta || v.getNumTrimestres() <= 0) {
+                    //DEPURACION
+                    System.out.println("No se genera recibo para " + v.getMatricula() +
+                            " porque anioAlta = " + anioAlta + " y numTrimestres = " + v.getNumTrimestres());
                     continue;
                 }
 
@@ -463,7 +471,7 @@ public class ExcelManager {
                 editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal());
 
                 //Añade el recibo al Map que almacena los recibos que se deben generar
-                if (v.getImporte() >= 0.0) {
+                if (v.getImporte() >= 0.0 || v.getExencion() == 'S') {
                     mapeaRecibos(recibosMap, c, v, i);
                     i++;
                 }
@@ -480,7 +488,13 @@ public class ExcelManager {
         editor.ordenarVehiculosPorId(vehiculosRutaXML);
         editor.ordenarRecibosPorIdFila(recibosXML);
 
+        //DEPURACIÓN
         System.out.println("Recibos mapeados: " + recibosMap.size());
+        for (Map.Entry<String, List<ReciboExcel>> e : recibosMap.entrySet()) {
+            for (ReciboExcel r : e.getValue()) {
+                System.out.println("Recibo mapeado: " + r.getVehiculo().getMatricula());
+            }
+        }
 
         //Creado Recibos.xml correctamente, los creamos en formato PDF
         reciboPDF.generaRecibos(recibosMap, anio);

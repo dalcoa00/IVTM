@@ -280,8 +280,10 @@ public class ValidadorCCC {
         c.setEmail(email);
         c.setBonificacion(bonificacion);
         c.setAytoCont(ayto);
-
+        System.out.println("Se va a mapear el contribuyente con DNI: " + c.getNifnie());
         contribuyentesMap.put(nifnie, c);
+        System.out.println("Se ha mapeado el contribuyente correctamente");
+        System.out.println("El contribuyente con DNI " + contribuyentesMap.get(nifnie) + " ha sido mapeado correctamente");
     }
 
 }

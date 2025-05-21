@@ -133,7 +133,7 @@ public class ValidadorVehiculo {
             case "AUTOBUS":
             case "CAMION":
             case "MOTOCICLETA":
-                if (esMatriculaNormal(matricula, ciudades)) {
+                if (esMatriculaNormal(matricula, ciudades) || esMatriculaHistorico(matricula)) {
                     //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
 
@@ -145,7 +145,7 @@ public class ValidadorVehiculo {
                 }
 
             case "CICLOMOTOR":
-                if (esMatriculaCiclomotor(matricula)) {
+                if (esMatriculaCiclomotor(matricula) || esMatriculaHistorico(matricula)) {
                     //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
 
@@ -157,7 +157,7 @@ public class ValidadorVehiculo {
                 }
 
             case "TRACTOR":
-                if (esMatriculaTractor(matricula, ciudades)) {
+                if (esMatriculaTractor(matricula, ciudades) || esMatriculaHistorico(matricula)) {
                     //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
 
@@ -169,7 +169,7 @@ public class ValidadorVehiculo {
                 }
 
             case "REMOLQUE":
-                if (esMatriculaRemolque(matricula, ciudades)) {
+                if (esMatriculaRemolque(matricula, ciudades) || esMatriculaHistorico(matricula)) {
                     //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
 
@@ -180,7 +180,7 @@ public class ValidadorVehiculo {
                     return false;
                 }
 
-            case "HISTORICO":
+            /*case "HISTORICO":
                 if (esMatriculaHistorico(matricula)) {
                     //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
@@ -190,7 +190,7 @@ public class ValidadorVehiculo {
                     System.out.println(matricula + " - Matrícula incorrecta.");
 
                     return false;
-                }
+                }*/
 
             default:
                 System.out.println("Tipo de vehículo no valido");
@@ -361,7 +361,7 @@ public class ValidadorVehiculo {
         Character exencion = exenc.charAt(0);
 
         //Unidad de cobro -> CVs(1), plazas(2), kgs(3), CCs(4)
-        if (row.getCell(5) != null) {
+        if (row.getCell(5) != null && row.getCell(5).getCellType() != CellType.BLANK && row.getCell(5).getNumericCellValue() != 0.0) {
             unidadCobro = 1;
 
             if (row.getCell(5).getCellType() == CellType.NUMERIC) {
@@ -375,7 +375,7 @@ public class ValidadorVehiculo {
                 }
             }
         }
-        else if (row.getCell(6) != null) {
+        else if (row.getCell(6) != null && row.getCell(6).getCellType() != CellType.BLANK && row.getCell(6).getNumericCellValue() != 0.0) {
             unidadCobro = 2;
 
             if (row.getCell(6).getCellType() == CellType.NUMERIC) {
@@ -389,7 +389,7 @@ public class ValidadorVehiculo {
                 }
             }
         }
-        else if (row.getCell(7) != null) {
+        else if (row.getCell(7) != null && row.getCell(7).getCellType() != CellType.BLANK && row.getCell(7).getNumericCellValue() != 0.0) {
             unidadCobro = 3;
 
             if (row.getCell(7).getCellType() == CellType.NUMERIC) {
@@ -403,7 +403,7 @@ public class ValidadorVehiculo {
                 }
             }
         }
-        else if (row.getCell(8) != null) {
+        else if (row.getCell(8) != null && row.getCell(8).getCellType() != CellType.BLANK && row.getCell(8).getNumericCellValue() != 0.0) {
             unidadCobro = 4;
 
             if (row.getCell(8).getCellType() == CellType.NUMERIC) {
@@ -434,7 +434,19 @@ public class ValidadorVehiculo {
         v.setValorUnidad(valorUnidad);
         v.setExenc_bonif(exencion);
 
+        System.out.println("Se va a mapear el vehículo con matrícula: " + v.getMatricula());
+
         vehiculosContribuyentesMap.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(v);
+
+        //DEPURACIÓN
+        List<VehiculoExcel> vehiculosMapeados = vehiculosContribuyentesMap.get(nifPropietario);
+
+        System.out.println("Vehículos mapeados para el NIF " + nifPropietario + ":");
+
+        for (VehiculoExcel ve : vehiculosMapeados) {
+            System.out.println(" - Matrícula: " + ve.getMatricula() + " | NIF propietario: " + ve.getNifPropietario());
+        }
+
 
         System.out.println("Vehiculo mapeado correctamente: " + tipo + marca + modelo);
     }

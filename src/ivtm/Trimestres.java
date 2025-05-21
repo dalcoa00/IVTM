@@ -39,4 +39,29 @@ public class Trimestres {
 
         return cal.getTime();
     }
+
+    public int calculaTrimestresVehiculo (Date fechaAlta, Date fechaBaja) {
+        int trimestres = 0;
+
+        // Si no hay baja, se considera alta hasta el final del año
+        if (fechaBaja == null) {
+            Calendar cal = Calendar.getInstance();
+            cal.set(anio, Calendar.DECEMBER, 31);
+            fechaBaja = cal.getTime();
+        }
+
+        for (int i = 1; i <= 4; i++) {
+            Date inicioTrimestre = getInicio(i);
+            Date finTrimestre = getFin(i);
+
+            // El trimestre se paga si hay solapamiento de fechas
+            boolean solapa = !fechaBaja.before(inicioTrimestre) && !fechaAlta.after(finTrimestre);
+
+            if (solapa) {
+                trimestres++;
+            }
+        }
+
+        return trimestres;
+    }
 }
