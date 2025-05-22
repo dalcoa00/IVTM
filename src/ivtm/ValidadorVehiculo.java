@@ -1,9 +1,7 @@
 package ivtm;
 
 import java.util.*;
-import POJOS.*;
 import modelosExcel.*;
-
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -15,30 +13,26 @@ public class ValidadorVehiculo {
     public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
         String matricula = matriculaCell.getStringCellValue().trim().toUpperCase();
         List<String> errores = new ArrayList<>();
+
         //Comprueba que la correlación de fechas es correcta
         if (!compruebaFechas(fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell)) {
             System.out.println("La correlación de fechas no es correcta.");
             errores.add("Fechas incoherentes");
-            //return;
         }
 
         //Comprueba que la matrícula sea correcta y la añade al set de serlo
         if (!compruebaMatricula(matricula, tipoVehiculoCell)) {
             errores.add("Matricula Erronea");
-            //return;
         }
 
         //Comprueba que el vehículo tiene propietario y si lo tiene comprueba que el NIF sea correcto
         if(!compruebaPropietario(dniSet, nifPropietarioCell, errores)) {
             System.out.println("El vehículo no tiene propietario o su NIF no es válido.");
-            //errores.add("Vehiculo sin propietario");
-            //return;
         }
 
         if (!matriculaSet.add(matricula)) {
             System.out.println("\nMATRICULA DUPLICADA!\n");
             errores.add("Matricula duplicada");
-            //return;
         }
 
         if (errores.isEmpty()){
@@ -50,7 +44,7 @@ public class ValidadorVehiculo {
              if (row.getCell(1).getCellType() == CellType.NUMERIC) {
                 aux = String.format("%.0f", row.getCell(1).getNumericCellValue());
             }
-             else{
+             else {
                 aux=row.getCell(1).getStringCellValue();
             }
 
@@ -65,9 +59,6 @@ public class ValidadorVehiculo {
         }
 
         //Vacía la lista de errores para el siguiente vehículo
-        /*if (!errores.isEmpty()) {
-            errores.clear();
-        }*/
         errores.clear();
     }
 
@@ -134,7 +125,6 @@ public class ValidadorVehiculo {
             case "CAMION":
             case "MOTOCICLETA":
                 if (esMatriculaNormal(matricula, ciudades) || esMatriculaHistorico(matricula)) {
-                    //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
 
                     return true;
@@ -146,7 +136,6 @@ public class ValidadorVehiculo {
 
             case "CICLOMOTOR":
                 if (esMatriculaCiclomotor(matricula) || esMatriculaHistorico(matricula)) {
-                    //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
 
                     return true;
@@ -158,7 +147,6 @@ public class ValidadorVehiculo {
 
             case "TRACTOR":
                 if (esMatriculaTractor(matricula, ciudades) || esMatriculaHistorico(matricula)) {
-                    //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
 
                     return true;
@@ -170,7 +158,6 @@ public class ValidadorVehiculo {
 
             case "REMOLQUE":
                 if (esMatriculaRemolque(matricula, ciudades) || esMatriculaHistorico(matricula)) {
-                    //matriculaSet.add(matricula);
                     System.out.println(matricula + " - Matrícula correcta.");
 
                     return true;
@@ -355,8 +342,6 @@ public class ValidadorVehiculo {
             }
         }
 
-        System.out.println("aa");
-
         String exenc = row.getCell(9).getStringCellValue().trim().toUpperCase();
         Character exencion = exenc.charAt(0);
 
@@ -434,21 +419,7 @@ public class ValidadorVehiculo {
         v.setValorUnidad(valorUnidad);
         v.setExenc_bonif(exencion);
 
-        System.out.println("Se va a mapear el vehículo con matrícula: " + v.getMatricula());
-
         vehiculosContribuyentesMap.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(v);
-
-        //DEPURACIÓN
-        List<VehiculoExcel> vehiculosMapeados = vehiculosContribuyentesMap.get(nifPropietario);
-
-        System.out.println("Vehículos mapeados para el NIF " + nifPropietario + ":");
-
-        for (VehiculoExcel ve : vehiculosMapeados) {
-            System.out.println(" - Matrícula: " + ve.getMatricula() + " | NIF propietario: " + ve.getNifPropietario());
-        }
-
-
-        System.out.println("Vehiculo mapeado correctamente: " + tipo + marca + modelo);
     }
 
 }

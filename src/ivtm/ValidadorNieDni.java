@@ -14,23 +14,26 @@ public class ValidadorNieDni {
 
         if (celdaComprobar.getCellType() == CellType.STRING) {
             dniNie = celdaComprobar.getStringCellValue();
-        } else if (celdaComprobar.getCellType() == CellType.NUMERIC) {
+        }
+        else if (celdaComprobar.getCellType() == CellType.NUMERIC) {
             dniNie = String.format("%.0f", celdaComprobar.getNumericCellValue());
         }
 
         if (dniNie(dniNie) == 1) {
-            System.out.println("Es un DNI");
+            //System.out.println("Es un DNI");
 
             if (!dniValido(dniNie, wb, ruta, row, numFila, dniSet)) {
                 System.out.println("El campo no es valido\n");
             }
-        } else if (dniNie(dniNie) == 2) {
-            System.out.println("Es un Nie");
+        }
+        else if (dniNie(dniNie) == 2) {
+            //System.out.println("Es un Nie");
 
             if (!nieValido(dniNie, wb, ruta, row, numFila, dniSet)) {
                 System.out.println("El campo es valido\n");
             }
-        } else if (dniNie(dniNie) == -1) {
+        }
+        else if (dniNie(dniNie) == -1) {
             //Lo mismo que en el caso 2
             dniValido(dniNie, wb, ruta, row, numFila, dniSet);
             System.out.println("No se trata ni de un Nie ni de un DNI\n");
@@ -47,14 +50,14 @@ public class ValidadorNieDni {
         if (comprobar.matches("^[0-9]{8}[A-Z]$")) {
             return 1;
         }
+
         return -1;
     }
 
     //Metodo  que comprueba que el campo del dni no es null
     public boolean dniVacio(String dni) {
         if (dni == null || dni.isEmpty()) {
-            System.out.println("El campo del dni se encuentra vacio");
-
+            //System.out.println("El campo del dni se encuentra vacio");
             return true;
         } else {
             return false;
@@ -64,8 +67,7 @@ public class ValidadorNieDni {
     //Metodo que comprueba que el campo nie no es null
     public boolean nieVacio(String nie) {
         if (nie == null || nie.isEmpty()) {
-            System.out.println("El campo del Nie se encuentra vacio");
-
+            //System.out.println("El campo del Nie se encuentra vacio");
             return true;
         } else {
             return false;
@@ -90,7 +92,7 @@ public class ValidadorNieDni {
 
         String letraInicioNie = nie.substring(0, 1).toUpperCase();
         if (!letraInicioNie.equals("X") && !letraInicioNie.equals("Y") && !letraInicioNie.equals("Z")) {
-            System.out.println("El NIE no tiene el formato correcto (letra inicial)");
+            //System.out.println("El NIE no tiene el formato correcto (letra inicial)");
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
@@ -99,7 +101,7 @@ public class ValidadorNieDni {
 
         String nieNumero = nie.substring(1, 8);
         if (!nieNumero.matches("\\d{7}")) {
-            System.out.println("El NIE no tiene el formato correcto (número)");
+            //System.out.println("El NIE no tiene el formato correcto (número)");
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
@@ -119,10 +121,10 @@ public class ValidadorNieDni {
                 fila.getCell(0).setCellValue(nieSubsanado);  // <-- importante para coherencia
             }
             if (!dniSet.add(nieSubsanado)) {
-                System.out.println("\n***************NIE no se ha podido añadir al SET -- Debe estar duplicado! ***************\n");
                 editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                         fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                         fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
+
                 return false;
             }
 
@@ -136,6 +138,7 @@ public class ValidadorNieDni {
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
+
             return false;
         }
 
@@ -150,6 +153,7 @@ public class ValidadorNieDni {
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF BLANCO");
+
             return false;
         }
 
@@ -161,6 +165,7 @@ public class ValidadorNieDni {
             editor.xmlDniNie(rutaXML, contador, aux,
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
+
             return false;
         }
 
@@ -170,7 +175,8 @@ public class ValidadorNieDni {
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
-            System.out.println("El dni no tiene el formato correcto (numero)");
+            //System.out.println("El dni no tiene el formato correcto (numero)");
+
             return false;
         }
 
@@ -179,7 +185,8 @@ public class ValidadorNieDni {
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF ERRONEO");
-            System.out.println("El dni no tiene el formato correcto (letra)");
+            //System.out.println("El dni no tiene el formato correcto (letra)");
+
             return false;
         }
 
@@ -199,6 +206,7 @@ public class ValidadorNieDni {
                 editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                         fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                         fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
+
                 return false;
             }
 
@@ -212,6 +220,7 @@ public class ValidadorNieDni {
             editor.xmlDniNie(rutaXML, contador, fila.getCell(0).getStringCellValue(),
                     fila.getCell(3).getStringCellValue(), fila.getCell(1).getStringCellValue(),
                     fila.getCell(2).getStringCellValue(), "NIF DUPLICADO");
+
             return false;
         }
 

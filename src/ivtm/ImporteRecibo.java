@@ -5,9 +5,7 @@ import modelosExcel.VehiculoExcel;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-
 import java.util.*;
-
 import static ivtm.ExcelManager.isEmpty;
 
 public class ImporteRecibo {
@@ -38,7 +36,7 @@ public class ImporteRecibo {
 
                     //Si la  fila esta vacia se las salta
                     if(isEmpty(row)){
-                        System.out.println("Fila sin datos\n");
+                        System.out.println("\nFila sin datos\n");
 
                         continue;
                     }
@@ -112,6 +110,7 @@ public class ImporteRecibo {
             Calendar calBaja = Calendar.getInstance();
             calBaja.setTime(fechaBaja);
             int anioBaja = calBaja.get(Calendar.YEAR);
+
             if (anioBaja < anio) {
                 vehiculo.setNumTrimestres(0);
                 return 0.0;
@@ -138,7 +137,4 @@ public class ImporteRecibo {
         //Importe total del año se divide en 4 partes (4 trimestres)
         return (vehiculo.getImporte_bonif() / 4.0) * trimestresAlta;
     }
-
-
-
 }

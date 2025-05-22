@@ -1,11 +1,9 @@
 package ivtm;
 
+import modelosExcel.ContribuyenteExcel;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Map;
-
-import POJOS.*;
-import modelosExcel.ContribuyenteExcel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -15,7 +13,6 @@ public class ValidadorCCC {
     private final String rutaXML = "resources\\ErroresCCC.xml";
 
     public void generacionEmail(Row row, HashSet<String> email, XSSFWorkbook wb,String ruta, int sheet){
-
         String dni= comprobarTipoDni(row.getCell(0));
         String apellido1= row.getCell(1).getStringCellValue();
         String apellido2= row.getCell(2).getStringCellValue();
@@ -87,8 +84,8 @@ public class ValidadorCCC {
             //System.out.println("validador2: " + validador2);
 
             String numeroCuenta = ccc.substring(10, 20);
-            System.out.println("codigo " + codigoMasIdentificacion + " " + " " + validador1 + " " + validador2 + " " + numeroCuenta);
-            System.out.println("numero total " + ccc);
+            //System.out.println("codigo " + codigoMasIdentificacion + " " + " " + validador1 + " " + validador2 + " " + numeroCuenta);
+            //System.out.println("numero total " + ccc);
 
             int suma1 = 0;
             int suma2 = 0;
@@ -192,7 +189,7 @@ public class ValidadorCCC {
 
         }
         else {
-            System.out.println("El CCC es incorrecto y/o no subsanable. Imposible generar el IBAN asociado.");
+            //System.out.println("El CCC es incorrecto y/o no subsanable. Imposible generar el IBAN asociado.");
             // XML - IMPOSIBLE GENERAR IBAN
             editor.xmlCuenta(rutaXML, row.getRowNum(), row.getCell(3).getStringCellValue(), row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), dniCell.getStringCellValue(), ccc, "", "IMPOSIBLE GENERAR IBAN");
 
@@ -202,7 +199,7 @@ public class ValidadorCCC {
     public boolean comprobarFormatoCCC (String ccc) {
 
         if (ccc.length() != 20) {
-            System.out.println("La cantidad de digitos del CCC es invalida");
+            //System.out.println("La cantidad de digitos del CCC es invalida");
 
             return false;
         }
@@ -211,7 +208,7 @@ public class ValidadorCCC {
                 char comprobar = ccc.charAt(i);
 
                 if (!Character.isDigit(comprobar)) {
-                    System.out.println("El digito "+ i + "no es un numero");
+                    //System.out.println("El digito "+ i + "no es un numero");
 
                     return false;
                 }
@@ -237,7 +234,7 @@ public class ValidadorCCC {
         //Se obtiene el IBAN generado
         String iban = paisCCC + numControl + ccc;
 
-        System.out.println("IBAN generado para el DNI " + dni + ": " + iban);
+        //System.out.println("IBAN generado para el DNI " + dni + ": " + iban);
 
         return iban;
     }
@@ -280,10 +277,8 @@ public class ValidadorCCC {
         c.setEmail(email);
         c.setBonificacion(bonificacion);
         c.setAytoCont(ayto);
-        System.out.println("Se va a mapear el contribuyente con DNI: " + c.getNifnie());
+
         contribuyentesMap.put(nifnie, c);
-        System.out.println("Se ha mapeado el contribuyente correctamente");
-        System.out.println("El contribuyente con DNI " + contribuyentesMap.get(nifnie) + " ha sido mapeado correctamente");
     }
 
 }

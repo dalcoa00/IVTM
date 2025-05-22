@@ -14,7 +14,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.util.List;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -72,8 +71,6 @@ public class EditorXML {
 
             transformer.transform(source, result);
 
-            System.out.println("Contribuyente agregado al XML:");
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,7 +78,6 @@ public class EditorXML {
     //Escribe en ErroresCCC.xml  los  errores del archivo
     public void xmlCuenta(String rutaArchivo, int id, String nombre, String primerApellido, String segundoApellido,String nifnie, String cccErroneo, String ibanCorrecto, String tipoDeError) {
         try{
-
             File xmlFile = new File(rutaArchivo);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -123,12 +119,6 @@ public class EditorXML {
                 ibancorrecto.appendChild(doc.createTextNode(ibanCorrecto));
                 cuentaElement.appendChild(ibancorrecto);
             }
-            /*if (tipoDeError.equals("IMPOSIBLE GENERAR IBAN")) {
-                Element tipoErrorElement = doc.createElement("TipoDeError");
-                tipoErrorElement.appendChild(doc.createTextNode(tipoDeError));
-                cuentaElement.appendChild(tipoErrorElement);
-            }*/
-
 
             // Agregar el nuevo contribuyente al XML
             rootElement.appendChild(cuentaElement);
@@ -143,8 +133,6 @@ public class EditorXML {
             StreamResult result = new StreamResult(new File(rutaArchivo));
 
             transformer.transform(source, result);
-
-            System.out.println("Cuenta agregada al XML:");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -207,8 +195,6 @@ public class EditorXML {
             StreamResult result = new StreamResult(archivo);
             transformer.transform(source, result);
 
-            System.out.println("Recibo añadido correctamente.");
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -260,192 +246,194 @@ public class EditorXML {
 
             transformer.transform(source, result);
 
-            System.out.println("Vehiculo agregado al XML:");
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     //Metodo auxiliar para añadir de  forma correcta los recibos
     private void appendChild(Document doc, Element parent, String tagName, String textContent) {
         Element elem = doc.createElement(tagName);
         elem.setTextContent(textContent);
         parent.appendChild(elem);
     }
+
     //Metodo que permite modificar los atributos  del xml  de recibos para hacerlo al final 
     public void modificarAtributosPadron(String rutaArchivo, double nuevoTotalPadron, String fechaPadron, int numeroTotalRecibos) {
-    try {
-        File archivo = new File(rutaArchivo);
 
-        if (!archivo.exists()) {
-            System.err.println("El archivo XML no existe: " + rutaArchivo);
-            return;
+        try {
+            File archivo = new File(rutaArchivo);
+
+            if (!archivo.exists()) {
+                System.err.println("El archivo XML no existe: " + rutaArchivo);
+                return;
+            }
+
+            // Cargar el documento XML existente
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(archivo);
+
+            // Obtener el nodo raíz <Recibos>
+            NodeList listaRecibos = doc.getElementsByTagName("Recibos");
+
+            if (listaRecibos.getLength() == 0) {
+                System.err.println("El documento no contiene un nodo raíz <Recibos>.");
+                return;
+            }
+
+            Element root = (Element) listaRecibos.item(0);
+
+            // Modificar los atributos
+            root.setAttribute("fechaPadron", fechaPadron);
+            root.setAttribute("totalPadron", String.format("%.2f", nuevoTotalPadron));
+            root.setAttribute("numeroTotalRecibos", String.valueOf(numeroTotalRecibos));
+
+
+            // Guardar los cambios en el mismo archivo
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(archivo);
+            transformer.transform(source, result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Cargar el documento XML existente
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(archivo);
-
-        // Obtener el nodo raíz <Recibos>
-        NodeList listaRecibos = doc.getElementsByTagName("Recibos");
-
-        if (listaRecibos.getLength() == 0) {
-            System.err.println("El documento no contiene un nodo raíz <Recibos>.");
-            return;
-        }
-
-        Element root = (Element) listaRecibos.item(0);
-
-        // Modificar los atributos
-        root.setAttribute("fechaPadron", fechaPadron);
-        root.setAttribute("totalPadron", String.format("%.2f", nuevoTotalPadron));
-        root.setAttribute("numeroTotalRecibos", String.valueOf(numeroTotalRecibos));
-
-
-        // Guardar los cambios en el mismo archivo
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(archivo);
-        transformer.transform(source, result);
-
-        System.out.println("Atributos del padrón modificados correctamente.");
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
 
-public void ordenarVehiculosPorId(String rutaArchivo) {
-    try {
-        File xmlFile = new File(rutaArchivo);
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(xmlFile);
-        doc.getDocumentElement().normalize();
+    public void ordenarVehiculosPorId(String rutaArchivo) {
 
-        Element root = doc.getDocumentElement(); // <Vehiculos>
+        try {
+            File xmlFile = new File(rutaArchivo);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(xmlFile);
+            doc.getDocumentElement().normalize();
 
-        NodeList vehiculoNodes = root.getElementsByTagName("Vehiculo");
+            Element root = doc.getDocumentElement(); // <Vehiculos>
 
-        List<Element> vehiculos = new ArrayList<>();
-        for (int i = 0; i < vehiculoNodes.getLength(); i++) {
-            vehiculos.add((Element) vehiculoNodes.item(i));
+            NodeList vehiculoNodes = root.getElementsByTagName("Vehiculo");
+
+            List<Element> vehiculos = new ArrayList<>();
+            for (int i = 0; i < vehiculoNodes.getLength(); i++) {
+                vehiculos.add((Element) vehiculoNodes.item(i));
+            }
+
+            // Ordenar por el atributo id numéricamente
+            vehiculos.sort(Comparator.comparingInt(e -> Integer.parseInt(e.getAttribute("id"))));
+
+            // Eliminar nodos actuales
+            for (Element v : vehiculos) {
+                root.removeChild(v);
+            }
+
+            // Volver a agregar nodos en orden
+            for (Element v : vehiculos) {
+                root.appendChild(v);
+            }
+
+            //Eliminar nodos vacíos de texto (líneas en blanco)
+            eliminarNodosVacios(doc);
+
+            // Guardar de nuevo el XML
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File(rutaArchivo));
+            transformer.transform(source, result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Ordenar por el atributo id numéricamente
-        vehiculos.sort(Comparator.comparingInt(e -> Integer.parseInt(e.getAttribute("id"))));
-
-        // Eliminar nodos actuales
-        for (Element v : vehiculos) {
-            root.removeChild(v);
-        }
-
-        // Volver a agregar nodos en orden
-        for (Element v : vehiculos) {
-            root.appendChild(v);
-        }
-
-        // 🧹 Eliminar nodos vacíos de texto (líneas en blanco)
-        eliminarNodosVacios(doc);
-
-        // Guardar de nuevo el XML
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(new File(rutaArchivo));
-        transformer.transform(source, result);
-
-        System.out.println("Vehículos ordenados por ID en el XML.");
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
 
-public void ordenarRecibosPorIdFila(String rutaArchivo) {
-    try {
-        File archivo = new File(rutaArchivo);
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(archivo);
-        doc.getDocumentElement().normalize();
+    public void ordenarRecibosPorIdFila(String rutaArchivo) {
 
-        Element root = doc.getDocumentElement();
-        NodeList recibosList = root.getElementsByTagName("Recibo");
+        try {
+            File archivo = new File(rutaArchivo);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(archivo);
+            doc.getDocumentElement().normalize();
 
-        List<Element> recibos = new ArrayList<>();
-        for (int i = 0; i < recibosList.getLength(); i++) {
-            Node node = recibosList.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                recibos.add((Element) node);
+            Element root = doc.getDocumentElement();
+            NodeList recibosList = root.getElementsByTagName("Recibo");
+
+            List<Element> recibos = new ArrayList<>();
+
+            for (int i = 0; i < recibosList.getLength(); i++) {
+                Node node = recibosList.item(i);
+
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    recibos.add((Element) node);
+                }
+            }
+
+            // Ordenar por idFilaExcelVehiculo
+            recibos.sort(Comparator.comparingInt(e ->
+                Integer.parseInt(e.getElementsByTagName("idFilaExcelVehiculo").item(0).getTextContent())));
+
+            // Eliminar todos los nodos <Recibo> actuales
+            for (Element recibo : recibos) {
+                root.removeChild(recibo);
+            }
+
+            // Reinsertar con idRecibo actualizado
+            int nuevoId = 1;
+
+            for (Element recibo : recibos) {
+                recibo.setAttribute("idRecibo", String.valueOf(nuevoId++));
+                root.appendChild(recibo);
+            }
+
+            //Eliminar nodos vacíos (saltos de línea / espacios)
+            eliminarNodosVacios(doc);
+
+            // Guardar el archivo actualizado
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(archivo);
+            transformer.transform(source, result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Metodo auxiliar para eliminar nodos de texto vacíos
+    private void eliminarNodosVacios(Node node) {
+        NodeList hijos = node.getChildNodes();
+
+        for (int i = 0; i < hijos.getLength(); ) {
+            Node actual = hijos.item(i);
+
+            if (actual.getNodeType() == Node.TEXT_NODE && actual.getTextContent().trim().isEmpty()) {
+                node.removeChild(actual);
+                // no incrementes i ya que el NodeList se actualiza
+            } else {
+                eliminarNodosVacios(actual); // recursivo
+                i++;
             }
         }
-
-        // Ordenar por idFilaExcelVehiculo
-        recibos.sort(Comparator.comparingInt(e -> 
-            Integer.parseInt(e.getElementsByTagName("idFilaExcelVehiculo").item(0).getTextContent()))
-        );
-
-        // Eliminar todos los nodos <Recibo> actuales
-        for (Element recibo : recibos) {
-            root.removeChild(recibo);
-        }
-
-        // Reinsertar con idRecibo actualizado
-        int nuevoId = 1;
-        for (Element recibo : recibos) {
-            recibo.setAttribute("idRecibo", String.valueOf(nuevoId++));
-            root.appendChild(recibo);
-        }
-
-        // 🧹 Eliminar nodos vacíos (saltos de línea / espacios)
-        eliminarNodosVacios(doc);
-
-        // Guardar el archivo actualizado
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(archivo);
-        transformer.transform(source, result);
-
-        System.out.println("Recibos ordenados correctamente por idFilaExcelVehiculo.");
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
-
-// Metodo auxiliar para eliminar nodos de texto vacíos
-private void eliminarNodosVacios(Node node) {
-    NodeList hijos = node.getChildNodes();
-    for (int i = 0; i < hijos.getLength(); ) {
-        Node actual = hijos.item(i);
-        if (actual.getNodeType() == Node.TEXT_NODE && actual.getTextContent().trim().isEmpty()) {
-            node.removeChild(actual);
-            // no incrementes i ya que el NodeList se actualiza
-        } else {
-            eliminarNodosVacios(actual); // recursivo
-            i++;
-        }
-    }
-}
 
 
 

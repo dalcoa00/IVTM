@@ -1,24 +1,19 @@
 package ivtm;
 
+import modelosExcel.ReciboExcel;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
-import modelosExcel.ReciboExcel;
-
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.layout.*;
-
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
-import java.io.File;
 import java.text.SimpleDateFormat;
 
 /*Clase para generar los recibos en formato PDF*/

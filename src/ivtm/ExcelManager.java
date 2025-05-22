@@ -378,7 +378,7 @@ public class ExcelManager {
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaPadron = "01/01/" + anio;
 
-        System.out.println("\n---------------  RECIBOS GENERADOS  ---------------\n");
+        System.out.println("\n------------------  RECIBOS GENERADOS  ------------------\n");
 
         int i = 1;
         int totalVehiculos = 0;
@@ -396,7 +396,6 @@ public class ExcelManager {
                 if (c == null) {
                     List<String> errores = new ArrayList<>();
                     errores.add("Vehiculo con propietario erroneo.");
-                    System.out.println("Vehiculo con matrícula:" + v.getMatricula() + " con propietario erroneo.");
                     editor.xmlVehiculos(vehiculosRutaXML, v.getIdFila()+1, v.getMarca(), v.getModelo(), errores);
                     continue;
                 }
@@ -407,15 +406,7 @@ public class ExcelManager {
                 calAlta.setTime(v.getFechaAlta());
                 int anioAlta = calAlta.get(Calendar.YEAR);
 
-                //DEPURACION
-                System.out.println("Verificando vehículo: " + v.getMatricula());
-                System.out.println("Fecha alta: " + v.getFechaAlta());
-                System.out.println("Trimestres: " + v.getNumTrimestres());
-
                 if (anio < anioAlta || v.getNumTrimestres() <= 0) {
-                    //DEPURACION
-                    System.out.println("No se genera recibo para " + v.getMatricula() +
-                            " porque anioAlta = " + anioAlta + " y numTrimestres = " + v.getNumTrimestres());
                     continue;
                 }
 
@@ -430,7 +421,7 @@ public class ExcelManager {
                 System.out.println("IBAN: " + c.getIban());
                 System.out.println("Bonificacion: " + c.getBonificacion());
 
-                //Fecha del recibo y del padrón
+                //Fecha del recibo
                 System.out.println("\nFecha del recibo: " + hoy.format(formato) + "\n"); //Día que ha sido generado el recibo
 
                 String unidadCobro;
@@ -477,6 +468,7 @@ public class ExcelManager {
                 }
             }
         }
+
         //Redondea el total del padrón a 2 decimales
         totalPadron = Math.round(totalPadron * 100.0) / 100.0;
         String fecha= "IVTM de "+anio;
@@ -488,15 +480,7 @@ public class ExcelManager {
         editor.ordenarVehiculosPorId(vehiculosRutaXML);
         editor.ordenarRecibosPorIdFila(recibosXML);
 
-        //DEPURACIÓN
-        System.out.println("Recibos mapeados: " + recibosMap.size());
-        for (Map.Entry<String, List<ReciboExcel>> e : recibosMap.entrySet()) {
-            for (ReciboExcel r : e.getValue()) {
-                System.out.println("Recibo mapeado: " + r.getVehiculo().getMatricula());
-            }
-        }
-
-        //Creado Recibos.xml correctamente, los creamos en formato PDF
+        //Generación de recibos y resumen en formato PDF
         reciboPDF.generaRecibos(recibosMap, anio);
         reciboPDF.generaResumen(anio, totalPadron, recibosMap.size()+1);
     }
@@ -522,12 +506,10 @@ public class ExcelManager {
         r.setUnidadCobro(v.getUnidadCobro());
         r.setTotalRecibo(v.getTotal());
 
-        System.out.println("Atributos del recibo seteados correctamente.");
         //Para cada propietario, crea una lista de recibos
         //Si solo tiene un recibo, es una lista de 1 elementos
         //Si tiene más, es una lista de varios recibos asignados a ese nif
         recibos.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(r);
-        System.out.println("Recibo mapeado correctamente.");
     }
 
     /*Metodo que limpia los sets al finalizar la ejecución*/
@@ -540,11 +522,6 @@ public class ExcelManager {
         contribuyentesMap.clear();
         vehiculosContribuyentesMap.clear();
         recibosMap.clear();
-
-        //Si no se va a utilizar, se puede eliminar la referencia
-        /*dniSet = null;
-        cccSet = null;
-        correoSet= null;*/
     }
 
 
