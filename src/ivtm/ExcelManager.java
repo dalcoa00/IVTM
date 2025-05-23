@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -515,20 +516,12 @@ public class ExcelManager {
         recibos.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(r);
     }
 
-    /*Metodo que limpia los sets al finalizar la ejecución*/
-    public void cleanSets() {
-        //Despues de leer el documento, vació el HashSet para no consumir memoria
-        dniSet.clear();
-        cccSet.clear();
-        correoSet.clear();
-        matriculaSet.clear();
-        contribuyentesMap.clear();
-        vehiculosContribuyentesMap.clear();
-        recibosMap.clear();
-    }
-
-    public void actualizaBD(Connection conexion){
+    public void actualizaBD(Connection conexion) throws IOException {
         int contador=0;
+
+        //Primero meter los datos de la ordenanza
+        leeOrdenanzaDB(conexion);
+
         for (ContribuyenteExcel c : contribuyentesMap.values()) {
             int idGenerado=contador++;
             actualizar.insertarContribuyente(conexion, 
@@ -547,4 +540,100 @@ public class ExcelManager {
             c.getAyuntamiento());
         }
     }
+
+    public void leeOrdenanzaDB (Connection conexion) throws IOException {
+        String rutaOrdenanzas = "resources\\SistemasOrdenanzas.xlsx";
+
+        FileInputStream file = new FileInputStream(rutaOrdenanzas);
+        XSSFWorkbook wb = new XSSFWorkbook(file);
+        file.close();
+
+        //Se lee la hoja
+        XSSFSheet ws = wb.getSheetAt(0);
+        System.out.println("\nLeyendo hoja \"" + ws.getSheetName() + "\"");
+
+        //Iteración por las filas de la hoja
+        Iterator<Row> rowIter = ws.iterator();
+
+        //Para empezar en la fila 1
+        if(rowIter.hasNext()){
+            rowIter.next();
+        }
+
+        //Lee columna por columna de cada fila
+        while (rowIter.hasNext()) {
+            Row row = rowIter.next();
+
+            //Si la  fila esta vacia se las salta
+            if(isEmpty(row)){
+                System.out.println("Fila sin datos\n");
+
+                continue;
+            }
+
+            Iterator<Cell> cellIter = row.cellIterator();
+
+            Cell aytoCell = null;
+            Cell tipoVehiculoCell = null;
+            Cell unidadCell = null;
+            Cell minCell = null;
+            Cell maxCell = null;
+            Cell importeCell = null;
+
+            while (cellIter.hasNext()) {
+                Cell cell = cellIter.next();
+
+                if (cell.getColumnIndex() == 0) {
+                    aytoCell = cell;
+                }
+
+                if (cell.getColumnIndex() == 1) {
+                    tipoVehiculoCell= cell;
+                }
+
+                if (cell.getColumnIndex() == 2) {
+                    unidadCell = cell;
+                }
+
+                if (cell.getColumnIndex() == 3) {
+                    minCell = cell;
+                }
+
+                if (cell.getColumnIndex() == 4) {
+                    maxCell = cell;
+                }
+
+                if (cell.getColumnIndex() == 5) {
+                    importeCell = cell;
+                }
+            }
+
+            String ayto = aytoCell.getStringCellValue();
+            String tipoVehiculo = tipoVehiculoCell.getStringCellValue();
+            String unidad = unidadCell.getStringCellValue();
+            String min = minCell.getStringCellValue();
+            String max = maxCell.getStringCellValue();
+            double importe = importeCell.getNumericCellValue();
+
+            //Hay que quitar los IDs de los métodos de insertar en la DB
+            actualizar.insertarOrdenanza(conexion, 000, ayto, tipoVehiculo, unidad, min, max, importe);
+        }
+
+        wb.close();
+
+        System.out.println("\nSe ha completado la lectura del archivo y se han insertado los datos correctamente\n");
+    }
+
+    /*Metodo que limpia los sets al finalizar la ejecución*/
+    public void cleanSets() {
+        //Despues de leer el documento, vació el HashSet para no consumir memoria
+        dniSet.clear();
+        cccSet.clear();
+        correoSet.clear();
+        matriculaSet.clear();
+        contribuyentesMap.clear();
+        vehiculosContribuyentesMap.clear();
+        recibosMap.clear();
+    }
+
 }
