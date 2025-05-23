@@ -183,6 +183,8 @@ public class ValidadorCCC {
                     editor.xmlCuenta(rutaXML, row.getRowNum(), row.getCell(3).getStringCellValue(), row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), dniCell.getStringCellValue(), ccc, iban, "");
                 }
 
+                //Añade el contribuyente a la base de datoss
+                //ActualizarDB.insertarContribuyente(conexion, row.getCell(3).getStringCellValue(),  row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), row.getCell(0).getStringCellValue(), row.getCell(4).getStringCellValue(), row.getCell(5).getStringCellValue(),  row.getCell(8).getStringCellValue(), row.getCell(9).getStringCellValue(), row.getCell(10).getStringCellValue(),  row.getCell(6).getStringCellValue())
                 //Agrega el contribuyente al map para generar los recibos
                 agregarContribuyente(contribuyentesMap, row);
             }

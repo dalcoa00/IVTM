@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
@@ -29,7 +31,7 @@ public class ExcelManager {
 
     EditorXML editor = new EditorXML();
     ReciboPDF reciboPDF = new ReciboPDF();
-
+    ActualizarBD actualizar = new ActualizarBD();
     private final String recibosXML = "resources\\Recibos.xml";
     private final String vehiculosRutaXML = "resources\\ErroresVehiculos.xml";
 
@@ -483,6 +485,7 @@ public class ExcelManager {
         //Generación de recibos y resumen en formato PDF
         reciboPDF.generaRecibos(recibosMap, anio);
         reciboPDF.generaResumen(anio, totalPadron, recibosMap.size()+1);
+
     }
 
     /*Metodo que mapea los recibos generados para un año usando como clave el nif del contribuyente*/
@@ -524,5 +527,24 @@ public class ExcelManager {
         recibosMap.clear();
     }
 
-
+    public void actualizaBD(Connection conexion){
+        int contador=0;
+        for (ContribuyenteExcel c : contribuyentesMap.values()) {
+            int idGenerado=contador++;
+            actualizar.insertarContribuyente(conexion, 
+            idGenerado,
+            c.getNombre(),
+            c.getApellido1(),
+            c.getApellido2(),
+            c.getNifNie(),
+            c.getDireccion(),
+            c.getNumero(),
+            c.getPaisCCC(),
+            c.getCCC(),
+            c.getIBAN(),
+            c.getEmail(),
+            c.getBonificacion(),
+            c.getAyuntamiento());
+        }
+    }
 }

@@ -85,5 +85,29 @@ public class Ivtm {
         /*También calcula el total de los recibos, los imprime por pantalla, genera los XMLs
         * Y crea los recibos en formato PDF*/
         manager.readExcel(rutaOrdenanzas, 0);
+        pruebaConexion();
+        
     }
+
+    public void pruebaConexion(){
+        Session session = IvtmSession.open();
+        IvtmTransaction transaction = new IvtmTransaction();
+        try{
+        transaction.beginTrans(session);
+
+            // Obtener la conexión JDBC desde la sesión Hibernate
+            Connection connection = session.doReturningWork(conn -> conn);
+
+            // Pasar esa conexión a otra clase que trabaja con JDBC directamente
+            ExcelManager.actulizaBD(connection);
+
+            transaction.commitTrans();
+        } catch (Exception e) {
+            transaction.rollbackTrans();
+            e.printStackTrace();
+        } finally {
+            session.close();
+            FactorySession.closeSessionFactory();
+        }
+            }
 }
