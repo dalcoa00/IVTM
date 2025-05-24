@@ -3,21 +3,22 @@ package modelosExcel;
 import java.util.Date;
 
 public class VehiculoExcel {
-    private int idFila;
+    private Integer idFila;
     private String nifPropietario;
     private String tipoVehiculo;
     private String marca;
     private String modelo;
     private String matricula;
     private String bastidor;
-    private Date fechaMatriculacion;
-    private Date fechaAlta;
-    private Date fechaBaja;
-    private Date fechaBajaTemporal;
     //1=CVs, 2=Plazas, 3=KGs, 4=CCs
     private int unidadCobro;
     //nº cvs, plazas, kgs o ccs
     private double valorUnidad;
+    private Date fechaMatriculacion;
+    private Date fechaAlta;
+    private Date fechaBaja;
+    private Date fechaBajaTemporal;
+
     private int numTrimestres;
     private double importe;
     private double importe_bonif; //Se añade al calcularlo leyendo Ordenanza
@@ -36,7 +37,7 @@ public class VehiculoExcel {
         return nifPropietario;
     }
 
-    public void setNifPropietario(String nifPropietario) {
+    public void setNifnifPropietario(String nifPropietario) {
         this.nifPropietario = nifPropietario;
     }
 

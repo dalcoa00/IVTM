@@ -1,4 +1,4 @@
-package ivtm;
+/*package ivtm;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Date;
@@ -206,5 +206,5 @@ public class ActualizarBD{
         }   
     }
 
-}
+}*/
  

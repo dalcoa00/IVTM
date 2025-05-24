@@ -16,7 +16,6 @@ public class Ivtm {
         validateNUpdate(manager);
 
 
-
         //Al finalizar la ejecución completa del programa se limpian los sets con los datos almacenados
         //manager.cleanSets();
     }
@@ -85,13 +84,16 @@ public class Ivtm {
         /*También calcula el total de los recibos, los imprime por pantalla, genera los XMLs
         * Y crea los recibos en formato PDF*/
         manager.readExcel(rutaOrdenanzas, 0);
-        pruebaConexion();
+
+        /*Práctica 5. Volcado de datos a la DB*/
+        //pruebaConexion();
         
     }
 
-    public void pruebaConexion(){
+    /*public void pruebaConexion(){
         Session session = IvtmSession.open();
         IvtmTransaction transaction = new IvtmTransaction();
+
         try{
         transaction.beginTrans(session);
 
@@ -109,5 +111,6 @@ public class Ivtm {
             session.close();
             FactorySession.closeSessionFactory();
         }
-            }
+            }*/
+
 }

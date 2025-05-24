@@ -1,5 +1,6 @@
 package ivtm;
 
+import POJOS.Contribuyente;
 import modelosExcel.ContribuyenteExcel;
 import java.math.BigInteger;
 import java.util.HashSet;
@@ -63,7 +64,7 @@ public class ValidadorCCC {
         }
         return dniNie;
     }
-    public void comprobarCCC(Row row, XSSFWorkbook wb, String  ruta, int sheet, HashSet<String> cccSet, HashSet<String> dniSet, HashSet<String> correoSet, Cell dniCell, Cell cccCell,  Map<String, ContribuyenteExcel> contribuyentesMap) {
+    public void comprobarCCC(Row row, XSSFWorkbook wb, String  ruta, int sheet, HashSet<String> cccSet, HashSet<String> dniSet, HashSet<String> correoSet, Cell dniCell, Cell cccCell, Map<String, ContribuyenteExcel> contribuyentesMap, Map<Integer, Contribuyente> contribuyentesPojosMap) {
         //Una vez que se comprueba el CCC hay que generar el IBAN
         //Aunque el CCC sea erróneo (o se ha subsanado), si se puede generar el IBAN se genera y se incluye en erroresCCC o se actualiza en el Excel
         Integer[] factores = {1, 2, 4, 8, 5, 10, 9, 7, 3, 6};
@@ -186,7 +187,7 @@ public class ValidadorCCC {
                 //Añade el contribuyente a la base de datoss
                 //ActualizarDB.insertarContribuyente(conexion, row.getCell(3).getStringCellValue(),  row.getCell(1).getStringCellValue(), row.getCell(2).getStringCellValue(), row.getCell(0).getStringCellValue(), row.getCell(4).getStringCellValue(), row.getCell(5).getStringCellValue(),  row.getCell(8).getStringCellValue(), row.getCell(9).getStringCellValue(), row.getCell(10).getStringCellValue(),  row.getCell(6).getStringCellValue())
                 //Agrega el contribuyente al map para generar los recibos
-                agregarContribuyente(contribuyentesMap, row);
+                agregarContribuyente(contribuyentesMap, contribuyentesPojosMap, row);
             }
 
         }
@@ -258,12 +259,18 @@ public class ValidadorCCC {
     }
 
     /*Metodo que agrega el contribuyente al Map una vez sus datos han sido verificados o subsanados*/
-    public void agregarContribuyente (Map<String, ContribuyenteExcel> contribuyentesMap, Row row) {
+    public void agregarContribuyente (Map<String, ContribuyenteExcel> contribuyentesMap, Map<Integer, Contribuyente> contribuyentesPojosMap, Row row) {
+        DataFormatter formatter = new DataFormatter();
+
+        Integer idFila = row.getRowNum();
         String nombre = row.getCell(3).getStringCellValue();
         String apellido1 = row.getCell(1).getStringCellValue();
         String apellido2 = row.getCell(2).getStringCellValue();
         String nifnie = row.getCell(0).getStringCellValue().trim();
         String direccion = row.getCell(4).getStringCellValue();
+        String numero = formatter.formatCellValue(row.getCell(5));
+        String pais = row.getCell(8).getStringCellValue();
+        String ccc = row.getCell(9).getStringCellValue();
         String iban = row.getCell(10).getStringCellValue();
         String email = row.getCell(6).getStringCellValue();
         Double bonificacion = row.getCell(11).getNumericCellValue();
@@ -275,12 +282,33 @@ public class ValidadorCCC {
         c.setApellido2(apellido2);
         c.setNifnie(nifnie);
         c.setDireccion(direccion);
+        c.setNumero(numero);
+        c.setPaisCcc(pais);
+        c.setCcc(ccc);
         c.setIban(iban);
         c.setEmail(email);
         c.setBonificacion(bonificacion);
         c.setAytoCont(ayto);
 
         contribuyentesMap.put(nifnie, c);
+
+        Contribuyente cont = new Contribuyente();
+
+        cont.setIdContribuyente(idFila);
+        cont.setNombre(c.getNombre());
+        cont.setApellido1(c.getApellido1());
+        cont.setApellido2(c.getApellido2());
+        cont.setNifnie(c.getNifnie());
+        cont.setDireccion(c.getDireccion());
+        cont.setNumero(c.getNumero());
+        cont.setPaisCcc(c.getPaisCcc());
+        cont.setCcc(c.getCcc());
+        cont.setIban(c.getIban());
+        cont.setEmail(c.getEmail());
+        cont.setBonificacion(c.getBonificacion());
+        cont.setAyuntamiento(c.getAytoCont());
+
+        contribuyentesPojosMap.put(idFila, cont);
     }
 
 }

@@ -1,5 +1,6 @@
 package ivtm;
 
+import POJOS.*;
 import modelosExcel.*;
 
 import org.apache.poi.ss.usermodel.*;
@@ -7,7 +8,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -15,7 +15,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
@@ -30,9 +29,14 @@ public class ExcelManager {
     Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap = new HashMap<>(); // <- Hoja vehiculos
     Map<String, List<ReciboExcel>> recibosMap = new HashMap<>(); //Recibos que se generan
 
+    Map<Integer, Contribuyente> contribuyentesPojosMap = new HashMap<>(); // <- Hoja Contribuyentes
+    Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap = new HashMap<>(); // <- Hoja vehiculos
+    Map<Integer, List<Recibos>> recibosPojosMap = new HashMap<>(); //Recibos que se generan
+    Map<Integer, List<Ordenanza>> ordenanzasMap = new HashMap<>();
+
     EditorXML editor = new EditorXML();
     ReciboPDF reciboPDF = new ReciboPDF();
-    ActualizarBD actualizar = new ActualizarBD();
+    //ActualizarBD actualizar = new ActualizarBD();
     private final String recibosXML = "resources\\Recibos.xml";
     private final String vehiculosRutaXML = "resources\\ErroresVehiculos.xml";
 
@@ -110,7 +114,7 @@ public class ExcelManager {
                     //Valida el CCC si la celda 9 es no nula
                     //Genera IBAN y correo si NIF/NIE y CCC correctos o subsanados
                     if (cccCell != null) {
-                        validadorCCC.comprobarCCC(row, wb, filepath, sheet, cccSet, dniSet, correoSet, dniCell, cccCell, contribuyentesMap);
+                        validadorCCC.comprobarCCC(row, wb, filepath, sheet, cccSet, dniSet, correoSet, dniCell, cccCell, contribuyentesMap, contribuyentesPojosMap);
                     }
 
                 }
@@ -220,7 +224,7 @@ public class ExcelManager {
 
                     //Comprueba que los datos del vehiculo son correctos
                     if (matriculaCell != null && tipoVehiculoCell != null) {
-                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell, fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell, nifPropietarioCell, vehiculosContribuyentesMap);
+                        validaVehiculo.comprobarVehiculo(wb, row, matriculaSet, dniSet, matriculaCell, tipoVehiculoCell, fechaMatriculacionCell, fechaAltaCell, fechaBajaCell, fechaBajaTempCell, nifPropietarioCell, vehiculosContribuyentesMap, vehiculosPojosContribuyentesMap, contribuyentesPojosMap);
                     }
                     else {
                         System.out.println("No es posible comprobar los datos del vehículo.");
@@ -258,12 +262,17 @@ public class ExcelManager {
                 ImporteRecibo importe = new ImporteRecibo();
                 //Meter en contribuyentes map (cuando se mapea en validadorCCC) el ayuntamiento (nuevo atributo)
                 // para calcular el importe correcto cuando recorre ordenanza en base al ayto
-                importe.calculaImporte(ws, vehiculosContribuyentesMap, contribuyentesMap, anio);
+                importe.calculaImporte(ws, vehiculosContribuyentesMap, contribuyentesMap, ordenanzasMap, vehiculosPojosContribuyentesMap, anio);
 
                 wb.close();
 
+                //DEPURACION
+                contribuyentesPojosMap.forEach((key, value) -> {
+                    System.out.println("ID: " + key + ", NIF: " + value.getNifnie());
+                });
+
                 /*Imprime por pantalla los recibos de los vehículos del año solicitado*/
-                printContribuyentesVehiculos(contribuyentesMap, vehiculosContribuyentesMap, anio);
+                printContribuyentesVehiculos(contribuyentesMap, vehiculosContribuyentesMap, anio, contribuyentesPojosMap, vehiculosPojosContribuyentesMap);
             }
             catch (IOException e) {
                 System.out.println("Error al leer el archivo " + e.getMessage());
@@ -375,7 +384,7 @@ public class ExcelManager {
     }
 
     /* Metodo que imprime los recibos por pantalla y loa guarda en un Map (solo los que hay que generar)*/
-    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, int anio) throws IOException {
+    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, int anio, Map<Integer, Contribuyente> contribuyentesPojosMap, Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap) throws IOException {
         //Obtengo el día de hoy (Día que se genera el recibo)
         LocalDate hoy = LocalDate.now();
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -464,10 +473,46 @@ public class ExcelManager {
                 //Añade el recibo a Recibos.xml
                 editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal());
 
-                //Añade el recibo al Map que almacena los recibos que se deben generar
-                if (v.getImporte() >= 0.0 || v.getExencion() == 'S') {
-                    mapeaRecibos(recibosMap, c, v, i);
-                    i++;
+                for (Map.Entry<Integer, List<Vehiculos>> entry2 : vehiculosPojosContribuyentesMap.entrySet()) {
+                    List<Vehiculos> vehiculosPojos = entry2.getValue();
+
+                    // Validar lista de vehículos
+                    if (vehiculosPojos == null || vehiculosPojos.isEmpty()) {
+                        System.out.println("La lista de vehículos está vacía para la clave: " + entry2.getKey());
+                        continue;
+                    }
+
+                    for (Vehiculos vPojos : vehiculosPojos) {
+                        Contribuyente contribuyente = vPojos.getContribuyente();
+
+                        if (contribuyente == null) {
+                            System.out.println("Advertencia: Vehículo con ID " + vPojos.getIdVehiculo()
+                                    + " no tiene un contribuyente asociado. Se omite.");
+                            continue; // Omitir este vehículo
+                        }
+
+                        if (vPojos == null) {
+                            System.out.println("Un vehículo en la lista es nulo.");
+                            continue;
+                        }
+
+                        Integer idContribuyente = vPojos.getContribuyente().getIdContribuyente();
+                        Contribuyente cPojos = contribuyentesPojosMap.get(idContribuyente);
+                        System.out.println("aaaaa");
+
+                        // Validar contribuyente
+                        if (cPojos == null) {
+                            System.out.println("No se encontró contribuyente para ID: " + idContribuyente);
+                            continue;
+                        }
+
+                        //Añade el recibo al Map que almacena los recibos que se deben generar
+                        //Tanto de Pojos como los propios
+                        if (v.getImporte() >= 0.0 || v.getExencion() == 'S') {
+                            mapeaRecibos(c, v, i, vPojos, cPojos);
+                            i++;
+                        }
+                    }
                 }
             }
         }
@@ -483,6 +528,8 @@ public class ExcelManager {
         editor.ordenarVehiculosPorId(vehiculosRutaXML);
         editor.ordenarRecibosPorIdFila(recibosXML);
 
+        System.out.println("\n Número de recibos mapeados: " + recibosMap.size());
+
         //Generación de recibos y resumen en formato PDF
         reciboPDF.generaRecibos(recibosMap, anio);
         reciboPDF.generaResumen(anio, totalPadron, recibosMap.size()+1);
@@ -490,7 +537,7 @@ public class ExcelManager {
     }
 
     /*Metodo que mapea los recibos generados para un año usando como clave el nif del contribuyente*/
-    public void mapeaRecibos(Map<String, List<ReciboExcel>> recibos, ContribuyenteExcel c, VehiculoExcel v, int numRecibo) {
+    public void mapeaRecibos(ContribuyenteExcel c, VehiculoExcel v, int numRecibo, Vehiculos vPojos, Contribuyente cPojos) {
         LocalDate localDate = LocalDate.now();
         Date fechaRecibo = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         int anioPadron = LocalDate.now().getYear();
@@ -513,10 +560,89 @@ public class ExcelManager {
         //Para cada propietario, crea una lista de recibos
         //Si solo tiene un recibo, es una lista de 1 elementos
         //Si tiene más, es una lista de varios recibos asignados a ese nif
-        recibos.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(r);
+        recibosMap.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(r);
+
+        //Mapeo recibos POJOS
+        Recibos rec = new Recibos();
+        rec.setNumRecibo(numRecibo);
+        rec.setContribuyente(cPojos);
+        rec.setVehiculos(vPojos);
+        rec.setFechaPadron(fechaPadron);
+        rec.setFechaRecibo(fechaRecibo);
+        rec.setNifContribuyente(nifPropietario);
+        rec.setDireccionCompleta(cPojos.getDireccion());
+        rec.setIban(cPojos.getIban());
+        rec.setTipoVehiculo(vPojos.getTipo());
+        rec.setMarcaModelo(vPojos.getMarca() + " " + vPojos.getModelo());
+
+        switch (v.getUnidadCobro()) {
+            case 1:
+                rec.setUnidad("CABALLOS");
+                break;
+            case 2:
+                rec.setUnidad("PLAZAS");
+                break;
+            case 3:
+                rec.setUnidad("KG");
+                break;
+            case 4:
+                rec.setUnidad("CC");
+                break;
+        }
+
+        switch (vPojos.getTipo()) {
+            case "TURISMO":
+            case "TRACTOR":
+                rec.setValorUnidad(vPojos.getCaballosFiscales());
+                break;
+            case "CAMION":
+            case "REMOLQUE":
+                rec.setValorUnidad(vPojos.getKgcarga());
+                break;
+            case "MOTOCICLETA":
+            case "CICLOMOTOR":
+                rec.setValorUnidad(vPojos.getCentrimetroscubicos());
+            case "AUTOBUS":
+                rec.setValorUnidad(vPojos.getPlazas());
+        }
+
+        rec.setTotalRecibo(v.getTotal());
+        rec.setExencion(vPojos.getExencion());
+        rec.setBonificacion(cPojos.getBonificacion());
+        rec.setEmail(cPojos.getEmail());
+        rec.setAyuntamiento(cPojos.getAyuntamiento());
+
+        recibosPojosMap.computeIfAbsent(numRecibo, k -> new ArrayList<>()).add(rec);
+
+        //Mapea los datos que faltaban en Contribuyente y Vehiculos
+        mapeaRestantes(rec);
     }
 
-    public void actualizaBD(Connection conexion) throws IOException {
+    public void mapeaRestantes(Recibos rec) {
+        Contribuyente  c = rec.getContribuyente();
+        Vehiculos v = rec.getVehiculos();
+
+        for (List<Ordenanza> listaOrdenanzas : ordenanzasMap.values()) {
+            for (Ordenanza o : listaOrdenanzas) {
+                Set<Vehiculos> vehiculosOrdenanza = o.getVehiculoses();
+
+                //Si el vehículo está en el Set de la ordenanza
+                if (vehiculosOrdenanza.contains(v)) {
+                    //Setteo la ordenanza al vehículo
+                    v.setOrdenanza(o);
+
+                    //Añado el recibo al Set de recibos del vehiculo
+                    v.getReciboses().add(rec);
+                    break;
+                }
+            }
+        }
+
+        c.getVehiculoses().add(v);
+        c.getReciboses().add(rec);
+    }
+
+    /*public void actualizaBD(Connection conexion) throws IOException {
         int contador=0;
 
         //Primero meter los datos de la ordenanza
@@ -529,7 +655,7 @@ public class ExcelManager {
             c.getNombre(),
             c.getApellido1(),
             c.getApellido2(),
-            c.getNifNie(),
+            c.getNifnie(),
             c.getDireccion(),
             c.getNumero(),
             c.getPaisCCC(),
@@ -622,7 +748,7 @@ public class ExcelManager {
         wb.close();
 
         System.out.println("\nSe ha completado la lectura del archivo y se han insertado los datos correctamente\n");
-    }
+    }*/
 
     /*Metodo que limpia los sets al finalizar la ejecución*/
     public void cleanSets() {
@@ -634,6 +760,10 @@ public class ExcelManager {
         contribuyentesMap.clear();
         vehiculosContribuyentesMap.clear();
         recibosMap.clear();
+        contribuyentesPojosMap.clear();
+        vehiculosPojosContribuyentesMap.clear();
+        recibosPojosMap.clear();
+        ordenanzasMap.clear();
     }
 
 }

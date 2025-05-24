@@ -1,15 +1,27 @@
 package modelosExcel;
 
 public class ContribuyenteExcel {
+    private Integer idContribuyente;
     private String nombre;
     private String apellido1;
     private String apellido2;
     private String nifnie;
     private String direccion;
+    private String numero;
+    private String paisCcc;
+    private String ccc;
     private String iban;
     private String email;
     private Double bonificacion;
     private String aytoCont;
+
+    public Integer getIdContribuyente() {
+        return idContribuyente;
+    }
+
+    public void setIdContribuyente(Integer idContribuyente) {
+        this.idContribuyente = idContribuyente;
+    }
 
     public String getNombre() {
         return nombre;
@@ -49,6 +61,25 @@ public class ContribuyenteExcel {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+    public String getPaisCcc() {
+        return paisCcc;
+    }
+    public void setPaisCcc(String paisCcc) {
+        this.paisCcc = paisCcc;
+    }
+    public String getCcc() {
+        return ccc;
+    }
+    public void setCcc(String ccc) {
+        this.ccc = ccc;
     }
 
     public String getIban() {

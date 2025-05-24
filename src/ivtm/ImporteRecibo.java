@@ -1,5 +1,7 @@
 package ivtm;
 
+import POJOS.Ordenanza;
+import POJOS.Vehiculos;
 import modelosExcel.ContribuyenteExcel;
 import modelosExcel.VehiculoExcel;
 import org.apache.poi.ss.usermodel.Cell;
@@ -11,7 +13,7 @@ import static ivtm.ExcelManager.isEmpty;
 public class ImporteRecibo {
 
     /*Calcula el importe que se debe pagar por cada vehículo*/
-    public void calculaImporte (XSSFSheet ws, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<String, ContribuyenteExcel> contribuyentesMap, int anio) {
+    public void calculaImporte (XSSFSheet ws, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<String, ContribuyenteExcel> contribuyentesMap, Map<Integer, List<Ordenanza>> ordenanzasMap, Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap, int anio) {
 
         for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
             //Obtengo los propietarios para comparar el ayuntamiento
@@ -23,6 +25,7 @@ public class ImporteRecibo {
             if (c == null) continue;
 
             for (VehiculoExcel vehiculo : vehiculos) {
+
                 //Iteración por las filas de la hoja
                 Iterator<Row> rowIter = ws.iterator();
 
@@ -48,12 +51,63 @@ public class ImporteRecibo {
                     Cell maxUnidadCell = row.getCell(4);
                     Cell importeCell = row.getCell(5);
 
+                    Integer idFilaOrdenanza = row.getRowNum();
                     String aytoOrdenanza = aytoCell.getStringCellValue().trim().toUpperCase();
                     String tipo = tipoCell.getStringCellValue();
                     String unidadStr = unidadCell.getStringCellValue();
                     double minUnidad = minUnidadCell.getNumericCellValue();
                     double maxUnidad = maxUnidadCell.getNumericCellValue();
                     double importe = importeCell.getNumericCellValue();
+
+                    //Obtener la lista de ordenanzas si ya existe o hay que crear una nueva
+                    List<Ordenanza> listaOrdenanzas = ordenanzasMap.computeIfAbsent(idFilaOrdenanza, k -> new ArrayList<>());
+
+                    //Busca si ya existe la ordenanza
+                    Ordenanza ordenanza = listaOrdenanzas.stream().filter(ord -> ord.getId().equals(idFilaOrdenanza)).findFirst().orElse(null);
+
+                    //Si no existe, se crea y mapea
+                    if (ordenanza == null) {
+                        Ordenanza o = new Ordenanza();
+
+                        o.setId(idFilaOrdenanza);
+                        o.setAyuntamiento(aytoOrdenanza);
+                        o.setTipoVehiculo(tipo);
+                        o.setMinimoRango(String.valueOf(minUnidad));
+                        o.setMaximoRango(String.valueOf(maxUnidad));
+                        o.setImporte(importe);
+
+                        for (List<Vehiculos> listaVehiculos : vehiculosPojosContribuyentesMap.values()) {
+                            for (Vehiculos vP : listaVehiculos) {
+                                if (vP.getMatricula().equalsIgnoreCase(vehiculo.getMatricula())) {
+                                    //Si al vehiculo actual hay que asignarle esta ordenanza
+                                    if (c.getAytoCont().equals(aytoOrdenanza) && vP.getTipo().equals(tipo)) {
+
+                                        o.getVehiculoses().add(vP);
+                                        listaOrdenanzas.add(o);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        for (List<Vehiculos> listaVehiculos : vehiculosPojosContribuyentesMap.values()) {
+                            for (Vehiculos vP : listaVehiculos) {
+                                if (vP.getMatricula().equalsIgnoreCase(vehiculo.getMatricula())) {
+                                    //Si al vehiculo actual hay que asignarle esta ordenanza
+                                    if (c.getAytoCont().equals(aytoOrdenanza) && vP.getTipo().equals(tipo)) {
+
+                                        ordenanza.getVehiculoses().add(vP);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+
+
+
+
 
                     if (c.getAytoCont().equals(aytoOrdenanza) && vehiculo.getTipoVehiculo().equals(tipo)) {
                         if (vehiculo.getValorUnidad() >= minUnidad && vehiculo.getValorUnidad() <= maxUnidad) {
@@ -84,7 +138,6 @@ public class ImporteRecibo {
                 double totalRecibo = calculaTotalRecibo(anio, vehiculo);
 
                 vehiculo.setTotal(totalRecibo);
-
             }
         }
     }

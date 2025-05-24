@@ -1,6 +1,9 @@
 package ivtm;
 
 import java.util.*;
+
+import POJOS.Contribuyente;
+import POJOS.Vehiculos;
 import modelosExcel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -10,7 +13,7 @@ public class ValidadorVehiculo {
     private final String erroresVehiculosXML = "resources\\ErroresVehiculos.xml";
 
     /*Comprueba la validez de los datos del vehículo*/
-    public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap) {
+    public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap, Map<Integer, Contribuyente> contribuyentesPojosMap) {
         String matricula = matriculaCell.getStringCellValue().trim().toUpperCase();
         List<String> errores = new ArrayList<>();
 
@@ -36,7 +39,7 @@ public class ValidadorVehiculo {
         }
 
         if (errores.isEmpty()){
-            agregarVehiculo(vehiculosContribuyentesMap, row);
+            agregarVehiculo(vehiculosContribuyentesMap, vehiculosPojosContribuyentesMap, contribuyentesPojosMap ,row);
         }
         else {
             String aux="";
@@ -302,8 +305,8 @@ public class ValidadorVehiculo {
     * La clave del mapa es el NIFNIE, puesto que existe la posibilidad de que una persona tenga varios vehiculos (valor)
     * Cada vehiculo se asocia a un nif, por eso un nif puede asociarse a una lista de vehiculos
     */
-    public void agregarVehiculo (Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Row row) {
-        int idFila = row.getRowNum();
+    public void agregarVehiculo (Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap, Map<Integer, Contribuyente> contribuyentesPojosMap, Row row) {
+        Integer idFila = row.getRowNum();
         String nifPropietario = row.getCell(14).getStringCellValue().trim();
         String tipo = row.getCell(0).getStringCellValue();
         String marca = row.getCell(1).getStringCellValue();
@@ -405,7 +408,7 @@ public class ValidadorVehiculo {
 
         VehiculoExcel v = new VehiculoExcel();
         v.setIdFila(idFila);
-        v.setNifPropietario(nifPropietario);
+        v.setNifnifPropietario(nifPropietario);
         v.setTipoVehiculo(tipo);
         v.setMarca(marca);
         v.setModelo(modelo);
@@ -420,6 +423,57 @@ public class ValidadorVehiculo {
         v.setExenc_bonif(exencion);
 
         vehiculosContribuyentesMap.computeIfAbsent(nifPropietario, k -> new ArrayList<>()).add(v);
+
+        Vehiculos ve = new Vehiculos();
+        Contribuyente c = contribuyentesPojosMap.get(encontrarIdContribuyente(nifPropietario, contribuyentesPojosMap));
+
+        ve.setIdVehiculo(idFila);
+        ve.setContribuyente(c);
+        ve.setTipo(tipo);
+        ve.setMarca(marca);
+        ve.setModelo(modelo);
+        ve.setMatricula(matricula);
+        ve.setNumeroBastidor(bastidor);
+
+        switch (tipo) {
+            case "TURISMO":
+            case "TRACTOR":
+                ve.setCaballosFiscales(valorUnidad);
+                break;
+            case "CAMION":
+            case "REMOLQUE":
+                ve.setKgcarga(valorUnidad);
+                break;
+            case "MOTOCICLETA":
+            case "CICLOMOTOR":
+                ve.setCentrimetroscubicos(valorUnidad);
+            case "AUTOBUS":
+                ve.setPlazas(valorUnidad);
+        }
+
+        ve.setExencion(exencion);
+        ve.setFechaMatriculacion(fechaMatriculacion);
+        ve.setFechaAlta(fechaAlta);
+        ve.setFechaBaja(fechaBaja);
+        ve.setFechaBajaTemporal(fechaBajaTemp);
+
+        vehiculosPojosContribuyentesMap.computeIfAbsent(idFila, k -> new ArrayList<>()).add(ve);
+    }
+
+    private Integer encontrarIdContribuyente (String nif, Map<Integer, Contribuyente> contribuyentesPojosMap) {
+        for (Map.Entry<Integer, Contribuyente> entry : contribuyentesPojosMap.entrySet()) {
+            Contribuyente contribuyente = entry.getValue();
+            System.out.println("Buscando contribuyente con NIF: " + nif);
+            System.out.println("Comparando con NIF existente: " + contribuyente.getNifnie());
+            if (contribuyente.getNifnie().equalsIgnoreCase(nif)) {
+                System.out.println("Contribuyente encontrado con ID: " + entry.getKey());
+                return entry.getKey();
+            }
+        }
+        System.out.println("Contribuyente no encontrado para NIF: " + nif);
+        return null;
+
+
     }
 
 }
