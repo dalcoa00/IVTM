@@ -35,8 +35,8 @@
         <property name="plazas" type="java.lang.Double">
             <column name="plazas" precision="22" scale="0" />
         </property>
-        <property name="centrimetroscubicos" type="java.lang.Double">
-            <column name="centrimetroscubicos" precision="22" scale="0" />
+        <property name="centimetroscubicos" type="java.lang.Double">
+            <column name="centimetroscubicos" precision="22" scale="0" />
         </property>
         <property name="kgcarga" type="java.lang.Double">
             <column name="kgcarga" precision="22" scale="0" />

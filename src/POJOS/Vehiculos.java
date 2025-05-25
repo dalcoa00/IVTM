@@ -22,7 +22,7 @@ public class Vehiculos  implements java.io.Serializable {
      private String numeroBastidor;
      private Double caballosFiscales;
      private Double plazas;
-     private Double centrimetroscubicos;
+     private Double centimetroscubicos;
      private Double kgcarga;
      private Character exencion;
      private Date fechaMatriculacion;
@@ -46,7 +46,7 @@ public class Vehiculos  implements java.io.Serializable {
         this.fechaMatriculacion = fechaMatriculacion;
         this.fechaAlta = fechaAlta;
     }
-    public Vehiculos(Contribuyente contribuyente, Ordenanza ordenanza, String tipo, String marca, String modelo, String matricula, String numeroBastidor, Double caballosFiscales, Double plazas, Double centrimetroscubicos, Double kgcarga, Character exencion, Date fechaMatriculacion, Date fechaAlta, Date fechaBaja, Date fechaBajaTemporal, Set reciboses) {
+    public Vehiculos(Contribuyente contribuyente, Ordenanza ordenanza, String tipo, String marca, String modelo, String matricula, String numeroBastidor, Double caballosFiscales, Double plazas, Double centimetroscubicos, Double kgcarga, Character exencion, Date fechaMatriculacion, Date fechaAlta, Date fechaBaja, Date fechaBajaTemporal, Set reciboses) {
        this.contribuyente = contribuyente;
        this.ordenanza = ordenanza;
        this.tipo = tipo;
@@ -56,7 +56,7 @@ public class Vehiculos  implements java.io.Serializable {
        this.numeroBastidor = numeroBastidor;
        this.caballosFiscales = caballosFiscales;
        this.plazas = plazas;
-       this.centrimetroscubicos = centrimetroscubicos;
+       this.centimetroscubicos = centimetroscubicos;
        this.kgcarga = kgcarga;
        this.exencion = exencion;
        this.fechaMatriculacion = fechaMatriculacion;
@@ -136,12 +136,12 @@ public class Vehiculos  implements java.io.Serializable {
     public void setPlazas(Double plazas) {
         this.plazas = plazas;
     }
-    public Double getCentrimetroscubicos() {
-        return this.centrimetroscubicos;
+    public Double getCentimetroscubicos() {
+        return this.centimetroscubicos;
     }
     
-    public void setCentrimetroscubicos(Double centrimetroscubicos) {
-        this.centrimetroscubicos = centrimetroscubicos;
+    public void setCentimetroscubicos(Double centimetroscubicos) {
+        this.centimetroscubicos = centimetroscubicos;
     }
     public Double getKgcarga() {
         return this.kgcarga;

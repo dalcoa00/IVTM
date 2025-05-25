@@ -599,7 +599,7 @@ public class ExcelManager {
                 break;
             case "MOTOCICLETA":
             case "CICLOMOTOR":
-                rec.setValorUnidad(vPojos.getCentrimetroscubicos());
+                rec.setValorUnidad(vPojos.getCentimetroscubicos());
             case "AUTOBUS":
                 rec.setValorUnidad(vPojos.getPlazas());
         }
@@ -645,8 +645,8 @@ public class ExcelManager {
     /*Metodo que envía los Maps a los métodos que insertan/actualizan la DB*/
     public void actualizaDB() {
         InsertarActualizarDB db = new InsertarActualizarDB();
-        db.insertaActualizaOrdenanzas(ordenanzasMap);
         db.insertaActualizaContribuyentes(contribuyentesPojosMap);
+        db.insertaActualizaOrdenanzas(ordenanzasMap);
         db.insertaActualizaVehiculos(recibosPojosMap);
         db.insertaActualizaRecibos(recibosPojosMap);
     }

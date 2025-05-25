@@ -446,7 +446,7 @@ public class ValidadorVehiculo {
                 break;
             case "MOTOCICLETA":
             case "CICLOMOTOR":
-                ve.setCentrimetroscubicos(valorUnidad);
+                ve.setCentimetroscubicos(valorUnidad);
             case "AUTOBUS":
                 ve.setPlazas(valorUnidad);
         }
