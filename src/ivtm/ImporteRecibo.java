@@ -72,6 +72,7 @@ public class ImporteRecibo {
                         o.setId(idFilaOrdenanza);
                         o.setAyuntamiento(aytoOrdenanza);
                         o.setTipoVehiculo(tipo);
+                        o.setUnidad(unidadStr);
                         o.setMinimoRango(String.valueOf(minUnidad));
                         o.setMaximoRango(String.valueOf(maxUnidad));
                         o.setImporte(importe);

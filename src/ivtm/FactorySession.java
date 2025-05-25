@@ -9,7 +9,7 @@ public class FactorySession {
     /* Una única instancia de SessionFactory */
     public static SessionFactory getSessionFactory() {
         //Si no hay una sesión, se crea
-        if (sessionFactory == null) {
+        if (sessionFactory == null || sessionFactory.isClosed()) {
             try {
                 //Carga config desde hibernate.cfg.xml
                 sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
@@ -25,7 +25,7 @@ public class FactorySession {
 
     /* Cierra sessionFactory al finalizar el programa */
     public static void closeSessionFactory() {
-        if (sessionFactory != null) {
+        if (sessionFactory != null && !sessionFactory.isClosed()) {
             sessionFactory.close();
         }
     }

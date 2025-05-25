@@ -12,12 +12,19 @@ public class Ivtm {
         /* Práctica 1 */
         //p1();
 
-        /* Práctica 2, 3 y 4 */
+        /* Práctica 2, 3, 4 y 5 (generación PDFs)*/
         validateNUpdate(manager);
 
+        /*P5. Volcado de datos en MySQL*/
+        try {
+            manager.actualizaDB();
+        } finally {
+            FactorySession.closeSessionFactory();
+        }
 
         //Al finalizar la ejecución completa del programa se limpian los sets con los datos almacenados
-        //manager.cleanSets();
+
+        manager.cleanSets();
     }
 
     //Metodo de la p1 para no llenar el main de cosas que no se usan siempre
@@ -89,28 +96,4 @@ public class Ivtm {
         //pruebaConexion();
         
     }
-
-    /*public void pruebaConexion(){
-        Session session = IvtmSession.open();
-        IvtmTransaction transaction = new IvtmTransaction();
-
-        try{
-        transaction.beginTrans(session);
-
-            // Obtener la conexión JDBC desde la sesión Hibernate
-            Connection connection = session.doReturningWork(conn -> conn);
-
-            // Pasar esa conexión a otra clase que trabaja con JDBC directamente
-            ExcelManager.actulizaBD(connection);
-
-            transaction.commitTrans();
-        } catch (Exception e) {
-            transaction.rollbackTrans();
-            e.printStackTrace();
-        } finally {
-            session.close();
-            FactorySession.closeSessionFactory();
-        }
-            }*/
-
 }

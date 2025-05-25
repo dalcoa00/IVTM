@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.sql.Connection;
 
 /*Clase para la lectura y modificación de los ficheros Excel*/
 public class ExcelManager {
@@ -29,9 +28,9 @@ public class ExcelManager {
     Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap = new HashMap<>(); // <- Hoja vehiculos
     Map<String, List<ReciboExcel>> recibosMap = new HashMap<>(); //Recibos que se generan
 
-    Map<Integer, Contribuyente> contribuyentesPojosMap = new HashMap<>(); // <- Hoja Contribuyentes
-    Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap = new HashMap<>(); // <- Hoja vehiculos
-    Map<Integer, List<Recibos>> recibosPojosMap = new HashMap<>(); //Recibos que se generan
+    Map<Integer, Contribuyente> contribuyentesPojosMap = new HashMap<>();
+    Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap = new HashMap<>();
+    Map<Integer, List<Recibos>> recibosPojosMap = new HashMap<>();
     Map<Integer, List<Ordenanza>> ordenanzasMap = new HashMap<>();
 
     EditorXML editor = new EditorXML();
@@ -642,113 +641,14 @@ public class ExcelManager {
         c.getReciboses().add(rec);
     }
 
-    /*public void actualizaBD(Connection conexion) throws IOException {
-        int contador=0;
-
-        //Primero meter los datos de la ordenanza
-        leeOrdenanzaDB(conexion);
-
-        for (ContribuyenteExcel c : contribuyentesMap.values()) {
-            int idGenerado=contador++;
-            actualizar.insertarContribuyente(conexion, 
-            idGenerado,
-            c.getNombre(),
-            c.getApellido1(),
-            c.getApellido2(),
-            c.getNifnie(),
-            c.getDireccion(),
-            c.getNumero(),
-            c.getPaisCCC(),
-            c.getCCC(),
-            c.getIBAN(),
-            c.getEmail(),
-            c.getBonificacion(),
-            c.getAyuntamiento());
-        }
+    /*Metodo que envía los Maps a los métodos que insertan/actualizan la DB*/
+    public void actualizaDB() {
+        InsertarActualizarDB db = new InsertarActualizarDB();
+        db.insertaActualizaContribuyentes(contribuyentesPojosMap);
+        db.insertaActualizaVehiculos(recibosPojosMap);
+        db.insertaActualizaOrdenanzas(ordenanzasMap);
+        db.insertaActualizaRecibos(recibosPojosMap);
     }
-
-    public void leeOrdenanzaDB (Connection conexion) throws IOException {
-        String rutaOrdenanzas = "resources\\SistemasOrdenanzas.xlsx";
-
-        FileInputStream file = new FileInputStream(rutaOrdenanzas);
-        XSSFWorkbook wb = new XSSFWorkbook(file);
-        file.close();
-
-        //Se lee la hoja
-        XSSFSheet ws = wb.getSheetAt(0);
-        System.out.println("\nLeyendo hoja \"" + ws.getSheetName() + "\"");
-
-        //Iteración por las filas de la hoja
-        Iterator<Row> rowIter = ws.iterator();
-
-        //Para empezar en la fila 1
-        if(rowIter.hasNext()){
-            rowIter.next();
-        }
-
-        //Lee columna por columna de cada fila
-        while (rowIter.hasNext()) {
-            Row row = rowIter.next();
-
-            //Si la  fila esta vacia se las salta
-            if(isEmpty(row)){
-                System.out.println("Fila sin datos\n");
-
-                continue;
-            }
-
-            Iterator<Cell> cellIter = row.cellIterator();
-
-            Cell aytoCell = null;
-            Cell tipoVehiculoCell = null;
-            Cell unidadCell = null;
-            Cell minCell = null;
-            Cell maxCell = null;
-            Cell importeCell = null;
-
-            while (cellIter.hasNext()) {
-                Cell cell = cellIter.next();
-
-                if (cell.getColumnIndex() == 0) {
-                    aytoCell = cell;
-                }
-
-                if (cell.getColumnIndex() == 1) {
-                    tipoVehiculoCell= cell;
-                }
-
-                if (cell.getColumnIndex() == 2) {
-                    unidadCell = cell;
-                }
-
-                if (cell.getColumnIndex() == 3) {
-                    minCell = cell;
-                }
-
-                if (cell.getColumnIndex() == 4) {
-                    maxCell = cell;
-                }
-
-                if (cell.getColumnIndex() == 5) {
-                    importeCell = cell;
-                }
-            }
-
-            String ayto = aytoCell.getStringCellValue();
-            String tipoVehiculo = tipoVehiculoCell.getStringCellValue();
-            String unidad = unidadCell.getStringCellValue();
-            String min = minCell.getStringCellValue();
-            String max = maxCell.getStringCellValue();
-            double importe = importeCell.getNumericCellValue();
-
-            //Hay que quitar los IDs de los métodos de insertar en la DB
-            actualizar.insertarOrdenanza(conexion, 000, ayto, tipoVehiculo, unidad, min, max, importe);
-        }
-
-        wb.close();
-
-        System.out.println("\nSe ha completado la lectura del archivo y se han insertado los datos correctamente\n");
-    }*/
 
     /*Metodo que limpia los sets al finalizar la ejecución*/
     public void cleanSets() {
