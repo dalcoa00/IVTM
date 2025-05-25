@@ -64,7 +64,7 @@ public class ValidadorCCC {
         }
         return dniNie;
     }
-    public void comprobarCCC(Row row, XSSFWorkbook wb, String  ruta, int sheet, HashSet<String> cccSet, HashSet<String> dniSet, HashSet<String> correoSet, Cell dniCell, Cell cccCell, Map<String, ContribuyenteExcel> contribuyentesMap, Map<Integer, Contribuyente> contribuyentesPojosMap) {
+    public void comprobarCCC(Row row, XSSFWorkbook wb, String  ruta, int sheet, HashSet<String> cccSet, HashSet<String> dniSet, HashSet<String> correoSet, Cell dniCell, Cell cccCell, Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, Contribuyente> contribuyentesPojosMap) {
         //Una vez que se comprueba el CCC hay que generar el IBAN
         //Aunque el CCC sea erróneo (o se ha subsanado), si se puede generar el IBAN se genera y se incluye en erroresCCC o se actualiza en el Excel
         Integer[] factores = {1, 2, 4, 8, 5, 10, 9, 7, 3, 6};
@@ -259,7 +259,7 @@ public class ValidadorCCC {
     }
 
     /*Metodo que agrega el contribuyente al Map una vez sus datos han sido verificados o subsanados*/
-    public void agregarContribuyente (Map<String, ContribuyenteExcel> contribuyentesMap, Map<Integer, Contribuyente> contribuyentesPojosMap, Row row) {
+    public void agregarContribuyente (Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, Contribuyente> contribuyentesPojosMap, Row row) {
         DataFormatter formatter = new DataFormatter();
 
         Integer idFila = row.getRowNum();
@@ -294,7 +294,7 @@ public class ValidadorCCC {
 
         Contribuyente cont = new Contribuyente();
 
-        cont.setIdContribuyente(idFila);
+        //cont.setIdContribuyente(idFila);
         cont.setNombre(c.getNombre());
         cont.setApellido1(c.getApellido1());
         cont.setApellido2(c.getApellido2());
@@ -308,7 +308,7 @@ public class ValidadorCCC {
         cont.setBonificacion(c.getBonificacion());
         cont.setAyuntamiento(c.getAytoCont());
 
-        contribuyentesPojosMap.put(idFila, cont);
+        contribuyentesPojosMap.put(nifnie, cont);
     }
 
 }

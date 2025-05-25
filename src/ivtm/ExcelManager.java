@@ -28,10 +28,10 @@ public class ExcelManager {
     Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap = new HashMap<>(); // <- Hoja vehiculos
     Map<String, List<ReciboExcel>> recibosMap = new HashMap<>(); //Recibos que se generan
 
-    Map<Integer, Contribuyente> contribuyentesPojosMap = new HashMap<>();
-    Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap = new HashMap<>();
-    Map<Integer, List<Recibos>> recibosPojosMap = new HashMap<>();
-    Map<Integer, List<Ordenanza>> ordenanzasMap = new HashMap<>();
+    Map<String, Contribuyente> contribuyentesPojosMap = new HashMap<>();
+    Map<String, List<Vehiculos>> vehiculosPojosContribuyentesMap = new HashMap<>();
+    Map<String, List<Recibos>> recibosPojosMap = new HashMap<>();
+    Map<String, List<Ordenanza>> ordenanzasMap = new HashMap<>();
 
     EditorXML editor = new EditorXML();
     ReciboPDF reciboPDF = new ReciboPDF();
@@ -383,7 +383,7 @@ public class ExcelManager {
     }
 
     /* Metodo que imprime los recibos por pantalla y loa guarda en un Map (solo los que hay que generar)*/
-    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, int anio, Map<Integer, Contribuyente> contribuyentesPojosMap, Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap) throws IOException {
+    private void printContribuyentesVehiculos(Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, int anio, Map<String, Contribuyente> contribuyentesPojosMap, Map<String, List<Vehiculos>> vehiculosPojosContribuyentesMap) throws IOException {
         //Obtengo el día de hoy (Día que se genera el recibo)
         LocalDate hoy = LocalDate.now();
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -472,7 +472,7 @@ public class ExcelManager {
                 //Añade el recibo a Recibos.xml
                 editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal());
 
-                for (Map.Entry<Integer, List<Vehiculos>> entry2 : vehiculosPojosContribuyentesMap.entrySet()) {
+                for (Map.Entry<String, List<Vehiculos>> entry2 : vehiculosPojosContribuyentesMap.entrySet()) {
                     List<Vehiculos> vehiculosPojos = entry2.getValue();
 
                     // Validar lista de vehículos
@@ -485,7 +485,7 @@ public class ExcelManager {
                         Contribuyente contribuyente = vPojos.getContribuyente();
 
                         if (contribuyente == null) {
-                            System.out.println("Advertencia: Vehículo con ID " + vPojos.getIdVehiculo()
+                            System.out.println("Advertencia: Vehículo con matrícula " + vPojos.getMatricula()
                                     + " no tiene un contribuyente asociado. Se omite.");
                             continue; // Omitir este vehículo
                         }
@@ -495,13 +495,12 @@ public class ExcelManager {
                             continue;
                         }
 
-                        Integer idContribuyente = vPojos.getContribuyente().getIdContribuyente();
-                        Contribuyente cPojos = contribuyentesPojosMap.get(idContribuyente);
-                        System.out.println("aaaaa");
+                        String nifContribuyente = vPojos.getContribuyente().getNifnie();
+                        Contribuyente cPojos = contribuyentesPojosMap.get(nifContribuyente);
 
                         // Validar contribuyente
                         if (cPojos == null) {
-                            System.out.println("No se encontró contribuyente para ID: " + idContribuyente);
+                            System.out.println("No se encontró contribuyente con NIF: " + nifContribuyente);
                             continue;
                         }
 
@@ -547,7 +546,7 @@ public class ExcelManager {
 
         ReciboExcel r = new ReciboExcel();
 
-        r.setNumRecibo(numRecibo);
+        //r.setNumRecibo(numRecibo);
         r.setContribuyente(c);
         r.setVehiculo(v);
         r.setNifPropietario(nifPropietario);
@@ -563,7 +562,7 @@ public class ExcelManager {
 
         //Mapeo recibos POJOS
         Recibos rec = new Recibos();
-        rec.setNumRecibo(numRecibo);
+        //rec.setNumRecibo(numRecibo);
         rec.setContribuyente(cPojos);
         rec.setVehiculos(vPojos);
         rec.setFechaPadron(fechaPadron);
@@ -611,7 +610,9 @@ public class ExcelManager {
         rec.setEmail(cPojos.getEmail());
         rec.setAyuntamiento(cPojos.getAyuntamiento());
 
-        recibosPojosMap.computeIfAbsent(numRecibo, k -> new ArrayList<>()).add(rec);
+        String claveRecibos = nifPropietario + fechaPadron.toString() + vPojos.getMarca() + vPojos.getModelo();
+
+        recibosPojosMap.computeIfAbsent(claveRecibos, k -> new ArrayList<>()).add(rec);
 
         //Mapea los datos que faltaban en Contribuyente y Vehiculos
         mapeaRestantes(rec);

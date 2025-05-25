@@ -13,7 +13,7 @@ import java.util.Map;
 public class InsertarActualizarDB {
 
     /*Metodo que inserta/actualiza todos los contribuyentes correctos*/
-    public void insertaActualizaContribuyentes (Map<Integer, Contribuyente> contribuyentesPojosMap) {
+    public void insertaActualizaContribuyentes (Map<String, Contribuyente> contribuyentesPojosMap) {
         Session s = null;
         IvtmTransaction trans = new IvtmTransaction();
 
@@ -23,14 +23,14 @@ public class InsertarActualizarDB {
 
             int contador = 0;
 
-            for (Map.Entry<Integer, Contribuyente> entry : contribuyentesPojosMap.entrySet()) {
+            for (Map.Entry<String, Contribuyente> entry : contribuyentesPojosMap.entrySet()) {
                 Contribuyente cont = entry.getValue();
 
                 //Busca si ya existe en la DB (IdContribuyente)
                 Query<Contribuyente> query = s.createQuery(
-                        "from Contribuyente c where c.idContribuyente = :idContribuyente", Contribuyente.class);
+                        "from Contribuyente c where c.nifnie = :nifnie", Contribuyente.class);
 
-                query.setParameter("idContribuyente", cont.getIdContribuyente());
+                query.setParameter("nifnie", cont.getNifnie());
 
                 Contribuyente existe = query.uniqueResult();
 
@@ -79,7 +79,7 @@ public class InsertarActualizarDB {
     }
 
     /*Metodo que inserta/actualiza todos los vehiculos que han generado recibo*/
-    public void insertaActualizaVehiculos(Map<Integer, List<Recibos>> recibosPojosMap) {
+    public void insertaActualizaVehiculos(Map<String, List<Recibos>> recibosPojosMap) {
         Session s = null;
         IvtmTransaction trans = new IvtmTransaction();
 
@@ -89,7 +89,7 @@ public class InsertarActualizarDB {
 
             int contador = 0;
 
-            for (Map.Entry<Integer, List<Recibos>> entry : recibosPojosMap.entrySet()) {
+            for (Map.Entry<String, List<Recibos>> entry : recibosPojosMap.entrySet()) {
                 List<Recibos> listaRecibos = entry.getValue();
 
                 for (Recibos rec : listaRecibos) {
@@ -97,9 +97,9 @@ public class InsertarActualizarDB {
 
                     //Busca si ya existe en la DB (IdVehiculo)
                     Query<Vehiculos> query = s.createQuery(
-                            "from Vehiculos v where v.idVehiculo = :idVehiculo", Vehiculos.class);
+                            "from Vehiculos v where v.matricula = :matricula", Vehiculos.class);
 
-                    query.setParameter("idVehiculo", v.getIdVehiculo());
+                    query.setParameter("matricula", v.getMatricula());
 
                     Vehiculos existe = query.uniqueResult();
 
@@ -163,7 +163,7 @@ public class InsertarActualizarDB {
     }
 
     /*Metodo que inserta/actualiza las ordenanzas aplicadas a los vehículos que generan recibo*/
-    public void insertaActualizaOrdenanzas(Map<Integer, List<Ordenanza>> ordenanzasMap) {
+    public void insertaActualizaOrdenanzas(Map<String, List<Ordenanza>> ordenanzasMap) {
         Session s = null;
         IvtmTransaction trans = new IvtmTransaction();
 
@@ -173,7 +173,7 @@ public class InsertarActualizarDB {
 
             int contador = 0;
 
-            for (Map.Entry<Integer, List<Ordenanza>> entry : ordenanzasMap.entrySet()) {
+            for (Map.Entry<String, List<Ordenanza>> entry : ordenanzasMap.entrySet()) {
                 List<Ordenanza> listaOrdenanzas = entry.getValue();
 
                 for (Ordenanza ord : listaOrdenanzas) {
@@ -181,9 +181,13 @@ public class InsertarActualizarDB {
 
                     //Busca si ya existe en la DB (id)
                     Query<Ordenanza> query = s.createQuery(
-                            "from Ordenanza o where o.id = :id", Ordenanza.class);
+                            "from Ordenanza o where o.ayuntamiento = :ayuntamiento and o.tipoVehiculo = :tipo and o.unidad = :unidad and o.minimoRango = :min and o.maximoRango = :max", Ordenanza.class);
 
-                    query.setParameter("id", o.getId());
+                    query.setParameter("ayuntamiento", o.getAyuntamiento());
+                    query.setParameter("tipo", o.getTipoVehiculo());
+                    query.setParameter("unidad", o.getUnidad());
+                    query.setParameter("min", o.getMinimoRango());
+                    query.setParameter("max", o.getMaximoRango());
 
                     Ordenanza existe = query.uniqueResult();
 
@@ -226,7 +230,7 @@ public class InsertarActualizarDB {
     }
 
     /*Metodo que inserta/actualiza todos los recibos generados*/
-    public void insertaActualizaRecibos(Map<Integer, List<Recibos>> recibosPojosMap) {
+    public void insertaActualizaRecibos(Map<String, List<Recibos>> recibosPojosMap) {
         Session s = null;
         IvtmTransaction trans = new IvtmTransaction();
 
@@ -236,7 +240,7 @@ public class InsertarActualizarDB {
 
             int contador = 0;
 
-            for (Map.Entry<Integer, List<Recibos>> entry : recibosPojosMap.entrySet()) {
+            for (Map.Entry<String, List<Recibos>> entry : recibosPojosMap.entrySet()) {
                 List<Recibos> listaRecibos = entry.getValue();
 
                 for (Recibos rec : listaRecibos) {
@@ -244,9 +248,11 @@ public class InsertarActualizarDB {
 
                     //Busca si ya existe en la DB (numRecibo)
                     Query<Recibos> query = s.createQuery(
-                            "from Recibos r where r.numRecibo = :numRecibo", Recibos.class);
+                            "from Recibos r where r.nifContribuyente = :nif and r.fechaPadron = :fechaPadron and r.marcaModelo = :marcaModelo", Recibos.class);
 
-                    query.setParameter("numRecibo", r.getNumRecibo());
+                    query.setParameter("nif", r.getNifContribuyente());
+                    query.setParameter("fechaPadron", r.getFechaPadron());
+                    query.setParameter("marcaModelo", r.getMarcaModelo());
 
                     Recibos existe = query.uniqueResult();
 

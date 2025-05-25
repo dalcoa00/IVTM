@@ -13,7 +13,7 @@ public class ValidadorVehiculo {
     private final String erroresVehiculosXML = "resources\\ErroresVehiculos.xml";
 
     /*Comprueba la validez de los datos del vehículo*/
-    public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap, Map<Integer, Contribuyente> contribuyentesPojosMap) {
+    public void comprobarVehiculo (XSSFWorkbook wb, Row row, HashSet<String> matriculaSet, HashSet<String> dniSet, Cell matriculaCell, Cell tipoVehiculoCell, Cell fechaMatriculacionCell, Cell fechaAltaCell, Cell fechaBajaCell, Cell fechaBajaTempCell, Cell nifPropietarioCell, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<String, List<Vehiculos>> vehiculosPojosContribuyentesMap, Map<String, Contribuyente> contribuyentesPojosMap) {
         String matricula = matriculaCell.getStringCellValue().trim().toUpperCase();
         List<String> errores = new ArrayList<>();
 
@@ -305,7 +305,7 @@ public class ValidadorVehiculo {
     * La clave del mapa es el NIFNIE, puesto que existe la posibilidad de que una persona tenga varios vehiculos (valor)
     * Cada vehiculo se asocia a un nif, por eso un nif puede asociarse a una lista de vehiculos
     */
-    public void agregarVehiculo (Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap, Map<Integer, Contribuyente> contribuyentesPojosMap, Row row) {
+    public void agregarVehiculo (Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<String, List<Vehiculos>> vehiculosPojosContribuyentesMap, Map<String, Contribuyente> contribuyentesPojosMap, Row row) {
         Integer idFila = row.getRowNum();
         String nifPropietario = row.getCell(14).getStringCellValue().trim();
         String tipo = row.getCell(0).getStringCellValue();
@@ -427,7 +427,7 @@ public class ValidadorVehiculo {
         Vehiculos ve = new Vehiculos();
         Contribuyente c = contribuyentesPojosMap.get(encontrarIdContribuyente(nifPropietario, contribuyentesPojosMap));
 
-        ve.setIdVehiculo(idFila);
+        //ve.setIdVehiculo(idFila);
         ve.setContribuyente(c);
         ve.setTipo(tipo);
         ve.setMarca(marca);
@@ -457,11 +457,11 @@ public class ValidadorVehiculo {
         ve.setFechaBaja(fechaBaja);
         ve.setFechaBajaTemporal(fechaBajaTemp);
 
-        vehiculosPojosContribuyentesMap.computeIfAbsent(idFila, k -> new ArrayList<>()).add(ve);
+        vehiculosPojosContribuyentesMap.computeIfAbsent(matricula, k -> new ArrayList<>()).add(ve);
     }
 
-    private Integer encontrarIdContribuyente (String nif, Map<Integer, Contribuyente> contribuyentesPojosMap) {
-        for (Map.Entry<Integer, Contribuyente> entry : contribuyentesPojosMap.entrySet()) {
+    private String encontrarIdContribuyente (String nif, Map<String, Contribuyente> contribuyentesPojosMap) {
+        for (Map.Entry<String, Contribuyente> entry : contribuyentesPojosMap.entrySet()) {
             Contribuyente contribuyente = entry.getValue();
             System.out.println("Buscando contribuyente con NIF: " + nif);
             System.out.println("Comparando con NIF existente: " + contribuyente.getNifnie());

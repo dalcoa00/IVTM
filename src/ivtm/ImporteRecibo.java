@@ -14,7 +14,7 @@ import static ivtm.ExcelManager.isEmpty;
 public class ImporteRecibo {
 
     /*Calcula el importe que se debe pagar por cada vehículo*/
-    public void calculaImporte (XSSFSheet ws, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<String, ContribuyenteExcel> contribuyentesMap, Map<Integer, List<Ordenanza>> ordenanzasMap, Map<Integer, List<Vehiculos>> vehiculosPojosContribuyentesMap, int anio) {
+    public void calculaImporte (XSSFSheet ws, Map<String, List<VehiculoExcel>> vehiculosContribuyentesMap, Map<String, ContribuyenteExcel> contribuyentesMap, Map<String, List<Ordenanza>> ordenanzasMap, Map<String, List<Vehiculos>> vehiculosPojosContribuyentesMap, int anio) {
 
         for (Map.Entry<String, List<VehiculoExcel>> entry : vehiculosContribuyentesMap.entrySet()) {
             //Obtengo los propietarios para comparar el ayuntamiento
@@ -75,16 +75,17 @@ public class ImporteRecibo {
                     double importe = importeCell.getNumericCellValue();
 
                     //Obtener la lista de ordenanzas si ya existe o hay que crear una nueva
-                    List<Ordenanza> listaOrdenanzas = ordenanzasMap.computeIfAbsent(idFilaOrdenanza, k -> new ArrayList<>());
+                    String claveOrdenanza = aytoOrdenanza + tipo + unidadStr + minUnidad + maxUnidad;
+                    List<Ordenanza> listaOrdenanzas = ordenanzasMap.computeIfAbsent(claveOrdenanza, k -> new ArrayList<>());
 
                     //Busca si ya existe la ordenanza
-                    Ordenanza ordenanza = listaOrdenanzas.stream().filter(ord -> ord.getId().equals(idFilaOrdenanza)).findFirst().orElse(null);
+                    Ordenanza ordenanza = listaOrdenanzas.stream().filter(ord -> ord.getImporte() == importe).findFirst().orElse(null);
 
                     //Si no existe, se crea y mapea
                     if (ordenanza == null) {
                         Ordenanza o = new Ordenanza();
 
-                        o.setId(idFilaOrdenanza);
+                        //o.setId(idFilaOrdenanza);
                         o.setAyuntamiento(aytoOrdenanza);
                         o.setTipoVehiculo(tipo);
                         o.setUnidad(unidadStr);
@@ -97,14 +98,12 @@ public class ImporteRecibo {
                                 if (vP.getMatricula().equalsIgnoreCase(vehiculo.getMatricula())) {
                                     //Si al vehiculo actual hay que asignarle esta ordenanza
                                     if (c.getAytoCont().equals(aytoOrdenanza) && vP.getTipo().equals(tipo)) {
-
                                         o.getVehiculoses().add(vP);
-                                        listaOrdenanzas.add(o);
                                     }
-
                                 }
                             }
                         }
+                        listaOrdenanzas.add(o);
                     }
                     else {
                         for (List<Vehiculos> listaVehiculos : vehiculosPojosContribuyentesMap.values()) {
@@ -112,7 +111,6 @@ public class ImporteRecibo {
                                 if (vP.getMatricula().equalsIgnoreCase(vehiculo.getMatricula())) {
                                     //Si al vehiculo actual hay que asignarle esta ordenanza
                                     if (c.getAytoCont().equals(aytoOrdenanza) && vP.getTipo().equals(tipo)) {
-
                                         ordenanza.getVehiculoses().add(vP);
                                     }
 
@@ -120,10 +118,6 @@ public class ImporteRecibo {
                             }
                         }
                     }
-
-
-
-
 
                     if (c.getAytoCont().equals(aytoOrdenanza) && vehiculo.getTipoVehiculo().equals(tipo)) {
                         if (vehiculo.getValorUnidad() >= minUnidad && vehiculo.getValorUnidad() <= maxUnidad) {
