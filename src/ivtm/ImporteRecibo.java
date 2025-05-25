@@ -5,6 +5,7 @@ import POJOS.Vehiculos;
 import modelosExcel.ContribuyenteExcel;
 import modelosExcel.VehiculoExcel;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import java.util.*;
@@ -44,6 +45,10 @@ public class ImporteRecibo {
                         continue;
                     }
 
+                    for (Cell cell : row) {
+                        if (cell == null || cell.getCellType() == CellType.BLANK) row = rowIter.next();
+                    }
+
                     Cell aytoCell = row.getCell(0);
                     Cell tipoCell = row.getCell(1);
                     Cell unidadCell = row.getCell(2);
@@ -51,8 +56,18 @@ public class ImporteRecibo {
                     Cell maxUnidadCell = row.getCell(4);
                     Cell importeCell = row.getCell(5);
 
-                    Integer idFilaOrdenanza = row.getRowNum();
+                    if (aytoCell == null || aytoCell.getCellType() == CellType.BLANK) {
+                        System.out.println("❌ Celda de ayuntamiento vacía en fila " + row.getRowNum());
+                        continue;
+                    }
+
                     String aytoOrdenanza = aytoCell.getStringCellValue().trim().toUpperCase();
+                    if (aytoOrdenanza.isEmpty()) {
+                        System.out.println("❌ Ayuntamiento vacío tras trim en fila " + row.getRowNum());
+                        continue;
+                    }
+
+                    Integer idFilaOrdenanza = row.getRowNum();
                     String tipo = tipoCell.getStringCellValue();
                     String unidadStr = unidadCell.getStringCellValue();
                     double minUnidad = minUnidadCell.getNumericCellValue();

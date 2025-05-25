@@ -644,9 +644,9 @@ public class ExcelManager {
     /*Metodo que envía los Maps a los métodos que insertan/actualizan la DB*/
     public void actualizaDB() {
         InsertarActualizarDB db = new InsertarActualizarDB();
+        db.insertaActualizaOrdenanzas(ordenanzasMap);
         db.insertaActualizaContribuyentes(contribuyentesPojosMap);
         db.insertaActualizaVehiculos(recibosPojosMap);
-        db.insertaActualizaOrdenanzas(ordenanzasMap);
         db.insertaActualizaRecibos(recibosPojosMap);
     }
 

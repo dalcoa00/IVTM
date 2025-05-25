@@ -123,8 +123,18 @@ public class InsertarActualizarDB {
                         existe.setFechaBajaTemporal(v.getFechaBajaTemporal());
                         existe.setReciboses(v.getReciboses());
 
+                        if (v.getOrdenanza() != null) {
+                            v.getOrdenanza().getVehiculoses().add(existe);
+                        }
+
                         s.update(existe);
                     } else {
+                        Ordenanza ordenanza = v.getOrdenanza();
+
+                        if (ordenanza != null) {
+                            ordenanza.getVehiculoses().add(existe);
+                        }
+
                         s.save(v);
                     }
 
