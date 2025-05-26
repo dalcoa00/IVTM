@@ -472,7 +472,44 @@ public class ExcelManager {
                 //Añade el recibo a Recibos.xml
                 editor.xmlRecibo(recibosXML, fechaPadron, 0,totalVehiculos,totalVehiculos, v.getExencion(), v.getIdFila()+1, c.getNombre(), c.getApellido1(), c.getApellido2(), c.getNifnie(), c.getIban(), v.getTipoVehiculo(), v.getMarca(), v.getModelo(), v.getMatricula(), v.getTotal());
 
-                for (Map.Entry<String, List<Vehiculos>> entry2 : vehiculosPojosContribuyentesMap.entrySet()) {
+                String matricula = v.getMatricula().trim().toUpperCase();
+                List<Vehiculos> vehiculosPojos = vehiculosPojosContribuyentesMap.get(matricula);
+
+                if (vehiculosPojos == null ||vehiculosPojos.isEmpty()) {
+                    System.out.println("No se encontró ningun POJO de vehículo con matrícula " + matricula);
+                    continue;
+                }
+
+                //Por si acaso hay duplicados (no debería)
+                for (Vehiculos vPojos : vehiculosPojos) {
+                    if (vPojos == null) {
+                        System.out.println("Un vehículo en la lista con matrícula " + matricula + "es nulo");
+                        continue;
+                    }
+
+                    Contribuyente contribuyente = vPojos.getContribuyente();
+
+                    if (contribuyente == null) {
+                        System.out.println("El vehículo no tiene un propietario válido.");
+                        continue;
+                    }
+
+                    String nifContribuyente = contribuyente.getNifnie();
+                    Contribuyente cPojos = contribuyentesPojosMap.get(nifContribuyente);
+
+                    if (cPojos == null) {
+                        System.out.println("No se encontró contribuyente POJO con NIF: " + nifContribuyente);
+                        continue;
+                    }
+
+                    if (v.getImporte() >= 0.0 || v.getExencion() == 'S') {
+                        mapeaRecibos(c, v, i, vPojos, cPojos);
+                        i++;
+                    }
+
+                }
+
+                /*for (Map.Entry<String, List<Vehiculos>> entry2 : vehiculosPojosContribuyentesMap.entrySet()) {
                     List<Vehiculos> vehiculosPojos = entry2.getValue();
 
                     // Validar lista de vehículos
@@ -511,7 +548,7 @@ public class ExcelManager {
                             i++;
                         }
                     }
-                }
+                }*/
             }
         }
 

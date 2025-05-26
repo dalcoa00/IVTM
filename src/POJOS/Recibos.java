@@ -10,7 +10,7 @@ import java.util.Date;
 public class Recibos  implements java.io.Serializable {
 
 
-     private int numRecibo;
+     private Integer numRecibo;
      private Contribuyente contribuyente;
      private Vehiculos vehiculos;
      private Date fechaPadron;
@@ -32,7 +32,7 @@ public class Recibos  implements java.io.Serializable {
     }
 
 	
-    public Recibos(int numRecibo, Contribuyente contribuyente, Vehiculos vehiculos, Date fechaPadron, Date fechaRecibo, String nifContribuyente, String direccionCompleta, String tipoVehiculo, String marcaModelo, String unidad, double valorUnidad, double totalRecibo, String ayuntamiento) {
+    public Recibos(Integer numRecibo, Contribuyente contribuyente, Vehiculos vehiculos, Date fechaPadron, Date fechaRecibo, String nifContribuyente, String direccionCompleta, String tipoVehiculo, String marcaModelo, String unidad, double valorUnidad, double totalRecibo, String ayuntamiento) {
         this.numRecibo = numRecibo;
         this.contribuyente = contribuyente;
         this.vehiculos = vehiculos;
@@ -47,7 +47,7 @@ public class Recibos  implements java.io.Serializable {
         this.totalRecibo = totalRecibo;
         this.ayuntamiento = ayuntamiento;
     }
-    public Recibos(int numRecibo, Contribuyente contribuyente, Vehiculos vehiculos, Date fechaPadron, Date fechaRecibo, String nifContribuyente, String direccionCompleta, String iban, String tipoVehiculo, String marcaModelo, String unidad, double valorUnidad, double totalRecibo, Character exencion, Double bonificacion, String email, String ayuntamiento) {
+    public Recibos(Integer numRecibo, Contribuyente contribuyente, Vehiculos vehiculos, Date fechaPadron, Date fechaRecibo, String nifContribuyente, String direccionCompleta, String iban, String tipoVehiculo, String marcaModelo, String unidad, double valorUnidad, double totalRecibo, Character exencion, Double bonificacion, String email, String ayuntamiento) {
        this.numRecibo = numRecibo;
        this.contribuyente = contribuyente;
        this.vehiculos = vehiculos;
@@ -67,11 +67,11 @@ public class Recibos  implements java.io.Serializable {
        this.ayuntamiento = ayuntamiento;
     }
    
-    public int getNumRecibo() {
+    public Integer getNumRecibo() {
         return this.numRecibo;
     }
     
-    public void setNumRecibo(int numRecibo) {
+    public void setNumRecibo(Integer numRecibo) {
         this.numRecibo = numRecibo;
     }
     public Contribuyente getContribuyente() {

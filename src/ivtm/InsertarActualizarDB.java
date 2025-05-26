@@ -79,108 +79,108 @@ public class InsertarActualizarDB {
 
     /*Metodo que inserta/actualiza todos los vehiculos que han generado recibo*/
     public void insertaActualizaVehiculos(Map<String, List<Recibos>> recibosPojosMap) {
-    Session s = null;
-    IvtmTransaction trans = new IvtmTransaction();
+        Session s = null;
+        IvtmTransaction trans = new IvtmTransaction();
 
-    try {
-        s = IvtmSession.open();
-        trans.beginTrans(s);
+        try {
+            s = IvtmSession.open();
+            trans.beginTrans(s);
 
-        int contador = 0;
+            int contador = 0;
 
-        for (Map.Entry<String, List<Recibos>> entry : recibosPojosMap.entrySet()) {
-            List<Recibos> listaRecibos = entry.getValue();
+            for (Map.Entry<String, List<Recibos>> entry : recibosPojosMap.entrySet()) {
+                List<Recibos> listaRecibos = entry.getValue();
 
-            for (Recibos rec : listaRecibos) {
-                Vehiculos v = rec.getVehiculos();
+                for (Recibos rec : listaRecibos) {
+                    Vehiculos v = rec.getVehiculos();
 
-                // Verificar y asociar Contribuyente persistido
-                Contribuyente contrib = v.getContribuyente();
-                if (contrib != null && contrib.getNifnie() != null) {
-                    Query<Contribuyente> contQuery = s.createQuery(
-                        "from Contribuyente c where c.nifnie = :nif", Contribuyente.class);
-                    contQuery.setParameter("nif", contrib.getNifnie());
-                    Contribuyente persistido = contQuery.uniqueResult();
+                    // Verificar y asociar Contribuyente persistido
+                    Contribuyente contrib = v.getContribuyente();
+                    if (contrib != null && contrib.getNifnie() != null) {
+                        Query<Contribuyente> contQuery = s.createQuery(
+                            "from Contribuyente c where c.nifnie = :nif", Contribuyente.class);
+                        contQuery.setParameter("nif", contrib.getNifnie());
+                        Contribuyente persistido = contQuery.uniqueResult();
 
-                    if (persistido != null) {
-                        v.setContribuyente(persistido);
-                    } else {
-                        System.out.println("❗ Vehículo con matrícula " + v.getMatricula() + " tiene contribuyente no persistido. Se omite.");
-                        continue;
+                        if (persistido != null) {
+                            v.setContribuyente(persistido);
+                        } else {
+                            System.out.println("❗ Vehículo con matrícula " + v.getMatricula() + " tiene contribuyente no persistido. Se omite.");
+                            continue;
+                        }
                     }
-                }
 
-                // Verificar y asociar Ordenanza persistida
-                Ordenanza ord = v.getOrdenanza();
-                if (ord != null) {
-                    Query<Ordenanza> ordQuery = s.createQuery(
-                        "from Ordenanza o where o.ayuntamiento = :ayto and o.tipoVehiculo = :tipo and o.unidad = :unidad and o.minimoRango = :min and o.maximoRango = :max", Ordenanza.class);
-                    ordQuery.setParameter("ayto", ord.getAyuntamiento());
-                    ordQuery.setParameter("tipo", ord.getTipoVehiculo());
-                    ordQuery.setParameter("unidad", ord.getUnidad());
-                    ordQuery.setParameter("min", ord.getMinimoRango());
-                    ordQuery.setParameter("max", ord.getMaximoRango());
+                    // Verificar y asociar Ordenanza persistida
+                    Ordenanza ord = v.getOrdenanza();
+                    if (ord != null) {
+                        Query<Ordenanza> ordQuery = s.createQuery(
+                            "from Ordenanza o where o.ayuntamiento = :ayto and o.tipoVehiculo = :tipo and o.unidad = :unidad and o.minimoRango = :min and o.maximoRango = :max", Ordenanza.class);
+                        ordQuery.setParameter("ayto", ord.getAyuntamiento());
+                        ordQuery.setParameter("tipo", ord.getTipoVehiculo());
+                        ordQuery.setParameter("unidad", ord.getUnidad());
+                        ordQuery.setParameter("min", ord.getMinimoRango());
+                        ordQuery.setParameter("max", ord.getMaximoRango());
 
-                    Ordenanza ordPersistida = ordQuery.uniqueResult();
-                    if (ordPersistida != null) {
-                        v.setOrdenanza(ordPersistida);
-                        ordPersistida.getVehiculoses().add(v);
-                    } else {
-                        System.out.println("❗ Vehículo con matrícula " + v.getMatricula() + " tiene ordenanza no persistida. Se omite.");
-                        continue;
+                        Ordenanza ordPersistida = ordQuery.uniqueResult();
+                        if (ordPersistida != null) {
+                            v.setOrdenanza(ordPersistida);
+                            ordPersistida.getVehiculoses().add(v);
+                        } else {
+                            System.out.println("❗ Vehículo con matrícula " + v.getMatricula() + " tiene ordenanza no persistida. Se omite.");
+                            continue;
+                        }
                     }
-                }
 
-                // Buscar si ya existe el vehículo
-                Query<Vehiculos> query = s.createQuery(
-                    "from Vehiculos v where v.matricula = :matricula", Vehiculos.class);
-                query.setParameter("matricula", v.getMatricula());
+                    // Buscar si ya existe el vehículo
+                    Query<Vehiculos> query = s.createQuery(
+                        "from Vehiculos v where v.matricula = :matricula", Vehiculos.class);
+                    query.setParameter("matricula", v.getMatricula());
 
-                Vehiculos existe = query.uniqueResult();
+                    Vehiculos existe = query.uniqueResult();
 
-                if (existe != null) {
-                    // Actualizar campos
-                    existe.setContribuyente(v.getContribuyente());
-                    existe.setOrdenanza(v.getOrdenanza());
-                    existe.setTipo(v.getTipo());
-                    existe.setMarca(v.getMarca());
-                    existe.setModelo(v.getModelo());
-                    existe.setMatricula(v.getMatricula());
-                    existe.setNumeroBastidor(v.getNumeroBastidor());
-                    existe.setCaballosFiscales(v.getCaballosFiscales());
-                    existe.setPlazas(v.getPlazas());
-                    existe.setCentimetroscubicos(v.getCentimetroscubicos());
-                    existe.setKgcarga(v.getKgcarga());
-                    existe.setExencion(v.getExencion());
-                    existe.setFechaMatriculacion(v.getFechaMatriculacion());
-                    existe.setFechaAlta(v.getFechaAlta());
-                    existe.setFechaBaja(v.getFechaBaja());
-                    existe.setFechaBajaTemporal(v.getFechaBajaTemporal());
-                    existe.setReciboses(v.getReciboses());
+                    if (existe != null) {
+                        // Actualizar campos
+                        existe.setContribuyente(v.getContribuyente());
+                        existe.setOrdenanza(v.getOrdenanza());
+                        existe.setTipo(v.getTipo());
+                        existe.setMarca(v.getMarca());
+                        existe.setModelo(v.getModelo());
+                        existe.setMatricula(v.getMatricula());
+                        existe.setNumeroBastidor(v.getNumeroBastidor());
+                        existe.setCaballosFiscales(v.getCaballosFiscales());
+                        existe.setPlazas(v.getPlazas());
+                        existe.setCentimetroscubicos(v.getCentimetroscubicos());
+                        existe.setKgcarga(v.getKgcarga());
+                        existe.setExencion(v.getExencion());
+                        existe.setFechaMatriculacion(v.getFechaMatriculacion());
+                        existe.setFechaAlta(v.getFechaAlta());
+                        existe.setFechaBaja(v.getFechaBaja());
+                        existe.setFechaBajaTemporal(v.getFechaBajaTemporal());
+                        existe.setReciboses(v.getReciboses());
 
-                    s.update(existe);
-                } else {
-                    s.save(v);
-                }
+                        s.update(existe);
+                    } else {
+                        s.save(v);
+                    }
 
-                if (++contador % 50 == 0) {
-                    s.flush();
-                    s.clear();
+                    if (++contador % 50 == 0) {
+                        s.flush();
+                        s.clear();
+                    }
                 }
             }
+
+            trans.commitTrans();
+            System.out.println("Vehículos insertados/actualizados correctamente");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            trans.rollbackTrans();
+        } finally {
+            if (s != null) s.close();
+            FactorySession.closeSessionFactory();
         }
-
-        trans.commitTrans();
-        System.out.println("Vehículos insertados/actualizados correctamente");
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        trans.rollbackTrans();
-    } finally {
-        if (s != null) s.close();
-        FactorySession.closeSessionFactory();
     }
-}
 
 
 
@@ -253,92 +253,92 @@ public class InsertarActualizarDB {
 
     /*Metodo que inserta/actualiza todos los recibos generados*/
     public void insertaActualizaRecibos(Map<String, List<Recibos>> recibosPojosMap) {
-    Session s = null;
-    IvtmTransaction trans = new IvtmTransaction();
+        Session s = null;
+        IvtmTransaction trans = new IvtmTransaction();
 
-    try {
-        s = IvtmSession.open();
-        trans.beginTrans(s);
+        try {
+            s = IvtmSession.open();
+            trans.beginTrans(s);
 
-        int contador = 0;
+            int contador = 0;
 
-        for (Map.Entry<String, List<Recibos>> entry : recibosPojosMap.entrySet()) {
-            List<Recibos> listaRecibos = entry.getValue();
+            for (Map.Entry<String, List<Recibos>> entry : recibosPojosMap.entrySet()) {
+                List<Recibos> listaRecibos = entry.getValue();
 
-            for (Recibos r : listaRecibos) {
+                for (Recibos r : listaRecibos) {
 
-                // Buscar y asociar contribuyente persistido
-                if (r.getContribuyente() != null) {
-                    Query<Contribuyente> contribQuery = s.createQuery(
-                        "from Contribuyente c where c.nifnie = :nif", Contribuyente.class);
-                    contribQuery.setParameter("nif", r.getContribuyente().getNifnie());
-                    Contribuyente contribuyentePersistido = contribQuery.uniqueResult();
-                    r.setContribuyente(contribuyentePersistido); // puede quedar en null si no existe
-                }
+                    // Buscar y asociar contribuyente persistido
+                    if (r.getContribuyente() != null) {
+                        Query<Contribuyente> contribQuery = s.createQuery(
+                            "from Contribuyente c where c.nifnie = :nif", Contribuyente.class);
+                        contribQuery.setParameter("nif", r.getContribuyente().getNifnie());
+                        Contribuyente contribuyentePersistido = contribQuery.uniqueResult();
+                        r.setContribuyente(contribuyentePersistido); // puede quedar en null si no existe
+                    }
 
-                // Buscar y asociar vehículo persistido
-                if (r.getVehiculos() != null) {
-                    Query<Vehiculos> vehQuery = s.createQuery(
-                        "from Vehiculos v where v.matricula = :matricula", Vehiculos.class);
-                    vehQuery.setParameter("matricula", r.getVehiculos().getMatricula());
-                    Vehiculos vehiculoPersistido = vehQuery.uniqueResult();
-                    r.setVehiculos(vehiculoPersistido); // puede quedar en null si no existe
-                }
+                    // Buscar y asociar vehículo persistido
+                    if (r.getVehiculos() != null) {
+                        Query<Vehiculos> vehQuery = s.createQuery(
+                            "from Vehiculos v where v.matricula = :matricula", Vehiculos.class);
+                        vehQuery.setParameter("matricula", r.getVehiculos().getMatricula());
+                        Vehiculos vehiculoPersistido = vehQuery.uniqueResult();
+                        r.setVehiculos(vehiculoPersistido); // puede quedar en null si no existe
+                    }
 
-                // Buscar si el recibo ya está en la base de datos
-                Query<Recibos> query = s.createQuery(
-                    "from Recibos r where r.nifContribuyente = :nif and r.fechaPadron = :fechaPadron and r.marcaModelo = :marcaModelo", 
-                    Recibos.class);
-                query.setParameter("nif", r.getNifContribuyente());
-                query.setParameter("fechaPadron", r.getFechaPadron());
-                query.setParameter("marcaModelo", r.getMarcaModelo());
+                    // Buscar si el recibo ya está en la base de datos
+                    Query<Recibos> query = s.createQuery(
+                        "from Recibos r where r.nifContribuyente = :nif and r.fechaPadron = :fechaPadron and r.marcaModelo = :marcaModelo",
+                        Recibos.class);
+                    query.setParameter("nif", r.getNifContribuyente());
+                    query.setParameter("fechaPadron", r.getFechaPadron());
+                    query.setParameter("marcaModelo", r.getMarcaModelo());
 
-                Recibos existe = query.uniqueResult();
+                    Recibos existe = query.getResultList().stream().findFirst().orElse(null);
 
-                if (existe != null) {
-                    // Actualización de campos
-                    existe.setContribuyente(r.getContribuyente());
-                    existe.setVehiculos(r.getVehiculos());
-                    existe.setFechaPadron(r.getFechaPadron());
-                    existe.setFechaRecibo(r.getFechaRecibo());
-                    existe.setNifContribuyente(r.getNifContribuyente());
-                    existe.setDireccionCompleta(r.getDireccionCompleta());
-                    existe.setIban(r.getIban());
-                    existe.setTipoVehiculo(r.getTipoVehiculo());
-                    existe.setMarcaModelo(r.getMarcaModelo());
-                    existe.setUnidad(r.getUnidad());
-                    existe.setValorUnidad(r.getValorUnidad());
-                    existe.setTotalRecibo(r.getTotalRecibo());
-                    existe.setExencion(r.getExencion());
-                    existe.setBonificacion(r.getBonificacion());
-                    existe.setEmail(r.getEmail());
-                    existe.setAyuntamiento(r.getAyuntamiento());
+                    if (existe != null) {
+                        // Actualización de campos
+                        existe.setContribuyente(r.getContribuyente());
+                        existe.setVehiculos(r.getVehiculos());
+                        existe.setFechaPadron(r.getFechaPadron());
+                        existe.setFechaRecibo(r.getFechaRecibo());
+                        existe.setNifContribuyente(r.getNifContribuyente());
+                        existe.setDireccionCompleta(r.getDireccionCompleta());
+                        existe.setIban(r.getIban());
+                        existe.setTipoVehiculo(r.getTipoVehiculo());
+                        existe.setMarcaModelo(r.getMarcaModelo());
+                        existe.setUnidad(r.getUnidad());
+                        existe.setValorUnidad(r.getValorUnidad());
+                        existe.setTotalRecibo(r.getTotalRecibo());
+                        existe.setExencion(r.getExencion());
+                        existe.setBonificacion(r.getBonificacion());
+                        existe.setEmail(r.getEmail());
+                        existe.setAyuntamiento(r.getAyuntamiento());
 
-                    s.merge(existe);
-                } else {
-                    s.save(r);
+                        s.update(existe);
+                    } else {
+                        r.setNumRecibo(contador + 1);
+                        s.save(r);
+                    }
 
-                }
-
-                if (++contador % 50 == 0) {
-                    s.flush();
-                    s.clear();
+                    if (++contador % 50 == 0) {
+                        s.flush();
+                        s.clear();
+                    }
                 }
             }
-        }
 
-        trans.commitTrans();
-        System.out.println("Recibos insertados/actualizados correctamente en la DB");
+            trans.commitTrans();
+            System.out.println("Recibos insertados/actualizados correctamente en la DB");
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        trans.rollbackTrans();
-    } finally {
-        if (s != null) {
-            s.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            trans.rollbackTrans();
+        } finally {
+            if (s != null) {
+                s.close();
+            }
+            FactorySession.closeSessionFactory();
         }
-        FactorySession.closeSessionFactory();
     }
-}
 
 }
