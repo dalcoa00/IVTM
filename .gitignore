@@ -15,3 +15,8 @@ resources/SistemasVehiculos.xlsx
 /nbproject
 /build
 /nbproject
+build/classes/ivtm/Ivtm.class
+hibernate/hibernate.cfg.xml
+nbproject/private/private.xml
+nbproject/project.properties
+build/classes/ivtm/Ivtm.class
