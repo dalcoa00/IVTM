@@ -170,18 +170,6 @@ public class ValidadorVehiculo {
                     return false;
                 }
 
-            /*case "HISTORICO":
-                if (esMatriculaHistorico(matricula)) {
-                    //matriculaSet.add(matricula);
-                    System.out.println(matricula + " - Matrícula correcta.");
-
-                    return true;
-                } else {
-                    System.out.println(matricula + " - Matrícula incorrecta.");
-
-                    return false;
-                }*/
-
             default:
                 System.out.println("Tipo de vehículo no valido");
 
@@ -463,14 +451,14 @@ public class ValidadorVehiculo {
     private String encontrarIdContribuyente (String nif, Map<String, Contribuyente> contribuyentesPojosMap) {
         for (Map.Entry<String, Contribuyente> entry : contribuyentesPojosMap.entrySet()) {
             Contribuyente contribuyente = entry.getValue();
-            System.out.println("Buscando contribuyente con NIF: " + nif);
-            System.out.println("Comparando con NIF existente: " + contribuyente.getNifnie());
+            //System.out.println("Buscando contribuyente con NIF: " + nif);
+            //System.out.println("Comparando con NIF existente: " + contribuyente.getNifnie());
             if (contribuyente.getNifnie().equalsIgnoreCase(nif)) {
-                System.out.println("Contribuyente encontrado con ID: " + entry.getKey());
+                //System.out.println("Contribuyente encontrado con ID: " + entry.getKey());
                 return entry.getKey();
             }
         }
-        System.out.println("Contribuyente no encontrado para NIF: " + nif);
+        //System.out.println("Contribuyente no encontrado para NIF: " + nif);
         return null;
 
 

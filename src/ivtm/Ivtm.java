@@ -23,7 +23,6 @@ public class Ivtm {
         }
 
         //Al finalizar la ejecución completa del programa se limpian los sets con los datos almacenados
-
         manager.cleanSets();
     }
 
@@ -76,7 +75,7 @@ public class Ivtm {
         }
     }
 
-    //Prácticas 2, 3, 4 y 5
+    //Prácticas 2, 3 y 4
     public static void validateNUpdate(ExcelManager manager) {
         String rutaVehiculos = "resources\\SistemasVehiculos.xlsx";
         String rutaOrdenanzas = "resources\\SistemasOrdenanzas.xlsx";
@@ -91,9 +90,5 @@ public class Ivtm {
         /*También calcula el total de los recibos, los imprime por pantalla, genera los XMLs
         * Y crea los recibos en formato PDF*/
         manager.readExcel(rutaOrdenanzas, 0);
-
-        /*Práctica 5. Volcado de datos a la DB*/
-        //pruebaConexion();
-        
     }
 }

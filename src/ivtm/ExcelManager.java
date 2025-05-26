@@ -265,11 +265,6 @@ public class ExcelManager {
 
                 wb.close();
 
-                //DEPURACION
-                contribuyentesPojosMap.forEach((key, value) -> {
-                    System.out.println("ID: " + key + ", NIF: " + value.getNifnie());
-                });
-
                 /*Imprime por pantalla los recibos de los vehículos del año solicitado*/
                 printContribuyentesVehiculos(contribuyentesMap, vehiculosContribuyentesMap, anio, contribuyentesPojosMap, vehiculosPojosContribuyentesMap);
             }
@@ -503,52 +498,11 @@ public class ExcelManager {
                     }
 
                     if (v.getImporte() >= 0.0 || v.getExencion() == 'S') {
-                        mapeaRecibos(c, v, i, vPojos, cPojos);
+                        mapeaRecibos(c, v, i, vPojos, cPojos, anio);
                         i++;
                     }
 
                 }
-
-                /*for (Map.Entry<String, List<Vehiculos>> entry2 : vehiculosPojosContribuyentesMap.entrySet()) {
-                    List<Vehiculos> vehiculosPojos = entry2.getValue();
-
-                    // Validar lista de vehículos
-                    if (vehiculosPojos == null || vehiculosPojos.isEmpty()) {
-                        System.out.println("La lista de vehículos está vacía para la clave: " + entry2.getKey());
-                        continue;
-                    }
-
-                    for (Vehiculos vPojos : vehiculosPojos) {
-                        Contribuyente contribuyente = vPojos.getContribuyente();
-
-                        if (contribuyente == null) {
-                            System.out.println("Advertencia: Vehículo con matrícula " + vPojos.getMatricula()
-                                    + " no tiene un contribuyente asociado. Se omite.");
-                            continue; // Omitir este vehículo
-                        }
-
-                        if (vPojos == null) {
-                            System.out.println("Un vehículo en la lista es nulo.");
-                            continue;
-                        }
-
-                        String nifContribuyente = vPojos.getContribuyente().getNifnie();
-                        Contribuyente cPojos = contribuyentesPojosMap.get(nifContribuyente);
-
-                        // Validar contribuyente
-                        if (cPojos == null) {
-                            System.out.println("No se encontró contribuyente con NIF: " + nifContribuyente);
-                            continue;
-                        }
-
-                        //Añade el recibo al Map que almacena los recibos que se deben generar
-                        //Tanto de Pojos como los propios
-                        if (v.getImporte() >= 0.0 || v.getExencion() == 'S') {
-                            mapeaRecibos(c, v, i, vPojos, cPojos);
-                            i++;
-                        }
-                    }
-                }*/
             }
         }
 
@@ -556,14 +510,14 @@ public class ExcelManager {
         totalPadron = Math.round(totalPadron * 100.0) / 100.0;
         String fecha= "IVTM de "+anio;
         editor.modificarAtributosPadron(recibosXML, totalPadron, fecha, totalVehiculos);
-        System.out.println("Número de recibos generados: " + totalVehiculos);
+        //System.out.println("Número de recibos generados: " + totalVehiculos);
 
         System.out.println("\nIVTM de " + fechaPadron); //Siempre el 1 de enero del año solicitado
         System.out.println("Importe total del padrón (Suma de todos los recibos generados): " + totalPadron + "€");
         editor.ordenarVehiculosPorId(vehiculosRutaXML);
         editor.ordenarRecibosPorIdFila(recibosXML);
 
-        System.out.println("\n Número de recibos mapeados: " + recibosMap.size());
+        //System.out.println("\n Número de recibos mapeados: " + recibosMap.size());
 
         //Generación de recibos y resumen en formato PDF
         reciboPDF.generaRecibos(recibosMap, anio);
@@ -572,18 +526,16 @@ public class ExcelManager {
     }
 
     /*Metodo que mapea los recibos generados para un año usando como clave el nif del contribuyente*/
-    public void mapeaRecibos(ContribuyenteExcel c, VehiculoExcel v, int numRecibo, Vehiculos vPojos, Contribuyente cPojos) {
+    public void mapeaRecibos(ContribuyenteExcel c, VehiculoExcel v, int numRecibo, Vehiculos vPojos, Contribuyente cPojos, int anio) {
         LocalDate localDate = LocalDate.now();
         Date fechaRecibo = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        int anioPadron = LocalDate.now().getYear();
-        LocalDate unoDelUno = LocalDate.of(anioPadron, 1, 1);
+        LocalDate unoDelUno = LocalDate.of(anio, 1, 1);
         Date fechaPadron = Date.from(unoDelUno.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         String nifPropietario = v.getNifPropietario().trim();
 
         ReciboExcel r = new ReciboExcel();
 
-        //r.setNumRecibo(numRecibo);
         r.setContribuyente(c);
         r.setVehiculo(v);
         r.setNifPropietario(nifPropietario);
@@ -599,7 +551,6 @@ public class ExcelManager {
 
         //Mapeo recibos POJOS
         Recibos rec = new Recibos();
-        //rec.setNumRecibo(numRecibo);
         rec.setContribuyente(cPojos);
         rec.setVehiculos(vPojos);
         rec.setFechaPadron(fechaPadron);
@@ -641,7 +592,7 @@ public class ExcelManager {
                 rec.setValorUnidad(vPojos.getPlazas());
         }
 
-        rec.setTotalRecibo(v.getTotal());
+        rec.setTotalRecibo(Math.round(v.getTotal() * 100.0) / 100.0);
         rec.setExencion(vPojos.getExencion());
         rec.setBonificacion(cPojos.getBonificacion());
         rec.setEmail(cPojos.getEmail());

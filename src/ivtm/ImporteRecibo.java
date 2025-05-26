@@ -57,13 +57,13 @@ public class ImporteRecibo {
                     Cell importeCell = row.getCell(5);
 
                     if (aytoCell == null || aytoCell.getCellType() == CellType.BLANK) {
-                        System.out.println("❌ Celda de ayuntamiento vacía en fila " + row.getRowNum());
+                        //System.out.println("❌ Celda de ayuntamiento vacía en fila " + row.getRowNum());
                         continue;
                     }
 
                     String aytoOrdenanza = aytoCell.getStringCellValue().trim().toUpperCase();
                     if (aytoOrdenanza.isEmpty()) {
-                        System.out.println("❌ Ayuntamiento vacío tras trim en fila " + row.getRowNum());
+                        //System.out.println("❌ Ayuntamiento vacío tras trim en fila " + row.getRowNum());
                         continue;
                     }
 
@@ -89,9 +89,9 @@ public class ImporteRecibo {
                         o.setAyuntamiento(aytoOrdenanza);
                         o.setTipoVehiculo(tipo);
                         o.setUnidad(unidadStr);
-                        o.setMinimoRango(String.valueOf(minUnidad));
-                        o.setMaximoRango(String.valueOf(maxUnidad));
-                        o.setImporte(importe);
+                        o.setMinimoRango(String.format("%.2f", minUnidad));
+                        o.setMaximoRango(String.format("%.2f", maxUnidad));
+                        o.setImporte(Math.round(importe * 100.0) / 100.0);
 
                         for (List<Vehiculos> listaVehiculos : vehiculosPojosContribuyentesMap.values()) {
                             for (Vehiculos vP : listaVehiculos) {

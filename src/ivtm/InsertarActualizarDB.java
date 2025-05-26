@@ -1,7 +1,5 @@
 package ivtm;
 
-import ivtm.IvtmSession;
-import ivtm.IvtmTransaction;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import POJOS.*;
@@ -105,7 +103,7 @@ public class InsertarActualizarDB {
                         if (persistido != null) {
                             v.setContribuyente(persistido);
                         } else {
-                            System.out.println("❗ Vehículo con matrícula " + v.getMatricula() + " tiene contribuyente no persistido. Se omite.");
+                            //System.out.println("❗ Vehículo con matrícula " + v.getMatricula() + " tiene contribuyente no persistido. Se omite.");
                             continue;
                         }
                     }
@@ -126,7 +124,7 @@ public class InsertarActualizarDB {
                             v.setOrdenanza(ordPersistida);
                             ordPersistida.getVehiculoses().add(v);
                         } else {
-                            System.out.println("❗ Vehículo con matrícula " + v.getMatricula() + " tiene ordenanza no persistida. Se omite.");
+                            //System.out.println("❗ Vehículo con matrícula " + v.getMatricula() + " tiene ordenanza no persistida. Se omite.");
                             continue;
                         }
                     }
@@ -260,7 +258,11 @@ public class InsertarActualizarDB {
             s = IvtmSession.open();
             trans.beginTrans(s);
 
-            int contador = 0;
+            Integer ultNumRecibo = (Integer) s.createQuery("select MAX(r.numRecibo) FROM Recibos r").uniqueResult();
+
+            if (ultNumRecibo == null) {
+                ultNumRecibo = 0;
+            }
 
             for (Map.Entry<String, List<Recibos>> entry : recibosPojosMap.entrySet()) {
                 List<Recibos> listaRecibos = entry.getValue();
@@ -316,11 +318,11 @@ public class InsertarActualizarDB {
 
                         s.update(existe);
                     } else {
-                        r.setNumRecibo(contador + 1);
+                        r.setNumRecibo(++ultNumRecibo);
                         s.save(r);
                     }
 
-                    if (++contador % 50 == 0) {
+                    if (++ultNumRecibo % 50 == 0) {
                         s.flush();
                         s.clear();
                     }

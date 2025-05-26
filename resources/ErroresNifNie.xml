@@ -1,3 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Contribuyentes>
+<Contribuyente id="10">
+<NIF_NIE>a9731953D</NIF_NIE>
+<Nombre>Tomas</Nombre>
+<PrimerApellido>Cedron</PrimerApellido>
+<SegundoApellido>Perez</SegundoApellido>
+<TipoDeError>NIF ERRONEO</TipoDeError>
+</Contribuyente>
+<Contribuyente id="11">
+<NIF_NIE>a9733795B</NIF_NIE>
+<Nombre>Clotilde</Nombre>
+<PrimerApellido>Castro</PrimerApellido>
+<SegundoApellido>Presa</SegundoApellido>
+<TipoDeError>NIF ERRONEO</TipoDeError>
+</Contribuyente>
+<Contribuyente id="12">
+<NIF_NIE>a9734839C</NIF_NIE>
+<Nombre>Cristina</Nombre>
+<PrimerApellido>Alonso</PrimerApellido>
+<SegundoApellido>Prieto</SegundoApellido>
+<TipoDeError>NIF ERRONEO</TipoDeError>
+</Contribuyente>
 </Contribuyentes>
