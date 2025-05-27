@@ -536,6 +536,7 @@ public class ExcelManager {
 
         ReciboExcel r = new ReciboExcel();
 
+        r.setNumRecibo(numRecibo);
         r.setContribuyente(c);
         r.setVehiculo(v);
         r.setNifPropietario(nifPropietario);
